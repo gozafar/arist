@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #0c0a08;
+  --ink: #eae4dc;
+}
+
+body {
+  background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.04), transparent 30%),
+    radial-gradient(circle at 80% 0%, rgba(255, 255, 255, 0.05), transparent 25%),
+    radial-gradient(circle at 50% 80%, rgba(255, 255, 255, 0.03), transparent 35%),
+    linear-gradient(135deg, #0c0a08, #0f0c0a);
+  color: var(--ink);
+}
+
+a {
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+a:hover {
+  color: #e1c9aa;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0c0a08;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3a2a22;
+  border-radius: 9999px;
+}
+
+.container-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.section-heading {
+  @apply font-display text-3xl md:text-4xl lg:text-5xl tracking-tight;
+}
+
+.card-glass {
+  @apply bg-white/5 backdrop-blur-md border border-white/10 shadow-card;
+}
+
+.button-primary {
+  @apply inline-flex items-center justify-center rounded-full px-5 py-3 font-semibold text-sm tracking-wide transition hover:-translate-y-0.5 hover:shadow-soft bg-gradient-to-r from-sand-500 via-sand-400 to-sand-600 text-black shadow-card;
+}
+
+.button-outline {
+  @apply inline-flex items-center justify-center rounded-full px-5 py-3 font-semibold text-sm tracking-wide transition border border-white/20 text-white hover:bg-white/10;
+}
+
+.hero-gradient {
+  background: radial-gradient(circle at 20% 20%, rgba(229, 196, 146, 0.3), transparent 35%),
+    radial-gradient(circle at 80% 10%, rgba(255, 255, 255, 0.18), transparent 30%),
+    linear-gradient(135deg, rgba(26, 18, 14, 0.9), rgba(13, 10, 8, 0.9));
+}
