@@ -1,31 +1,88 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import AddToCartButton from "@/components/AddToCartButton";
-import { usePaintings } from "@/context/PaintingContext";
+import type { Metadata } from "next";
+import type { PaintingDTO } from "@/lib/dto";
+import { defaultKeywords, siteUrl } from "@/lib/seo";
 
-const PaintingDetailPage = ({ params }: { params: { id: string } }) => {
-  const { paintings } = usePaintings();
-  const painting = paintings.find((p) => p.id === params.id);
+type PaintingResponse = PaintingDTO;
+
+async function fetchPainting(id: string): Promise<PaintingResponse | null> {
+  const base = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+  const res = await fetch(`${base}/api/paintings/${id}`, {
+    next: { tags: ["paintings"] }
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error("Failed to load painting");
+  return (await res.json()) as PaintingResponse;
+}
+
+export const generateMetadata = async ({ params }: { params: { id: string } }): Promise<Metadata> => {
+  const painting = await fetchPainting(params.id);
   if (!painting) {
-    return (
-      <div className="mx-auto max-w-4xl px-4 py-16 text-center text-white/70 lg:px-6">
-        <p>Painting not found.</p>
-        <Link href="/paintings" className="mt-4 inline-block button-outline">
-          Back to gallery
-        </Link>
-      </div>
-    );
+    return { title: "Painting not found", robots: { index: false } };
+  }
+  const title = `${painting.title} | ${painting.medium} by Rakhi Vashisht`;
+  const description = `${painting.title} — ${painting.medium}, ${painting.size}. Original painting by Rakhi Vashisht.`;
+  return {
+    title,
+    description,
+    keywords: [...defaultKeywords, painting.title, painting.medium, ...(painting.tags ?? [])],
+    alternates: { canonical: `${siteUrl}/paintings/${painting.id}` },
+    openGraph: {
+      title,
+      description,
+      url: `${siteUrl}/paintings/${painting.id}`,
+      images: [{ url: painting.image, alt: `${painting.title} by Rakhi Vashisht` }]
+    },
+    twitter: {
+      title,
+      description,
+      images: [{ url: painting.image, alt: `${painting.title} by Rakhi Vashisht` }]
+    }
+  };
+};
+
+const PaintingDetailPage = async ({ params }: { params: { id: string } }) => {
+  const painting = await fetchPainting(params.id);
+  if (!painting) {
+    notFound();
   }
   const isSold = painting.availability === "sold";
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: painting.title,
+    image: [painting.image],
+    description: `${painting.title} - ${painting.medium}, ${painting.size}`,
+    brand: "Rakhi Studio",
+    sku: painting.id,
+    offers: {
+      "@type": "Offer",
+      priceCurrency: "USD",
+      price: painting.price,
+      availability: isSold ? "https://schema.org/SoldOut" : "https://schema.org/InStock",
+      url: `${siteUrl}/paintings/${painting.id}`
+    }
+  };
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
       <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
         <div className="card-glass relative overflow-hidden rounded-[30px] border border-white/10">
           <div className="relative aspect-[4/5]">
-            <Image src={painting.image} alt={painting.title} fill className="object-cover" priority />
+            <Image
+              src={painting.image}
+              alt={`${painting.title} by Rakhi Vashisht – ${painting.medium}`}
+              fill
+              className="object-cover"
+              priority
+            />
           </div>
         </div>
         <div className="space-y-5">

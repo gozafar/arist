@@ -6,13 +6,13 @@ import AdminGate from "@/components/admin/AdminGate";
 import AdminPaintingTable from "@/components/admin/AdminPaintingTable";
 import AdminPaintingForm from "@/components/admin/AdminPaintingForm";
 import AdminPagination from "@/components/admin/AdminPagination";
-import { Painting } from "@/data/paintings";
+import type { PaintingDTO } from "@/lib/dto";
 import { NewPaintingInput, usePaintings } from "@/context/PaintingContext";
 import { useEffect, useRef } from "react";
 
 const AdminPaintingsPage = () => {
   const { paintings, deletePainting, toggleAvailability, updatePainting } = usePaintings();
-  const [editing, setEditing] = useState<Painting | null>(null);
+  const [editing, setEditing] = useState<PaintingDTO | null>(null);
   const editRef = useRef<HTMLDivElement | null>(null);
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 8;

@@ -29,8 +29,8 @@ const Navbar = () => {
         <Link href="/" className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-full bg-gradient-to-br from-sand-500 to-sand-700 shadow-card" />
           <div>
-            <p className="text-xs uppercase tracking-[0.35em] text-white/70">Artist Portfolio</p>
-            <p className="font-display text-xl">Lipi Srivastava</p>
+            <p className="text-xs uppercase tracking-[0.35em] text-white/70">Rakhi Studio</p>
+            <p className="font-display text-xl">Rakhi Vashisht</p>
           </div>
         </Link>
 

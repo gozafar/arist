@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 import Button from "@/components/Button";
-import { Painting } from "@/data/paintings";
+import type { PaintingDTO } from "@/lib/dto";
 
 export type AdminPaintingTableProps = {
-  paintings: Painting[];
-  onEdit: (painting: Painting) => void;
+  paintings: PaintingDTO[];
+  onEdit: (painting: PaintingDTO) => void;
   onDelete: (id: string) => void;
   onToggle: (id: string) => void;
 };
