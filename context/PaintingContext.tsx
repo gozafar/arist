@@ -16,7 +16,7 @@ type NewPaintingInput = Omit<PaintingDTO, "id" | "createdAt" | "updatedAt" | "ye
 
 type PaintingContextValue = {
   paintings: Painting[];
-  addPainting: (painting: NewPaintingInput) => void;
+  addPainting: (painting: NewPaintingInput | FormData) => void;
   updatePainting: (id: string, painting: Partial<NewPaintingInput>) => void;
   deletePainting: (id: string) => void;
   toggleAvailability: (id: string) => void;
@@ -53,22 +53,14 @@ export const PaintingProvider = ({ children }: { children: ReactNode }) => {
     void load();
   }, []);
 
-  const addPainting = (painting: NewPaintingInput) => {
+  const addPainting = (painting: NewPaintingInput | FormData) => {
     const create = async () => {
-      const payload: PaintingDTO = {
-        ...painting,
-        year: painting.year ?? new Date().getFullYear(),
-        id: generateId(),
-        tags: painting.tags ?? [],
-        availability: painting.availability ?? "in-stock",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
       try {
-        const saved = await adminCreatePainting(payload);
+        const saved = await adminCreatePainting(painting as any);
         setPaintings((prev) => [saved, ...prev]);
       } catch {
-        setPaintings((prev) => [payload, ...prev]);
+        // For FormData, we can't create a local fallback
+        console.error('Failed to create painting');
       }
     };
     void create();

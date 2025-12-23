@@ -5,6 +5,9 @@ import Painting from "@/models/Painting";
 import AdminLog from "@/models/AdminLog";
 import { requireRole } from "@/lib/rbac";
 import { verifyAccessToken } from "@/lib/jwt";
+import fs from "fs";
+import path from "path";
+import { uploadOnCloudinary } from "../../cloudinary";
 
 export const dynamic = "force-dynamic";
 
@@ -33,29 +36,127 @@ export const GET = async (req: NextRequest) => {
   });
 };
 
+// export const POST = async (req: NextRequest) => {
+//   const authError = await requireRole(req, ["ADMIN", "SUPER_ADMIN"]);
+//   if (authError) return authError;
+
+//   await dbConnect();
+//   const payload = (await req.json()) as {
+//     title: string;
+//     description: string;
+//     price: number;
+//     medium: string;
+//     size: string;
+//     year: number;
+//     availability: "in-stock" | "sold";
+//     image: string;
+//     tags: string[];
+//     id?: string;
+//   };
+
+//   const token = req.cookies.get("access_token")?.value;
+//   const user = token ? verifyAccessToken(token) : null;
+//   const _id = payload.id || payload.title.toLowerCase().replace(/\s+/g, "-") + "-" + Date.now().toString(16);
+//   const created = await Painting.create({ ...payload, _id });
+//   if (user) await AdminLog.create({ adminId: user.userId, action: "CREATE_PAINTING", targetId: created._id });
+//   revalidateTag("paintings", "default");
+//   return NextResponse.json(created.toJSON(), { status: 201 });
+// };
+
+
 export const POST = async (req: NextRequest) => {
   const authError = await requireRole(req, ["ADMIN", "SUPER_ADMIN"]);
   if (authError) return authError;
 
   await dbConnect();
-  const payload = (await req.json()) as {
-    title: string;
-    description: string;
-    price: number;
-    medium: string;
-    size: string;
-    year: number;
-    availability: "in-stock" | "sold";
-    image: string;
-    tags: string[];
-    id?: string;
+
+  // Check if request is multipart/form-data
+  const contentType = req.headers.get('content-type');
+  if (!contentType || !contentType.includes('multipart/form-data')) {
+    return NextResponse.json(
+      { message: "Content-Type must be multipart/form-data" },
+      { status: 400 }
+    );
+  }
+
+  const formData = await req.formData();
+  const imageFile = formData.get('image') as File;
+  
+  if (!imageFile) {
+    return NextResponse.json(
+      { message: "Image is required" },
+      { status: 400 }
+    );
+  }
+
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+  if (!allowedTypes.includes(imageFile.type)) {
+    return NextResponse.json(
+      { message: "Only image files are allowed" },
+      { status: 400 }
+    );
+  }
+
+  console.log('Image validation passed:', imageFile.name, imageFile.type);
+
+  const tempDir = path.join(process.cwd(), "public/temp");
+  if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
+
+  const tempPath = path.join(tempDir, `${Date.now()}-${imageFile.name}`);
+  const buffer = Buffer.from(await imageFile.arrayBuffer());
+  fs.writeFileSync(tempPath, buffer);
+
+  console.log('Temp file created:', tempPath);
+
+  let cloudinaryRes: any;
+  cloudinaryRes = await uploadOnCloudinary(tempPath);
+
+  if (!cloudinaryRes) {
+    fs.unlinkSync(tempPath);
+    return NextResponse.json(
+      { message: "Image upload failed" },
+      { status: 500 }
+    );
+  }
+
+  console.log('Image uploaded to Cloudinary successfully:', cloudinaryRes.secure_url);
+
+  // Delete temp file
+  try {
+    if (fs.existsSync(tempPath)) {
+      fs.unlinkSync(tempPath);
+      console.log('Temp file deleted:', tempPath);
+    }
+  } catch (error) {
+    console.log('Temp file already deleted or not found:', tempPath);
+  }
+
+  const paintingData = {
+    title: formData.get('title') as string,
+    description: formData.get('description') as string,
+    price: Number(formData.get('price')),
+    medium: formData.get('medium') as string,
+    size: formData.get('size') as string,
+    year: Number(formData.get('year')),
+    availability: formData.get('availability') as "in-stock" | "sold",
+    tags: JSON.parse(formData.get('tags') as string || '[]'),
+    image: cloudinaryRes.secure_url,
   };
 
   const token = req.cookies.get("access_token")?.value;
   const user = token ? verifyAccessToken(token) : null;
-  const _id = payload.id || payload.title.toLowerCase().replace(/\s+/g, "-") + "-" + Date.now().toString(16);
-  const created = await Painting.create({ ...payload, _id });
-  if (user) await AdminLog.create({ adminId: user.userId, action: "CREATE_PAINTING", targetId: created._id });
+
+  const created = await Painting.create(paintingData);
+
+  if (user) {
+    await AdminLog.create({
+      adminId: user.userId,
+      action: "CREATE_PAINTING",
+      targetId: created._id,
+    });
+  }
+
   revalidateTag("paintings", "default");
-  return NextResponse.json(created.toJSON(), { status: 201 });
+
+  return NextResponse.json(created, { status: 201 });
 };

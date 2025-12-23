@@ -30,6 +30,7 @@ const emptyState: NewPaintingInput = {
 const AdminPaintingForm = ({ initial, onSubmit, mode = "create" }: AdminPaintingFormProps) => {
   const [form, setForm] = useState<NewPaintingInput>(initial ?? emptyState);
   const [preview, setPreview] = useState<string>(initial?.image ?? "");
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [status, setStatus] = useState<{ type: "success" | "error" | null; message: string } | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -43,10 +44,14 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = "create" }: AdminPainting
   const handleImage = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    
+    // Store the actual file for FormData upload
+    setImageFile(file);
+    
+    // Create preview URL
     const reader = new FileReader();
     reader.onload = (ev) => {
       const result = ev.target?.result as string;
-      setForm((prev) => ({ ...prev, image: result }));
       setPreview(result);
     };
     reader.readAsDataURL(file);
@@ -59,7 +64,7 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = "create" }: AdminPainting
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!form.title.trim()) newErrors.title = "Title is required";
-    if (!form.image) newErrors.image = "Image is required";
+    if (!imageFile && !form.image) newErrors.image = "Image is required";
     if (!form.price || Number.isNaN(Number(form.price))) newErrors.price = "Price is required";
     return newErrors;
   };
@@ -72,10 +77,28 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = "create" }: AdminPainting
       setStatus({ type: "error", message: "Please fix the highlighted fields." });
       return;
     }
-    onSubmit({ ...form, price: Number(form.price) });
+    
+    // Create FormData for API call
+    const formData = new FormData();
+    if (imageFile) {
+      formData.append('image', imageFile);
+    }
+    formData.append('title', form.title);
+    formData.append('description', form.description);
+    formData.append('price', String(form.price));
+    formData.append('medium', form.medium);
+    formData.append('size', form.size);
+    formData.append('year', String(form.year));
+    formData.append('availability', form.availability);
+    formData.append('tags', JSON.stringify(form.tags));
+    
+    // Call onSubmit with FormData instead of form data
+    onSubmit(formData as any);
+    
     if (mode === "create") {
       setForm(emptyState);
       setPreview("");
+      setImageFile(null);
     }
     setStatus({ type: "success", message: mode === "create" ? "Painting added." : "Painting updated." });
   };

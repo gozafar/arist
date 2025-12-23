@@ -1,5 +1,5 @@
 type FetchOptions = {
-  method?: "GET" | "POST" | "PATCH" | "DELETE";
+  method?: "GET" | "POST" | "PATCH" | "DELETE" | "PUT";
   body?: unknown;
   headers?: Record<string, string>;
   cache?: RequestCache;
@@ -38,7 +38,18 @@ export const apiFetch = async <T>(path: string, options: FetchOptions = {}): Pro
   const { method = "GET", body, headers = {}, cache, next, authToken } = options;
   const base = getBaseUrl();
   const url = `${base}${path}`;
-  const mergedHeaders: Record<string, string> = { ...defaultHeaders, ...headers };
+  
+  // Handle FormData differently
+  const isFormData = body instanceof FormData;
+  const mergedHeaders: Record<string, string> = { 
+    ...defaultHeaders, 
+    ...headers 
+  };
+
+  // Remove Content-Type for FormData (browser sets it automatically)
+  if (isFormData) {
+    delete mergedHeaders["Content-Type"];
+  }
 
   if (authToken) {
     mergedHeaders.Authorization = `Bearer ${authToken}`;
@@ -47,7 +58,7 @@ export const apiFetch = async <T>(path: string, options: FetchOptions = {}): Pro
   const response = await fetch(url, {
     method,
     headers: mergedHeaders,
-    body: body ? JSON.stringify(body) : undefined,
+    body: isFormData ? body : (body ? JSON.stringify(body) : undefined),
     cache,
     next
   });

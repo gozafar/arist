@@ -24,7 +24,7 @@ export const adminPaintingsList = (params?: { page?: number; limit?: number }) =
   });
 };
 
-export const adminCreatePainting = (payload: PaintingInput) =>
+export const adminCreatePainting = (payload: FormData | PaintingInput) =>
   apiFetch<PaintingDTO>(endpoints.admin.paintings.root, {
     method: "POST",
     body: payload,
@@ -33,7 +33,7 @@ export const adminCreatePainting = (payload: PaintingInput) =>
 
 export const adminUpdatePainting = (id: string, payload: Partial<PaintingInput>) =>
   apiFetch<PaintingDTO>(endpoints.admin.paintings.detail(id), {
-    method: "PATCH",
+    method: "PUT",
     body: payload,
     cache: "no-store"
   });
@@ -50,3 +50,28 @@ export const adminToggleAvailability = (id: string, availability: "in-stock" | "
     body: { availability },
     cache: "no-store"
   });
+
+export const adminDeleteImage = (publicId: string) =>
+  apiFetch<{ message: string; success: boolean }>(`/api/admin/cloudinary?publicId=${encodeURIComponent(publicId)}`, {
+    method: "DELETE",
+    cache: "no-store"
+  });
+
+export const adminUpdateImage = (imageFile: File, existingPublicId?: string) => {
+  const formData = new FormData();
+  formData.append('image', imageFile);
+  if (existingPublicId) {
+    formData.append('existingPublicId', existingPublicId);
+  }
+  
+  return apiFetch<{ 
+    message: string; 
+    success: boolean; 
+    image: string; 
+    publicId: string; 
+  }>('/api/admin/cloudinary', {
+    method: "POST",
+    body: formData,
+    cache: "no-store"
+  });
+};
