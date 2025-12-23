@@ -25,6 +25,7 @@ export const endpoints = {
       detail: (id: string) => `/api/admin/paintings/${id}`,
       availability: (id: string) => `/api/admin/paintings/${id}/availability`
     },
-    uploadSign: "/api/admin/uploads/sign"
+    uploadSign: "/api/admin/uploads/sign",
+    category: "/api/admin/category"
   }
 };

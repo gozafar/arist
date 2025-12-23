@@ -2,6 +2,21 @@ import { dbConnect } from "@/lib/db";
 import { requireRole } from "@/lib/rbac";
 import Category from "@/models/Category";
 import { NextRequest, NextResponse } from "next/server";
+import mongoose from "mongoose";
+
+interface CategoryDocument {
+  _id: mongoose.Types.ObjectId;
+  categoryName: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface CategoryResponse {
+  id: string;
+  categoryName: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export const POST = async (req: NextRequest) => {
   const authError = await requireRole(req, ["ADMIN", "SUPER_ADMIN"]);
@@ -52,8 +67,15 @@ export const GET = async (req: NextRequest) => {
       .sort({ createdAt: -1 })
       .lean();
 
+    // Transform _id to id for frontend compatibility
+    const transformedCategories: CategoryResponse[] = categories.map((cat) => ({
+      categoryName: cat.categoryName as string,
+      createdAt: cat.createdAt as string,
+      updatedAt: cat.updatedAt as string,
+      id: (cat._id as mongoose.Types.ObjectId).toString()
+    }));
 
-    return NextResponse.json(categories);
+    return NextResponse.json(transformedCategories);
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to fetch categories" },

@@ -75,3 +75,28 @@ export const adminUpdateImage = (imageFile: File, existingPublicId?: string) => 
     cache: "no-store"
   });
 };
+
+export const adminCreateCategory = (categoryName: string) =>
+  apiFetch(endpoints.admin.category, {
+    method: "POST",
+    body: { categoryName },
+    cache: "no-store"
+  });
+
+export const adminUpdateCategory = (id: string, categoryName: string) =>
+  apiFetch(`${endpoints.admin.category}/${id}`, {
+    method: "PUT",
+    body: { categoryName },
+    cache: "no-store"
+  });
+
+export const adminDeleteCategory = (id: string) =>
+  apiFetch(`${endpoints.admin.category}/${id}`, {
+    method: "DELETE",
+    cache: "no-store"
+  });
+
+export const adminGetCategories = () =>
+  apiFetch<{ id: string; categoryName: string; createdAt: string; updatedAt: string }[]>(endpoints.admin.category, {
+    cache: "no-store"
+  });

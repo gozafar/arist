@@ -1,18 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import AdminGate from "@/components/admin/AdminGate";
 import AdminPaintingTable from "@/components/admin/AdminPaintingTable";
 import AdminPaintingForm from "@/components/admin/AdminPaintingForm";
 import AdminPagination from "@/components/admin/AdminPagination";
+import AddCategoryModal from "@/components/admin/AddCategoryModal";
 import type { PaintingDTO } from "@/lib/dto";
 import { NewPaintingInput, usePaintings } from "@/context/PaintingContext";
-import { useEffect, useRef } from "react";
 
 const AdminPaintingsPage = () => {
   const { paintings, deletePainting, toggleAvailability, updatePainting } = usePaintings();
   const [editing, setEditing] = useState<PaintingDTO | null>(null);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const editRef = useRef<HTMLDivElement | null>(null);
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 8;
@@ -27,6 +28,10 @@ const AdminPaintingsPage = () => {
       updatePainting(editing.id, payload);
       setEditing(null);
     }
+  };
+
+  const handleCategoryAdded = () => {
+    // Refresh categories if needed
   };
 
   useEffect(() => {
@@ -44,9 +49,25 @@ const AdminPaintingsPage = () => {
             <h1 className="section-heading">Manage paintings</h1>
             <p className="text-white/70">Edit, toggle availability, or delete artworks.</p>
           </div>
-          <Link href="/admin/paintings/add" className="button-primary text-xs">
-            Add new
-          </Link>
+          <div className="flex items-center space-x-3 ml-auto">
+             <button
+              onClick={() => setIsCategoryModalOpen(true)}
+              className="button-primary text-xs"
+            >
+              LIst category
+            </button>
+            <button
+              onClick={() => setIsCategoryModalOpen(true)}
+              className="button-primary text-xs"
+            >
+              Add category
+            </button>
+            <Link href="/admin/paintings/add" className="button-primary text-xs">
+              Add new
+            </Link>
+          </div>
+
+
         </div>
 
         <AdminPaintingTable
@@ -74,6 +95,12 @@ const AdminPaintingsPage = () => {
             />
           </div>
         )}
+
+        <AddCategoryModal
+          isOpen={isCategoryModalOpen}
+          onClose={() => setIsCategoryModalOpen(false)}
+          onCategoryAdded={handleCategoryAdded}
+        />
       </div>
     </AdminGate>
   );

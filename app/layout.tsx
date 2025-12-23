@@ -6,6 +6,8 @@ import Footer from "@/components/Footer";
 import { CartProvider } from "@/context/CartContext";
 import { PaintingProvider } from "@/context/PaintingContext";
 import { defaultDescription, defaultKeywords, siteUrl } from "@/lib/seo";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
 const sora = Sora({ subsets: ["latin"], variable: "--font-sora" });
@@ -66,6 +68,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 />
                 {children}
               </main>
+              <ToastContainer
+                position='bottom-right'
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme='light'
+              />
               <Footer />
             </div>
           </CartProvider>
