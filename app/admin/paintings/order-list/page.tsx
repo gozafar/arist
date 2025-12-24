@@ -110,9 +110,9 @@ export default function OrderListPage() {
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <h3 className="font-semibold text-white mb-2">Order #{order._id.slice(-8)}</h3>
-                      {/* <p className="text-sm text-white/70">
+                      <p className="text-sm text-white/70">
                         {new Date(order.createdAt).toLocaleDateString()}
-                      </p> */}
+                      </p>
                     </div>
                     <button
                       onClick={() => fetchOrderDetails(order._id)}
