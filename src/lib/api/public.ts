@@ -2,6 +2,30 @@ import { apiFetch } from "./client";
 import { endpoints } from "./endpoints";
 import { AddressDTO, CartLineDTO, Paginated, PaintingDTO } from "../dto";
 
+interface Painting {
+  _id: string;
+  title: string;
+  price: number;
+  image: string;
+  availability: string;
+}
+
+interface Order {
+  _id: string;
+  user: {
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+    city: string;
+    state: string;
+    postal: string;
+  };
+  paintingId: string | Painting;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export const getPaintings = (params?: { page?: number; limit?: number; availability?: string }) => {
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));
@@ -86,4 +110,18 @@ export const createPaintingOrder = (payload: {
     body: payload,
     cache: "no-store"
   });
+
+export const getAllOrders = () =>
+  apiFetch<{ success: boolean; payload: Order[]; count: number }>(endpoints.admin.paintingOrder.root, {
+    method: "GET",
+    cache: "no-store"
+  });
+
+export const getOrderById = (id: string) =>
+  apiFetch<{ success: boolean; data: Order }>(endpoints.admin.paintingOrder.detail(id), {
+    method: "GET",
+    cache: "no-store"
+  });
+
+
 

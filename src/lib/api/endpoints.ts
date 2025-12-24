@@ -21,6 +21,10 @@ export const endpoints = {
   },
   paintingOrder: "/api/painting-order",
   admin: {
+      paintingOrder: {
+        root: "/api/admin/painting-order",
+        detail: (id: string) => `/api/admin/painting-order/${id}`
+      },
     paintings: {
       root: "/api/admin/paintings",
       detail: (id: string) => `/api/admin/paintings/${id}`,

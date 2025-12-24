@@ -1,4 +1,4 @@
-import { Schema, model, models } from "mongoose";
+import { Schema, model, models, Types } from "mongoose";
 
 export interface PaintingOrderDoc{
   user: {
@@ -10,7 +10,7 @@ export interface PaintingOrderDoc{
     state: string;
     postal: string;
   };
-  paintingId: string;
+  paintingId: Types.ObjectId;
 //   quantity: number;
 //   status: "pending" | "confirmed" | "shipped" | "delivered";
   createdAt: Date;
@@ -28,7 +28,7 @@ const PaintingOrderSchema = new Schema<PaintingOrderDoc>(
       state: { type: String, required: true },
       postal: { type: String, required: true },
     },
-    paintingId: { type: String, required: true, ref: 'Painting' },
+    paintingId: { type: Schema.Types.ObjectId, required: true, ref: 'Painting' },
     // quantity: { type: Number, required: true },
     // status: { type: String, enum: ["pending", "confirmed", "shipped", "delivered"], default: "pending" },
   },
