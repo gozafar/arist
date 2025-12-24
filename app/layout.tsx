@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Playfair_Display, Sora } from "next/font/google";
+import { Playfair_Display, Montserrat } from "next/font/google";
 import "@/styles/globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -8,12 +8,12 @@ import { PaintingProvider } from "@/context/PaintingContext";
 import { defaultDescription, defaultKeywords, siteUrl } from "@/lib/seo";
 
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
-const sora = Sora({ subsets: ["latin"], variable: "--font-sora" });
+const montserrat = Montserrat({ subsets: ["latin"], variable: "--font-montserrat" });
 
 export const metadata: Metadata = {
   title: {
-    default: "Rakhi Studio | Art & Portfolio",
-    template: "%s | Rakhi Studio"
+    default: "Artistry – Online Painting Gallery",
+    template: "%s | Artistry Gallery"
   },
   description: defaultDescription,
   keywords: defaultKeywords,
@@ -22,16 +22,16 @@ export const metadata: Metadata = {
     canonical: siteUrl
   },
   openGraph: {
-    title: "Rakhi Studio | Art & Portfolio",
+    title: "Artistry – Online Painting Gallery",
     description: defaultDescription,
     url: siteUrl,
-    siteName: "Rakhi Studio",
+    siteName: "Artistry Gallery",
     locale: "en_US",
     type: "website"
   },
   twitter: {
     card: "summary_large_image",
-    title: "Rakhi Studio | Art & Portfolio",
+    title: "Artistry – Online Painting Gallery",
     description: defaultDescription
   }
 };
@@ -39,13 +39,13 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#0c0a08"
+  themeColor: "#F8F5F0"
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${sora.variable} ${playfair.variable} font-sans antialiased text-white`}>
+      <body className={`${montserrat.variable} ${playfair.variable} font-sans antialiased`}>
         <PaintingProvider>
           <CartProvider>
             <div className="min-h-screen flex flex-col">

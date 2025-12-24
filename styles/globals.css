@@ -3,24 +3,31 @@
 @tailwind utilities;
 
 :root {
-  --bg: #0c0a08;
-  --ink: #eae4dc;
+  --bg: #f8f5f0;
+  --ink: #1c1c1c;
+  --muted: rgba(28, 28, 28, 0.7);
+  --muted-soft: rgba(28, 28, 28, 0.55);
+  --surface: #ffffff;
+  --surface-soft: #f2e9da;
+  --accent: #b89b5e;
+  --accent-strong: #a2803e;
 }
 
 body {
-  background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.04), transparent 30%),
-    radial-gradient(circle at 80% 0%, rgba(255, 255, 255, 0.05), transparent 25%),
-    radial-gradient(circle at 50% 80%, rgba(255, 255, 255, 0.03), transparent 35%),
-    linear-gradient(135deg, #0c0a08, #0f0c0a);
+  background:
+    radial-gradient(circle at 20% 18%, rgba(184, 155, 94, 0.16), transparent 32%),
+    radial-gradient(circle at 78% 0%, rgba(157, 133, 90, 0.12), transparent 26%),
+    linear-gradient(135deg, #f8f5f0, #f1ebdf);
   color: var(--ink);
 }
 
 a {
+  color: inherit;
   transition: color 0.2s ease, opacity 0.2s ease;
 }
 
 a:hover {
-  color: #e1c9aa;
+  color: var(--accent);
 }
 
 ::-webkit-scrollbar {
@@ -28,11 +35,11 @@ a:hover {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0c0a08;
+  background: var(--surface);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #3a2a22;
+  background: #d3c5a4;
   border-radius: 9999px;
 }
 
@@ -44,22 +51,102 @@ a:hover {
 
 .section-heading {
   @apply font-display text-3xl md:text-4xl lg:text-5xl tracking-tight;
+  color: var(--ink);
 }
 
 .card-glass {
-  @apply bg-white/5 backdrop-blur-md border border-white/10 shadow-card;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(28, 28, 28, 0.08);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 28px 80px -48px rgba(28, 28, 28, 0.25);
 }
 
 .button-primary {
-  @apply inline-flex items-center justify-center rounded-full px-5 py-3 font-semibold text-sm tracking-wide transition hover:-translate-y-0.5 hover:shadow-soft bg-gradient-to-r from-sand-500 via-sand-400 to-sand-600 text-black shadow-card;
+  @apply inline-flex items-center justify-center rounded-full px-5 py-3 font-semibold text-sm tracking-wide transition hover:-translate-y-0.5 hover:shadow-soft;
+  background: linear-gradient(120deg, #b89b5e, #d2ba80, #b89b5e);
+  color: var(--ink);
+  box-shadow: 0 16px 40px -18px rgba(184, 155, 94, 0.55);
 }
 
 .button-outline {
-  @apply inline-flex items-center justify-center rounded-full px-5 py-3 font-semibold text-sm tracking-wide transition border border-white/20 text-white hover:bg-white/10;
+  @apply inline-flex items-center justify-center rounded-full px-5 py-3 font-semibold text-sm tracking-wide transition;
+  border: 1px solid rgba(28, 28, 28, 0.12);
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 10px 26px -18px rgba(28, 28, 28, 0.18);
+  backdrop-filter: blur(4px);
+}
+
+.button-outline:hover {
+  border-color: rgba(28, 28, 28, 0.18);
+  background: rgba(255, 255, 255, 0.9);
 }
 
 .hero-gradient {
-  background: radial-gradient(circle at 20% 20%, rgba(229, 196, 146, 0.3), transparent 35%),
-    radial-gradient(circle at 80% 10%, rgba(255, 255, 255, 0.18), transparent 30%),
-    linear-gradient(135deg, rgba(26, 18, 14, 0.9), rgba(13, 10, 8, 0.9));
+  background:
+    radial-gradient(circle at 12% 18%, rgba(184, 155, 94, 0.2), transparent 30%),
+    radial-gradient(circle at 86% 12%, rgba(255, 255, 255, 0.4), transparent 22%),
+    linear-gradient(135deg, #fdfaf5, #f2e9da);
+  box-shadow: 0 30px 90px -60px rgba(28, 28, 28, 0.3);
+}
+
+/* Palette overrides to match the light gallery theme */
+.text-white {
+  color: var(--ink) !important;
+}
+
+.text-white\/80 {
+  color: rgba(28, 28, 28, 0.8) !important;
+}
+
+.text-white\/70 {
+  color: rgba(28, 28, 28, 0.7) !important;
+}
+
+.text-white\/60 {
+  color: rgba(28, 28, 28, 0.6) !important;
+}
+
+.text-white\/50 {
+  color: rgba(28, 28, 28, 0.5) !important;
+}
+
+.text-white\/40 {
+  color: rgba(28, 28, 28, 0.4) !important;
+}
+
+.border-white\/10 {
+  border-color: rgba(28, 28, 28, 0.08) !important;
+}
+
+.border-white\/15 {
+  border-color: rgba(28, 28, 28, 0.12) !important;
+}
+
+.border-white\/20 {
+  border-color: rgba(28, 28, 28, 0.16) !important;
+}
+
+.border-white\/30 {
+  border-color: rgba(28, 28, 28, 0.22) !important;
+}
+
+.bg-white\/5 {
+  background-color: rgba(184, 155, 94, 0.08) !important;
+}
+
+.bg-white\/10 {
+  background-color: rgba(184, 155, 94, 0.12) !important;
+}
+
+.bg-black\/40 {
+  background-color: rgba(28, 28, 28, 0.06) !important;
+}
+
+.bg-black\/50 {
+  background-color: rgba(28, 28, 28, 0.08) !important;
+}
+
+.bg-black\/70 {
+  background-color: rgba(28, 28, 28, 0.12) !important;
 }

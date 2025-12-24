@@ -1,18 +1,18 @@
 export const siteUrl =
   (process.env.NEXT_PUBLIC_CLIENT_BASE_URL || process.env.NEXT_PUBLIC_SERVER_BASE_URL || "").replace(/\/$/, "") ||
-  "https://rakhistudio.in";
+  "https://artistry-gallery.com";
 
 export const defaultKeywords = [
-  "Rakhi Vashisht",
-  "Rakhi Studio",
-  "Hong Kong artist",
-  "acrylic paintings",
-  "abstract art",
+  "Artistry gallery",
+  "online painting gallery",
+  "buy original art",
+  "modern art shop",
+  "abstract paintings",
   "fine art",
-  "original paintings",
-  "commission artwork",
-  "art gallery"
+  "wall art",
+  "canvas art online",
+  "luxury art"
 ];
 
 export const defaultDescription =
-  "Rakhi Vashisht is a Hong Kong-based artist creating vibrant acrylic works inspired by global travels and cultural stories.";
+  "Artistry is a modern online painting gallery featuring curated originals, luminous abstracts, and statement pieces for refined spaces.";
