@@ -71,9 +71,15 @@ export const apiFetch = async <T>(path: string, options: FetchOptions = {}): Pro
   if (!response.ok) {
     throw new ApiResponseError({
       status: response.status,
-      message: isJson && payload && typeof payload === "object" && "message" in (payload as Record<string, unknown>)
-        ? String((payload as Record<string, unknown>).message)
-        : response.statusText,
+      //  message: isJson && payload && typeof payload === "object" && "message" in (payload as Record<string, unknown>)
+      //   ? String((payload as Record<string, unknown>).message)
+      //   : response.statusText,
+      message: (() => {
+        const record = isJson && payload && typeof payload === "object" 
+          ? payload as Record<string, unknown> 
+          : null;
+        return record?.message as string || record?.error as string || response.statusText;
+      })(),
       details: payload
     });
   }

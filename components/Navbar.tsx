@@ -77,7 +77,7 @@ const Navbar = () => {
                 {item.label}
               </Link>
             ))}
-            <Link
+            {/* <Link
               href="/cart"
               className="flex items-center justify-between rounded-xl border border-white/15 px-4 py-3 text-white"
               onClick={() => setOpen(false)}
@@ -86,7 +86,7 @@ const Navbar = () => {
               <span className="ml-2 inline-flex h-7 min-w-[1.75rem] items-center justify-center rounded-full bg-sand-500 px-2 text-xs font-semibold text-black shadow-card">
                 {totalItems}
               </span>
-            </Link>
+            </Link> */}
           </div>
         </div>
       )}

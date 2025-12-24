@@ -9,6 +9,7 @@ import AdminPagination from "@/components/admin/AdminPagination";
 import AddCategoryModal from "@/components/admin/AddCategoryModal";
 import type { PaintingDTO } from "@/lib/dto";
 import { NewPaintingInput, usePaintings } from "@/context/PaintingContext";
+import { useRouter } from "next/navigation";
 
 const AdminPaintingsPage = () => {
   const { paintings, deletePainting, toggleAvailability, updatePainting } = usePaintings();
@@ -22,6 +23,7 @@ const AdminPaintingsPage = () => {
   const currentPage = Math.min(page, totalPages);
   const start = (currentPage - 1) * PAGE_SIZE;
   const paginated = paintings.slice(start, start + PAGE_SIZE);
+  const router = useRouter();
 
   const handleEditSubmit = (payload: NewPaintingInput) => {
     if (editing) {
@@ -51,10 +53,16 @@ const AdminPaintingsPage = () => {
           </div>
           <div className="flex items-center space-x-3 ml-auto">
              <button
-              onClick={() => setIsCategoryModalOpen(true)}
+               onClick={() => router.push("/admin/paintings/list")}
               className="button-primary text-xs"
             >
               LIst category
+            </button>
+            <button
+               onClick={() => router.push("/admin/paintings/order-list")}
+              className="button-primary text-xs"
+            >
+              Order List
             </button>
             <button
               onClick={() => setIsCategoryModalOpen(true)}

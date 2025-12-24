@@ -5,8 +5,11 @@ import Link from "next/link";
 import type { PaintingDTO } from "@/lib/dto";
 import Button from "./Button";
 import { useCart } from "@/context/CartContext";
+import { useRouter } from "next/navigation";
+// import { useRouter } from "next/router";
 
 const PaintingCard = ({ painting }: { painting: PaintingDTO }) => {
+  const router = useRouter();
   const { addToCart } = useCart();
   const isSold = painting.availability === "sold";
 
@@ -46,6 +49,11 @@ const PaintingCard = ({ painting }: { painting: PaintingDTO }) => {
               disabled={isSold}
             >
               {isSold ? "Sold" : "Add"}
+            </Button>
+            <Button
+            onClick={() => router.push(`/paintings/${painting.id}/PaintingOrder`)}
+            >
+              contact
             </Button>
           </div>
         </div>

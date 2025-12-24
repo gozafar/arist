@@ -18,7 +18,8 @@ const initialState: Omit<NewPaintingInput, "price"> & { price: number | "" } = {
   year: new Date().getFullYear(),
   availability: "in-stock",
   image: "",
-  tags: []
+  tags: [],
+  categoryId: "",
 };
 
 const PaintingUploadForm = () => {

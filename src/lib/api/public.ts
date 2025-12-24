@@ -70,3 +70,20 @@ export const confirmPayment = (payload: { orderId: string }) =>
     body: payload,
     cache: "no-store"
   });
+
+export const createPaintingOrder = (payload: { 
+  name: string; 
+  email: string; 
+  phone: string; 
+  address: string; 
+  city: string; 
+  state: string; 
+  postal: string; 
+  paintingId: string; 
+}) =>
+  apiFetch<{ success: boolean; message?: string }>(endpoints.paintingOrder, {
+    method: "POST",
+    body: payload,
+    cache: "no-store"
+  });
+

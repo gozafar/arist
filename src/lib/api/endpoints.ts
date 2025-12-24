@@ -19,6 +19,7 @@ export const endpoints = {
     refresh: "/api/auth/refresh",
     logout: "/api/auth/logout"
   },
+  paintingOrder: "/api/painting-order",
   admin: {
     paintings: {
       root: "/api/admin/paintings",

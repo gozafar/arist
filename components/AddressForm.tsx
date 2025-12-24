@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useEffect } from "react";
 import Button from "./Button";
 
 type Address = {
@@ -15,9 +15,11 @@ type Address = {
 
 type Props = {
   onSubmit?: (address: Address) => void;
+  isLoading?: boolean;
+  resetForm?: boolean;
 };
 
-const AddressForm = ({ onSubmit }: Props) => {
+const AddressForm = ({ onSubmit, isLoading, resetForm }: Props) => {
   const [form, setForm] = useState<Address>({
     name: "",
     email: "",
@@ -31,6 +33,20 @@ const AddressForm = ({ onSubmit }: Props) => {
   const handleChange = (key: keyof Address, value: string) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
+
+  useEffect(() => {
+    if (resetForm) {
+      setForm({
+        name: "",
+        email: "",
+        phone: "",
+        address: "",
+        city: "",
+        state: "",
+        postal: ""
+      });
+    }
+  }, [resetForm]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -53,8 +69,8 @@ const AddressForm = ({ onSubmit }: Props) => {
         <InputField label="State" value={form.state} onChange={(v) => handleChange("state", v)} required />
       </div>
       <div className="pt-2">
-        <Button type="submit" className="w-full md:w-auto">
-          Continue to payment
+        <Button type="submit" className="w-full md:w-auto" disabled={isLoading}>
+          {isLoading ? "Processing..." : "Continue to payment"}
         </Button>
       </div>
     </form>
