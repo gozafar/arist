@@ -11,19 +11,19 @@ const HomeClient = () => {
   const testimonials = [
     {
       quote:
-        "Rakhi’s work brings a warmth to our living room—bold color without feeling loud. You can sense the gratitude in every layer.",
+        "The curation feels museum-grade. Each piece has depth and soul, with colors that transform the room without overpowering it.",
       name: "Rina Mehta",
       role: "Collector, Hong Kong"
     },
     {
       quote:
-        "We commissioned a piece for our lobby and it has become a talking point. Rakhi listened deeply and translated our story onto canvas.",
+        "We commissioned a large abstract for our lobby; it has become the quiet centerpiece guests can’t stop asking about.",
       name: "David Lau",
       role: "Hotelier, Singapore"
     },
     {
       quote:
-        "Her paintings have a meditative quality. Standing in front of them feels like taking a breath after a long day.",
+        "Standing in front of these canvases feels like taking a slow breath—calming, intentional, and beautifully detailed.",
       name: "Priya Nair",
       role: "Art enthusiast, Mumbai"
     }
@@ -31,37 +31,35 @@ const HomeClient = () => {
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-16 pt-10 lg:px-6 lg:pt-14">
-      <section className="hero-gradient relative overflow-hidden rounded-[32px] border border-white/10 px-6 py-12 md:px-10 lg:px-14 lg:py-16 shadow-soft">
+      <section className="hero-gradient relative overflow-hidden rounded-[32px] border border-white/15 px-6 py-12 md:px-10 lg:px-14 lg:py-16 shadow-soft">
         <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div className="space-y-6">
-            <p className="text-sm uppercase tracking-[0.3em] text-white/60">Acrylic & oil</p>
-            <h1 className="section-heading">
-              Vibrant storytelling by <span className="text-sand-200">Rakhi Vashisht</span>
-            </h1>
-            <p className="max-w-2xl text-lg text-white/80">
-              Hong Kong-based artist and corporate leader turned painter, Rakhi creates bold, uplifting works inspired by
-              resilience, gratitude, and her journey of healing.
+            <p className="text-sm uppercase tracking-[0.3em] text-black/60">Curated originals</p>
+            <h1 className="section-heading">Discover &amp; Buy Original Art</h1>
+            <p className="max-w-2xl text-lg text-black/70">
+              Artistry pairs vivid paintings with a calm, gallery-grade experience. Explore limited originals, textured
+              abstracts, and serene figuratives designed to elevate modern spaces.
             </p>
             <div className="flex flex-wrap gap-3">
-              <Link href="/paintings" className="button-primary">
-                View paintings
+              <Link href="/paintings" className="button-primary shadow-soft">
+                Explore Collection
               </Link>
               <Link href="/contact" className="button-outline">
-                Book a studio visit
+                Connect with curator
               </Link>
             </div>
-            <div className="flex gap-6 text-sm text-white/70">
-              <div>
-                <p className="text-2xl font-semibold text-sand-200">25+ yrs</p>
-                <p>Leadership & HR background</p>
+            <div className="flex gap-6 text-sm text-black/70">
+              <div className="rounded-2xl bg-white/80 px-4 py-3 shadow-card">
+                <p className="text-2xl font-semibold text-sand-700">30+ works</p>
+                <p>One-of-a-kind paintings</p>
               </div>
-              <div>
-                <p className="text-2xl font-semibold text-sand-200">Global</p>
-                <p>Delhi · Dubai · Moscow · Bangalore · Hong Kong</p>
+              <div className="rounded-2xl bg-white/80 px-4 py-3 shadow-card">
+                <p className="text-2xl font-semibold text-sand-700">Worldwide</p>
+                <p>Insured, gallery-ready shipping</p>
               </div>
             </div>
           </div>
-          <div className="relative h-[420px] overflow-hidden rounded-3xl border border-white/10 bg-black/50 shadow-card">
+          <div className="relative h-[420px] overflow-hidden rounded-3xl border border-white/15 bg-white shadow-card">
             <Image
               src="https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1600&q=80"
               alt="Colorful abstract painting in a studio"
@@ -69,9 +67,9 @@ const HomeClient = () => {
               className="object-cover"
               priority
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-            <div className="absolute bottom-4 left-4 right-4 rounded-2xl bg-white/10 p-4 text-sm text-white/80 backdrop-blur">
-              Art inspired by resilience, gratitude, and community.
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-white/20 to-transparent" />
+            <div className="absolute bottom-4 left-4 right-4 rounded-2xl bg-white/90 p-4 text-sm text-black/70 backdrop-blur">
+              Limited-edition originals with certificates of authenticity.
             </div>
           </div>
         </div>
@@ -91,17 +89,17 @@ const HomeClient = () => {
         </div>
       </section>
 
-      <section className="mt-16 space-y-6 rounded-[28px] border border-white/10 bg-white/5 px-6 py-10 md:px-10">
+      <section className="mt-16 space-y-6 rounded-[28px] border border-white/15 bg-white/80 px-6 py-10 md:px-10 shadow-card">
         <div className="flex items-center justify-between">
           <h2 className="section-heading">Testimonials</h2>
-          <span className="text-sm text-white/60">Collectors on Rakhi’s paintings</span>
+          <span className="text-sm text-black/60">Collectors on Rakhi’s paintings</span>
         </div>
         <div className="container-grid">
           {testimonials.map((item) => (
             <div key={item.name} className="card-glass h-full rounded-2xl p-5">
-              <p className="text-white/80 leading-relaxed">“{item.quote}”</p>
-              <div className="mt-4 text-sm text-white/60">
-                <p className="font-semibold text-white">{item.name}</p>
+              <p className="text-black/80 leading-relaxed">“{item.quote}”</p>
+              <div className="mt-4 text-sm text-black/60">
+                <p className="font-semibold text-black">{item.name}</p>
                 <p>{item.role}</p>
               </div>
             </div>
@@ -109,22 +107,22 @@ const HomeClient = () => {
         </div>
       </section>
 
-      <section className="mt-16 grid gap-10 rounded-[28px] border border-white/10 bg-white/5 px-6 py-10 md:grid-cols-3 md:px-10">
+      <section className="mt-16 grid gap-10 rounded-[28px] border border-white/15 bg-white/80 px-6 py-10 md:grid-cols-3 md:px-10 shadow-card">
         <div className="space-y-3">
           <h3 className="font-display text-2xl">Studio visits</h3>
-          <p className="text-white/70 text-sm leading-relaxed">
-            View works in Hong Kong by appointment. Private walkthroughs with curated lighting.
+          <p className="text-black/70 text-sm leading-relaxed">
+            View works by appointment. Private walkthroughs with curated lighting and framing guidance.
           </p>
         </div>
         <div className="space-y-3">
           <h3 className="font-display text-2xl">Commissions</h3>
-          <p className="text-white/70 text-sm leading-relaxed">
-            Bespoke pieces tailored to your space, palette, and size requirements.
+          <p className="text-black/70 text-sm leading-relaxed">
+            Bespoke pieces tailored to your space, palette, and size requirements with design consultations.
           </p>
         </div>
         <div className="space-y-3">
           <h3 className="font-display text-2xl">Shipping</h3>
-          <p className="text-white/70 text-sm leading-relaxed">
+          <p className="text-black/70 text-sm leading-relaxed">
             Worldwide shipping in museum-grade crates. Works ship 7–10 days after purchase.
           </p>
         </div>

@@ -10,12 +10,12 @@ export const metadata: Metadata = {
     canonical: siteUrl
   },
   openGraph: {
-    title: "Rakhi Studio | Home",
+    title: "Artistry – Online Painting Gallery",
     description: defaultDescription,
     url: siteUrl
   },
   twitter: {
-    title: "Rakhi Studio | Home",
+    title: "Artistry – Online Painting Gallery",
     description: defaultDescription
   }
 };
