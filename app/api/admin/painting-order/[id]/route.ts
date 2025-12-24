@@ -33,6 +33,7 @@ export async function GET(
 
         // Fetch single order by ID
         const order = await PaintingOrder.findById(orderId)
+            .populate('paintingId', 'title price image availability')
             .lean()
             .exec();
 

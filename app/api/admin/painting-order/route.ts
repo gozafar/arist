@@ -12,6 +12,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         await dbConnect();
 
         const orders = await PaintingOrder.find({})
+            .populate('paintingId', 'title price image availability')
             .sort({ createdAt: -1 })
             .lean()
             .exec();
