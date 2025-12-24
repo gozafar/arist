@@ -97,6 +97,7 @@ export const PUT = async (req: NextRequest, context: { params: Promise<{ id: str
       year: Number(formData.get('year')),
       availability: formData.get('availability') as "in-stock" | "sold",
       tags: JSON.parse(formData.get('tags') as string || '[]'),
+      categoryId: formData.get('categoryId') as string,
     };
 
     // Add new image URL if image was uploaded
@@ -115,8 +116,9 @@ export const PUT = async (req: NextRequest, context: { params: Promise<{ id: str
     // Handle regular JSON payload (no image update)
     updateData = await req.json() as Record<string, unknown>;
   }
-
+  console.log(updateData,"=============>119")
   const updated = await Painting.findByIdAndUpdate(id, updateData, { new: true }).lean();
+  console.log(updated,"============>121")
   if (!updated || Array.isArray(updated)) {
     return NextResponse.json({ message: "Not found" }, { status: 404 });
   }
@@ -125,6 +127,7 @@ export const PUT = async (req: NextRequest, context: { params: Promise<{ id: str
   if (user) await AdminLog.create({ adminId: user.userId, action: "UPDATE_PAINTING" });
   revalidateTag("paintings", "default");
   const { _id, ...rest } = updated;
+   console.log('Updated painting data:', rest);
   return NextResponse.json({ ...rest, id: _id?.toString?.() || id });
 };
 

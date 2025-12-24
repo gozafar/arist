@@ -141,6 +141,7 @@ export const POST = async (req: NextRequest) => {
     availability: formData.get('availability') as "in-stock" | "sold",
     tags: JSON.parse(formData.get('tags') as string || '[]'),
     image: cloudinaryRes.secure_url,
+    categoryId: formData.get('categoryId') as string,
   };
 
   const token = req.cookies.get("access_token")?.value;

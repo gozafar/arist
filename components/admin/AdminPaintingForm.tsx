@@ -48,7 +48,6 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = "create" }: AdminPainting
     const loadCategories = async () => {
       try {
         const data = await adminGetCategories();
-        console.log(data,"============>50")
         setCategories(data);
       } catch (error) {
         console.error("Failed to load categories", error);
@@ -102,6 +101,8 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = "create" }: AdminPainting
       setStatus({ type: "error", message: "Please fix the highlighted fields." });
       return;
     }
+
+
     
     // Create FormData for API call
     const formData = new FormData();
@@ -128,6 +129,8 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = "create" }: AdminPainting
     }
     setStatus({ type: "success", message: mode === "create" ? "Painting added." : "Painting updated." });
   };
+
+  console.log( form.categoryId ,"------------->133")
 
   return (
     <form className="space-y-6" onSubmit={handleSubmit}>
