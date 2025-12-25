@@ -7,12 +7,12 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET!,
 });
 
-export const uploadOnCloudinary = async (localFilePath: string) => {
+export const uploadOnCloudinary = async (localFilePath: string, folder?: string) => {
   try {
     if (!localFilePath) return null;
 
     const response = await cloudinary.uploader.upload(localFilePath, {
-      folder: "paintings",
+      folder: folder || "rakhi-studio",
       resource_type: "auto",
     });
 
@@ -42,7 +42,7 @@ export const deleteFromCloudinary = async (publicId: string) => {
   }
 };
 
-export const updateOnCloudinary = async (localFilePath: string, existingPublicId?: string) => {
+export const updateOnCloudinary = async (localFilePath: string, existingPublicId?: string, folder?: string) => {
   try {
     if (!localFilePath) return null;
 
@@ -52,7 +52,7 @@ export const updateOnCloudinary = async (localFilePath: string, existingPublicId
     }
 
     const response = await cloudinary.uploader.upload(localFilePath, {
-      folder: "paintings",
+      folder: folder || "paintings",
       resource_type: "auto",
     });
 

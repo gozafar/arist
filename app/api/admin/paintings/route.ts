@@ -8,6 +8,25 @@ import { verifyAccessToken } from "@/lib/jwt";
 import fs from "fs";
 import path from "path";
 import { uploadOnCloudinary } from "../../cloudinary";
+import mongoose from "mongoose";
+
+interface CloudinaryResponse {
+  secure_url: string;
+  public_id: string;
+  url?: string;
+  asset_id?: string;
+  signature?: string;
+  version?: number;
+  format?: string;
+  resource_type?: string;
+  created_at?: string;
+  tags?: string[];
+  bytes?: number;
+  width?: number;
+  height?: number;
+  etag?: string;
+  placeholder?: boolean;
+}
 
 export const dynamic = "force-dynamic";
 
@@ -106,10 +125,8 @@ export const POST = async (req: NextRequest) => {
   const buffer = Buffer.from(await imageFile.arrayBuffer());
   fs.writeFileSync(tempPath, buffer);
 
-  console.log('Temp file created:', tempPath);
-
-  let cloudinaryRes: any;
-  cloudinaryRes = await uploadOnCloudinary(tempPath);
+  let cloudinaryRes: CloudinaryResponse | null;
+  cloudinaryRes = await uploadOnCloudinary(tempPath, "rakhi-studio/paintings");
 
   if (!cloudinaryRes) {
     fs.unlinkSync(tempPath);

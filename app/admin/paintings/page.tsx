@@ -19,9 +19,22 @@ const AdminPaintingsPage = () => {
   const start = (currentPage - 1) * PAGE_SIZE;
   const paginated = paintings.slice(start, start + PAGE_SIZE);
 
-  const handleEditSubmit = (payload: NewPaintingInput) => {
+  const handleEditSubmit = (payload: FormData) => {
     if (editing) {
-      updatePainting(editing.id, payload);
+      // Extract painting data from FormData
+      const paintingData: Partial<NewPaintingInput> = {
+        title: payload.get('title') as string,
+        description: payload.get('description') as string,
+        price: Number(payload.get('price')),
+        medium: payload.get('medium') as string,
+        size: payload.get('size') as string,
+        year: Number(payload.get('year')),
+        availability: payload.get('availability') as "in-stock" | "sold",
+        categoryId: payload.get('categoryId') as string,
+        tags: JSON.parse(payload.get('tags') as string || '[]')
+      };
+      
+      updatePainting(editing.id, paintingData);
       setEditing(null);
     }
   };

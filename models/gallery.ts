@@ -1,36 +1,40 @@
 import { Schema, Types, model, models } from "mongoose";
 
+export interface GalleryImage {
+  url: string;   // Cloudinary secure_url
+  name: string;  // Image name (stored only in DB)
+}
+
 export interface GalleryDoc {
-  title: string;
-  description?: string;
-  images: string[];              // Cloudinary URLs
-  categoryId: Types.ObjectId;     // Reference to Category
+  images: GalleryImage[];
+  categoryId: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
 
 const GallerySchema = new Schema<GalleryDoc>(
   {
-    title: {
-      type: String,
-      trim: true,
-      required: true,
-      minlength: 3,
-      maxlength: 150,
-    },
-
-    description: {
-      type: String,
-      trim: true,
-      maxlength: 1000,
-    },
-
     images: {
-      type: [String],
+      type: [
+        {
+          url: {
+            type: String,
+            required: true,
+          },
+          name: {
+            type: String,
+            required: true,
+            trim: true,
+            minlength: 1,
+            maxlength: 100,
+          },
+        },
+      ],
       required: true,
       validate: {
-        validator: (v: string[]) => v.length > 0,
-        message: "At least one image is required",
+        validator: (v: GalleryImage[]) =>
+          Array.isArray(v) && v.length > 0 && v.length <= 3,
+        message: "Between 1 and 3 images are required",
       },
     },
 
@@ -41,10 +45,9 @@ const GallerySchema = new Schema<GalleryDoc>(
       index: true,
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 GallerySchema.index({ categoryId: 1, createdAt: -1 });
+
 export default models.Gallery || model<GalleryDoc>("Gallery", GallerySchema);

@@ -18,7 +18,7 @@ interface Category {
 
 export type AdminPaintingFormProps = {
   initial?: NewPaintingInput & { id?: string };
-  onSubmit: (payload: NewPaintingInput) => void;
+  onSubmit: (payload: FormData) => void;
   mode?: "create" | "edit";
 };
 
@@ -119,8 +119,8 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = "create" }: AdminPainting
     formData.append('categoryId', form.categoryId || '');
     formData.append('tags', JSON.stringify(form.tags));
     
-    // Call onSubmit with FormData instead of form data
-    onSubmit(formData as any);
+    // Call onSubmit with FormData
+    onSubmit(formData);
     
     if (mode === "create") {
       setForm(emptyState);

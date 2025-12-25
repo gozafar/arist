@@ -20,7 +20,7 @@ interface Response {
 }
 
 interface NextFunction {
-  (error?: any): void;
+  (error?: Error | string | undefined): void;
 }
 
 export const uploadToCloudinary = async (
@@ -44,6 +44,6 @@ export const uploadToCloudinary = async (
 
     next();
   } catch (error) {
-    next(error);
+    next(error instanceof Error ? error : String(error));
   }
 };

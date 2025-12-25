@@ -1,9 +1,89 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
+import mongoose from 'mongoose';
+import Contact from '@/models/Contact';
+import { dbConnect } from '@/lib/db';
+import { sanitizeContactData, validateContactForm } from '../../../lib/validations/contactValidation';
+import { ValidationError } from 'next/dist/compiled/amphtml-validator';
 
-export const POST = async (req: Request) => {
-  const payload = (await req.json()) as { name?: string; email?: string; message?: string };
-  if (!payload.name || !payload.email || !payload.message) {
-    return NextResponse.json({ message: "Missing fields" }, { status: 400 });
+// POST /api/contact - Create new contact submission
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { name, email, phone, message, status, adminNotes } = body;
+
+    // Validate form data
+    const validationResult = validateContactForm({ name, email, phone, message, status, adminNotes });
+    
+    if (!validationResult.isValid) {
+      return NextResponse.json(
+        { 
+          error: 'Validation failed', 
+          details: validationResult.errors.map((err: ValidationError) => err.message)
+        },
+        { status: 400 }
+      );
+    }
+
+    await dbConnect();
+
+    // Check if contact with this email already exists
+    const existingContact = await Contact.findOne({ 
+      email: email.trim().toLowerCase() 
+    });
+    if (existingContact) {
+      return NextResponse.json(
+        { error: 'A contact with this email already exists' },
+        { status: 409 }
+      );
+    }
+
+    // Sanitize and prepare contact data
+    const sanitizedData = sanitizeContactData({ name, email, phone, message, status, adminNotes });
+
+    // Create new contact
+    const contact = new Contact(sanitizedData);
+    await contact.save();
+
+    return NextResponse.json(
+      { 
+        message: 'Contact created successfully',
+        contact: {
+          id: contact._id,
+          name: contact.name,
+          email: contact.email,
+          phone: contact.phone,
+          message: contact.message,
+          status: contact.status,
+          adminNotes: contact.adminNotes,
+          createdAt: contact.createdAt,
+        }
+      },
+      { status: 201 }
+    );
+
+  } catch (error) {
+    console.error('Error creating contact:', error);
+    
+    // Handle specific MongoDB errors
+    if (error instanceof mongoose.Error.ValidationError) {
+      const validationErrors = Object.values(error.errors).map((err) => err.message);
+      return NextResponse.json(
+        { error: 'Validation failed', details: validationErrors },
+        { status: 400 }
+      );
+    }
+    
+    if (error) {
+      return NextResponse.json(
+        { error: 'A contact with this email already exists' },
+        { status: 409 }
+      );
+    }
+
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
-  return NextResponse.json({ status: "ok" });
-};
+}
+
