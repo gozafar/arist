@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getAllOrders, getOrderById } from "@/lib/api/public";
-import { endpoints } from "@/lib/api/endpoints";
+import { getAllOrders } from "@/lib/api/public";
+import Pagination from "@/components/Pagination";
 
 interface Painting {
   _id: string;
@@ -32,6 +32,8 @@ export default function OrderListPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 10;
 
   useEffect(() => {
     fetchOrders();
@@ -48,6 +50,7 @@ export default function OrderListPage() {
       
       if (response.success ) {
         setOrders(response.payload);
+        setCurrentPage(1);
       } else {
         setError('Failed to fetch orders');
       }
@@ -59,19 +62,14 @@ export default function OrderListPage() {
     }
   };
 
-  const fetchOrderDetails = async (orderId: string) => {
-    try {
-      const response = await getOrderById(orderId);
-      if (response.success) {
-        setSelectedOrder(response.data);
-      } else {
-        setError('Failed to fetch order details');
-      }
-    } catch (err) {
-      setError('Error fetching order details');
-      console.error('Error:', err);
-    }
+  const openOrderDetails = (order: Order) => {
+    setSelectedOrder(order);
   };
+
+  const totalPages = Math.max(1, Math.ceil(orders.length / PAGE_SIZE));
+  const clampedPage = Math.min(currentPage, totalPages);
+  const startIndex = (clampedPage - 1) * PAGE_SIZE;
+  const visibleOrders = orders.slice(startIndex, startIndex + PAGE_SIZE);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-16">
@@ -104,121 +102,174 @@ export default function OrderListPage() {
               <p className="text-white/70">No orders found</p>
             </div>
           ) : (
-            <div className="grid gap-4">
-              {orders.map((order) => (
-                <div key={order._id} className="card-glass rounded-3xl p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h3 className="font-semibold text-white mb-2">Order #{order._id.slice(-8)}</h3>
-                      {/* <p className="text-sm text-white/70">
-                        {new Date(order.createdAt).toLocaleDateString()}
-                      </p> */}
-                    </div>
-                    <button
-                      onClick={() => fetchOrderDetails(order._id)}
-                      className="button-outline text-xs"
-                    >
-                      View Details
-                    </button>
-                  </div>
-                  
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div>
-                      <h4 className="font-medium text-white mb-2">Customer Details</h4>
-                      <div className="space-y-1 text-sm text-white/80">
-                        <p><strong>Name:</strong> {order.user.name}</p>
-                        <p><strong>Email:</strong> {order.user.email}</p>
-                        <p><strong>Phone:</strong> {order.user.phone}</p>
-                        <p><strong>Address:</strong></p>
-                        <p className="ml-4">{order.user.address}</p>
-                        <p className="ml-4">{order.user.city}, {order.user.state} {order.user.postal}</p>
-                      </div>
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-white mb-2">Order Details</h4>
-                      <div className="space-y-1 text-sm text-white/80">
-                        {typeof order.paintingId === 'object' ? (
-                          <>
-                            <div className="mb-3">
-                              <img 
-                                src={order.paintingId.image} 
-                                alt={order.paintingId.title}
-                                className="w-20 h-20 object-cover rounded-lg"
-                              />
-                            </div>
-                            <p><strong>Painting:</strong> {order.paintingId.title}</p>
-                            <p><strong>Price:</strong> ${order.paintingId.price}</p>
-                            <p><strong>Availability:</strong> {order.paintingId.availability}</p>
-                          </>
-                        ) : (
-                          <p><strong>Painting ID:</strong> {order.paintingId}</p>
-                        )}
-                        {/* <p><strong>Status:</strong> 
-                          <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs">
-                            Pending
-                          </span>
-                        </p> */}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <div className="card-glass rounded-3xl p-4 sm:p-6">
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-left text-sm text-white/80">
+                  <thead className="border-b border-white/10 text-xs uppercase tracking-wide text-white/60">
+                    <tr>
+                      <th className="px-4 py-3">S.No</th>
+                      <th className="px-4 py-3">Order</th>
+                      <th className="px-4 py-3">Customer</th>
+                      <th className="px-4 py-3">Email</th>
+                      <th className="px-4 py-3">Painting</th>
+                      <th className="px-4 py-3">Price</th>
+                      <th className="px-4 py-3">Date</th>
+                      <th className="px-4 py-3 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/10">
+                    {visibleOrders.map((order, index) => {
+                      const paintingTitle =
+                        typeof order.paintingId === "object" ? order.paintingId.title : "Painting";
+                      const paintingPrice =
+                        typeof order.paintingId === "object" ? order.paintingId.price : null;
+                      const serialNumber = startIndex + index + 1;
+                      return (
+                        <tr
+                          key={order._id}
+                          className="cursor-pointer transition-colors hover:bg-white/5"
+                          onClick={() => openOrderDetails(order)}
+                        >
+                          <td className="px-4 py-3 text-white/70">{serialNumber}</td>
+                          <td className="px-4 py-3 font-semibold text-white">#{order._id.slice(-8)}</td>
+                          <td className="px-4 py-3">{order.user.name}</td>
+                          <td className="px-4 py-3">{order.user.email}</td>
+                          <td className="px-4 py-3">{paintingTitle}</td>
+                          <td className="px-4 py-3">
+                            {paintingPrice !== null ? `$${paintingPrice}` : "--"}
+                          </td>
+                          <td className="px-4 py-3">
+                            {new Date(order.createdAt).toLocaleDateString()}
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <button
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                openOrderDetails(order);
+                              }}
+                              className="button-outline text-xs"
+                            >
+                              View
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              <p className="mt-3 text-xs text-white/50">Tip: click any row to view full details.</p>
             </div>
           )}
         </div>
       )}
 
+      {!loading && !error && orders.length > PAGE_SIZE && (
+        <div className="mt-6">
+          <Pagination
+            total={orders.length}
+            perPage={PAGE_SIZE}
+            currentPage={clampedPage}
+            onPageChange={setCurrentPage}
+          />
+        </div>
+      )}
+
       {/* Order Details Modal */}
       {selectedOrder && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="card-glass rounded-3xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-white">Order Details</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-[2px]">
+          <div className="w-full max-w-3xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_30px_80px_rgba(15,23,42,0.25)]">
+            <div className="flex flex-col gap-4 border-b border-slate-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Order details</p>
+                <h2 className="mt-2 text-xl font-semibold text-slate-900">
+                  Order #{selectedOrder._id.slice(-8)}
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  {new Date(selectedOrder.createdAt).toLocaleDateString()} ·{" "}
+                  {new Date(selectedOrder.createdAt).toLocaleTimeString()}
+                </p>
+              </div>
               <button
                 onClick={() => setSelectedOrder(null)}
-                className="text-white/70 hover:text-white"
+                className="inline-flex items-center justify-center rounded-full border border-slate-300 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600 transition hover:border-slate-400 hover:text-slate-800"
               >
-                ✕
+                Close
               </button>
             </div>
-            
-            <div className="grid gap-6 md:grid-cols-2">
-              <div>
-                <h3 className="font-semibold text-white mb-4">Customer Information</h3>
-                <div className="space-y-2 text-sm text-white/80">
-                  <p><strong>Full Name:</strong> {selectedOrder.user.name}</p>
-                  <p><strong>Email:</strong> {selectedOrder.user.email}</p>
-                  <p><strong>Phone:</strong> {selectedOrder.user.phone}</p>
-                  <p><strong>Shipping Address:</strong></p>
-                  <div className="ml-4 space-y-1">
+
+            <div className="grid gap-6 px-6 py-6 md:grid-cols-2">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">
+                  Customer
+                </h3>
+                <div className="mt-4 space-y-3 text-sm text-slate-600">
+                  <div>
+                    <p className="text-xs uppercase text-slate-400">Full name</p>
+                    <p className="text-base font-semibold text-slate-900">{selectedOrder.user.name}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase text-slate-400">Email</p>
+                    <p>{selectedOrder.user.email}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase text-slate-400">Phone</p>
+                    <p>{selectedOrder.user.phone}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase text-slate-400">Shipping address</p>
                     <p>{selectedOrder.user.address}</p>
-                    <p>{selectedOrder.user.city}, {selectedOrder.user.state} {selectedOrder.user.postal}</p>
+                    <p>
+                      {selectedOrder.user.city}, {selectedOrder.user.state} {selectedOrder.user.postal}
+                    </p>
                   </div>
                 </div>
               </div>
-              
-              <div>
-                <h3 className="font-semibold text-white mb-4">Order Information</h3>
-                <div className="space-y-2 text-sm text-white/80">
-                  <p><strong>Order ID:</strong> {selectedOrder._id}</p>
-                  {typeof selectedOrder.paintingId === 'object' ? (
+
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">
+                  Order
+                </h3>
+                <div className="mt-4 space-y-3 text-sm text-slate-600">
+                  <div>
+                    <p className="text-xs uppercase text-slate-400">Order ID</p>
+                    <p className="break-all">{selectedOrder._id}</p>
+                  </div>
+                  {typeof selectedOrder.paintingId === "object" ? (
                     <>
-                      <div className="mb-3">
-                        <img 
-                          src={selectedOrder.paintingId.image} 
+                      <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-3">
+                        <img
+                          src={selectedOrder.paintingId.image}
                           alt={selectedOrder.paintingId.title}
-                          className="w-32 h-32 object-cover rounded-lg"
+                          className="h-20 w-20 rounded-xl object-cover"
                         />
+                        <div>
+                          <p className="text-xs uppercase text-slate-400">Painting</p>
+                          <p className="text-base font-semibold text-slate-900">{selectedOrder.paintingId.title}</p>
+                          <p className="text-sm text-slate-600">${selectedOrder.paintingId.price}</p>
+                        </div>
                       </div>
-                      <p><strong>Painting:</strong> {selectedOrder.paintingId.title}</p>
-                      <p><strong>Price:</strong> ${selectedOrder.paintingId.price}</p>
-                      <p><strong>Availability:</strong> {selectedOrder.paintingId.availability}</p>
+                      <div className="flex flex-wrap gap-2">
+                        <span
+                          className={`rounded-full border px-3 py-1 text-xs font-semibold ${
+                            selectedOrder.paintingId.availability === "in-stock"
+                              ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                              : "border-slate-200 bg-white text-slate-600"
+                          }`}
+                        >
+                          {selectedOrder.paintingId.availability}
+                        </span>
+                        <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-600">
+                          Original artwork
+                        </span>
+                      </div>
                     </>
                   ) : (
-                    <p><strong>Painting ID:</strong> {selectedOrder.paintingId}</p>
+                    <div>
+                      <p className="text-xs uppercase text-slate-400">Painting ID</p>
+                      <p>{selectedOrder.paintingId}</p>
+                    </div>
                   )}
-                  <p><strong>Order Date:</strong> {new Date(selectedOrder.createdAt).toLocaleDateString()}</p>
-                  <p><strong>Order Time:</strong> {new Date(selectedOrder.createdAt).toLocaleTimeString()}</p>
                 </div>
               </div>
             </div>

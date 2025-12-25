@@ -58,8 +58,8 @@ export default function ContactPainting() {
     <div className="mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-16">
       <div className="mb-8 flex items-center justify-between">
         <h1 className="section-heading">Checkout</h1>
-        <Link href="/cart" className="button-outline text-xs">
-          Back to cart
+        <Link href="/paintings" className="button-outline text-xs">
+          Back
         </Link>
       </div>
       <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr]">
@@ -70,29 +70,7 @@ export default function ContactPainting() {
             <AddressForm onSubmit={handleOrderSubmit} isLoading={isLoading} resetForm={resetForm} />
           </div>
         </div>
-        <div className="card-glass rounded-3xl p-6">
-          <h2 className="font-display text-2xl">Order summary</h2>
-          <div className="mt-4 space-y-4 text-sm text-white/80">
-            {/* {items.map((item) => ( */}
-              {/* <div key={item.painting.id} className="flex items-center justify-between">
-                <span>
-                  {item.painting.title}
-                  <span className="text-white/50"> × {item.quantity}</span>
-                </span>
-                <span>${(item.painting.price * item.quantity).toLocaleString()}</span>
-              </div> */}
-            {/* ))} */}
-            <div className="border-t border-white/10 pt-4 text-lg font-semibold text-sand-200">
-              <div className="flex justify-between">
-                <span>Total</span>
-                {/* <span>${subtotal.toLocaleString()}</span> */}
-              </div>
-            </div>
-            <Button className="w-full" >
-              Continue to payment
-            </Button>
-          </div>
-        </div>
+       
       </div>
     </div>
   )

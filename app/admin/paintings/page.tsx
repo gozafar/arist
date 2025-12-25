@@ -44,12 +44,13 @@ const AdminPaintingsPage = () => {
 
   return (
     <AdminGate>
-      <div className="mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-16">
+      <div className="min-h-screen bg-white text-slate-900">
+        <div className="mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-16">
         <div className="mb-8 flex items-center justify-between">
           <div className="space-y-2">
-            <p className="text-sm uppercase tracking-[0.3em] text-white/60">Admin · Paintings</p>
+            <p className="text-sm uppercase tracking-[0.3em] text-slate-500">Admin · Paintings</p>
             <h1 className="section-heading">Manage paintings</h1>
-            <p className="text-white/70">Edit, toggle availability, or delete artworks.</p>
+            <p className="text-slate-600">Edit, toggle availability, or delete artworks.</p>
           </div>
           <div className="flex items-center space-x-3 ml-auto">
              <button
@@ -89,10 +90,10 @@ const AdminPaintingsPage = () => {
         <AdminPagination total={paintings.length} perPage={PAGE_SIZE} currentPage={currentPage} onPageChange={setPage} />
 
         {editing && (
-          <div ref={editRef} className="mt-8 card-glass rounded-3xl p-6">
+          <div ref={editRef} className="mt-8 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="font-display text-2xl">Edit painting</h2>
-              <button className="text-sm text-white/60 hover:text-white" onClick={() => setEditing(null)}>
+              <button className="text-sm text-slate-500 hover:text-slate-700" onClick={() => setEditing(null)}>
                 Cancel
               </button>
             </div>
@@ -109,6 +110,7 @@ const AdminPaintingsPage = () => {
           onClose={() => setIsCategoryModalOpen(false)}
           onCategoryAdded={handleCategoryAdded}
         />
+      </div>
       </div>
     </AdminGate>
   );

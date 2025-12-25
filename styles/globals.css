@@ -3,22 +3,21 @@
 @tailwind utilities;
 
 :root {
-  --bg: #f8f5f0;
-  --ink: #1c1c1c;
-  --muted: rgba(28, 28, 28, 0.7);
-  --muted-soft: rgba(28, 28, 28, 0.55);
+  --bg: #ffffff;
   --surface: #ffffff;
-  --surface-soft: #f2e9da;
-  --accent: #b89b5e;
-  --accent-strong: #a2803e;
+  --surface-soft: #ffffff;
+  --ink: #2e2e2e;
+  --muted: rgb(100, 116, 139);
+  --muted-soft: rgba(100, 116, 139, 0.7);
+  --accent: rgb(10, 201, 188);
+  --accent-hover: rgb(8, 176, 165);
+  --border: rgba(10, 201, 188, 0.35);
 }
 
 body {
-  background:
-    radial-gradient(circle at 20% 18%, rgba(184, 155, 94, 0.16), transparent 32%),
-    radial-gradient(circle at 78% 0%, rgba(157, 133, 90, 0.12), transparent 26%),
-    linear-gradient(135deg, #f8f5f0, #f1ebdf);
+  background: #ffffff;
   color: var(--ink);
+  line-height: 1.7;
 }
 
 a {
@@ -27,7 +26,7 @@ a {
 }
 
 a:hover {
-  color: var(--accent);
+  color: var(--accent-hover);
 }
 
 ::-webkit-scrollbar {
@@ -35,11 +34,11 @@ a:hover {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--surface);
+  background: var(--surface-soft);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d3c5a4;
+  background: #cbb9a6;
   border-radius: 9999px;
 }
 
@@ -55,39 +54,49 @@ a:hover {
 }
 
 .card-glass {
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(28, 28, 28, 0.08);
+  background: #ffffff;
+  border: 1px solid var(--border);
   backdrop-filter: blur(8px);
-  box-shadow: 0 28px 80px -48px rgba(28, 28, 28, 0.25);
+  box-shadow: 0 28px 80px -48px rgba(46, 46, 46, 0.22);
 }
 
 .button-primary {
   @apply inline-flex items-center justify-center rounded-full px-5 py-3 font-semibold text-sm tracking-wide transition hover:-translate-y-0.5 hover:shadow-soft;
-  background: linear-gradient(120deg, #b89b5e, #d2ba80, #b89b5e);
-  color: var(--ink);
-  box-shadow: 0 16px 40px -18px rgba(184, 155, 94, 0.55);
+  background: var(--accent);
+  color: #f8f5f0;
+  box-shadow: 0 16px 40px -20px rgba(10, 201, 188, 0.45);
+}
+
+.button-primary:hover {
+  background: var(--accent-hover);
 }
 
 .button-outline {
   @apply inline-flex items-center justify-center rounded-full px-5 py-3 font-semibold text-sm tracking-wide transition;
-  border: 1px solid rgba(28, 28, 28, 0.12);
-  color: var(--ink);
-  background: rgba(255, 255, 255, 0.6);
-  box-shadow: 0 10px 26px -18px rgba(28, 28, 28, 0.18);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  background: #ffffff;
+  box-shadow: 0 10px 26px -18px rgba(46, 46, 46, 0.18);
   backdrop-filter: blur(4px);
 }
 
 .button-outline:hover {
-  border-color: rgba(28, 28, 28, 0.18);
-  background: rgba(255, 255, 255, 0.9);
+  border-color: var(--accent-hover);
+  color: var(--accent-hover);
+  background: #ffffff;
+}
+
+button:not(.button-primary):not(.button-outline) {
+  color: var(--accent);
+}
+
+button:not(.button-primary):not(.button-outline):hover {
+  color: var(--accent-hover);
 }
 
 .hero-gradient {
-  background:
-    radial-gradient(circle at 12% 18%, rgba(184, 155, 94, 0.2), transparent 30%),
-    radial-gradient(circle at 86% 12%, rgba(255, 255, 255, 0.4), transparent 22%),
-    linear-gradient(135deg, #fdfaf5, #f2e9da);
-  box-shadow: 0 30px 90px -60px rgba(28, 28, 28, 0.3);
+  background: #ffffff;
+  box-shadow: 0 30px 90px -60px rgba(46, 46, 46, 0.26);
 }
 
 /* Palette overrides to match the light gallery theme */
@@ -96,57 +105,61 @@ a:hover {
 }
 
 .text-white\/80 {
-  color: rgba(28, 28, 28, 0.8) !important;
+  color: rgba(100, 116, 139, 0.8) !important;
 }
 
 .text-white\/70 {
-  color: rgba(28, 28, 28, 0.7) !important;
+  color: rgba(100, 116, 139, 0.7) !important;
 }
 
 .text-white\/60 {
-  color: rgba(28, 28, 28, 0.6) !important;
+  color: rgba(100, 116, 139, 0.6) !important;
 }
 
 .text-white\/50 {
-  color: rgba(28, 28, 28, 0.5) !important;
+  color: rgba(100, 116, 139, 0.5) !important;
 }
 
 .text-white\/40 {
-  color: rgba(28, 28, 28, 0.4) !important;
+  color: rgba(100, 116, 139, 0.4) !important;
 }
 
 .border-white\/10 {
-  border-color: rgba(28, 28, 28, 0.08) !important;
+  border-color: rgba(100, 116, 139, 0.2) !important;
 }
 
 .border-white\/15 {
-  border-color: rgba(28, 28, 28, 0.12) !important;
+  border-color: rgba(100, 116, 139, 0.24) !important;
 }
 
 .border-white\/20 {
-  border-color: rgba(28, 28, 28, 0.16) !important;
+  border-color: rgba(100, 116, 139, 0.28) !important;
 }
 
 .border-white\/30 {
-  border-color: rgba(28, 28, 28, 0.22) !important;
+  border-color: rgba(100, 116, 139, 0.36) !important;
 }
 
 .bg-white\/5 {
-  background-color: rgba(184, 155, 94, 0.08) !important;
+  background-color: rgba(100, 116, 139, 0.06) !important;
 }
 
 .bg-white\/10 {
-  background-color: rgba(184, 155, 94, 0.12) !important;
+  background-color: rgba(100, 116, 139, 0.1) !important;
 }
 
 .bg-black\/40 {
-  background-color: rgba(28, 28, 28, 0.06) !important;
+  background-color: rgba(100, 116, 139, 0.08) !important;
 }
 
 .bg-black\/50 {
-  background-color: rgba(28, 28, 28, 0.08) !important;
+  background-color: rgba(100, 116, 139, 0.1) !important;
 }
 
 .bg-black\/70 {
-  background-color: rgba(28, 28, 28, 0.12) !important;
+  background-color: rgba(100, 116, 139, 0.14) !important;
+}
+
+.bg-white {
+  background-color: var(--surface-soft) !important;
 }
