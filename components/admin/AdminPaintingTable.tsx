@@ -13,9 +13,9 @@ export type AdminPaintingTableProps = {
 
 const AdminPaintingTable = ({ paintings, onEdit, onDelete, onToggle }: AdminPaintingTableProps) => {
   return (
-    <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5">
-      <table className="min-w-full text-left text-sm text-white/80">
-        <thead className="bg-white/10 text-white">
+    <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white">
+      <table className="min-w-full text-left text-sm text-slate-700">
+        <thead className="bg-slate-50 text-slate-900">
           <tr>
             <th className="px-4 py-3">Artwork</th>
             <th className="px-4 py-3">Price</th>
@@ -25,15 +25,15 @@ const AdminPaintingTable = ({ paintings, onEdit, onDelete, onToggle }: AdminPain
         </thead>
         <tbody>
           {paintings.map((painting) => (
-            <tr key={painting.id} className="border-t border-white/10">
+            <tr key={painting.id} className="border-t border-slate-200">
               <td className="px-4 py-3">
                 <div className="flex items-center gap-3">
                   <div className="relative h-14 w-12 overflow-hidden rounded-lg">
                     <Image src={painting.image} alt={painting.title} fill className="object-cover" sizes="64px" />
                   </div>
                   <div>
-                    <p className="font-semibold text-white">{painting.title}</p>
-                    <p className="text-xs text-white/60">{painting.medium}</p>
+                    <p className="font-semibold text-slate-900">{painting.title}</p>
+                    <p className="text-xs text-slate-500">{painting.medium}</p>
                   </div>
                 </div>
               </td>
@@ -41,7 +41,9 @@ const AdminPaintingTable = ({ paintings, onEdit, onDelete, onToggle }: AdminPain
               <td className="px-4 py-3">
                 <span
                   className={`rounded-full px-3 py-1 text-xs ${
-                    painting.availability === "sold" ? "bg-red-500/20 text-red-200" : "bg-green-500/20 text-green-200"
+                    painting.availability === "sold"
+                      ? "bg-red-100 text-red-700"
+                      : "bg-emerald-100 text-emerald-700"
                   }`}
                 >
                   {painting.availability === "sold" ? "Sold" : "In Stock"}
