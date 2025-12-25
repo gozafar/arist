@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import AdminGate from "@/components/admin/AdminGate";
 import AdminPaintingForm from "@/components/admin/AdminPaintingForm";
 import { usePaintings } from "@/context/PaintingContext";
 
@@ -9,8 +8,6 @@ const AdminAddPaintingPage = () => {
   const { addPainting } = usePaintings();
 
   return (
-    <AdminGate>
-      <div className="min-h-screen bg-white text-slate-900">
         <div className="mx-auto max-w-5xl px-4 py-12 lg:px-6 lg:py-16">
         <div className="mb-8 flex items-center justify-between">
           <div className="space-y-2">
@@ -29,8 +26,6 @@ const AdminAddPaintingPage = () => {
           <AdminPaintingForm onSubmit={addPainting} mode="create" />
         </div>
       </div>
-      </div>
-    </AdminGate>
   );
 };
 

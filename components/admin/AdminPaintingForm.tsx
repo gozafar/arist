@@ -130,7 +130,7 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = "create" }: AdminPainting
     setStatus({ type: "success", message: mode === "create" ? "Painting added." : "Painting updated." });
   };
 
-  console.log( form.categoryId ,"------------->133")
+
 
   return (
     <form className="space-y-6" onSubmit={handleSubmit}>

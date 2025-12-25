@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import AdminGate from "@/components/admin/AdminGate";
 import CategoryModal from "@/components/admin/CategoryModal";
 import AdminPagination from "@/components/admin/AdminPagination";
+import AddCategoryModal from "@/components/admin/AddCategoryModal";
 import { adminGetCategories, adminDeleteCategory, adminUpdateCategory } from "@/lib/api/admin";
 
 interface PaintingItem {
@@ -37,6 +36,7 @@ export default function CategoriesListPage() {
   const [selectedCategory, setSelectedCategory] = useState<CategoryItem | null>(null);
   const [modalMode, setModalMode] = useState<"edit" | "delete" | "view">("edit");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 8;
   
@@ -103,19 +103,16 @@ export default function CategoriesListPage() {
 
   if (loading) {
     return (
-      <AdminGate>
         <div className="mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-16">
           <div className="text-center py-8">
             <p className="text-white/70">Loading categories...</p>
           </div>
         </div>
-      </AdminGate>
     );
   }
 
   if (error) {
     return (
-      <AdminGate>
         <div className="mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-16">
           <div className="text-center py-8">
             <p className="text-red-400">{error}</p>
@@ -124,7 +121,6 @@ export default function CategoriesListPage() {
             </button>
           </div>
         </div>
-      </AdminGate>
     );
   }
 
@@ -134,7 +130,6 @@ export default function CategoriesListPage() {
   const paginated = categories.slice(start, start + PAGE_SIZE);
 
   return (
-    <AdminGate>
       <div className="mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-16">
         <div className="mb-8 flex items-center justify-between">
           <div className="space-y-2">
@@ -142,18 +137,18 @@ export default function CategoriesListPage() {
             <h1 className="section-heading">Manage Categories</h1>
           </div>
           <div className="flex gap-4">
-            <Link href="/admin/categories/add" className="button-primary text-xs">
+            <button onClick={() => setIsAddModalOpen(true)} className="button-primary text-xs">
               Add New Category
-            </Link>
+            </button>
           </div>
         </div>
 
         {categories.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-white/70 mb-4">No categories found</p>
-            <Link href="/admin/categories/add" className="button-primary text-xs">
+            <button onClick={() => setIsAddModalOpen(true)} className="button-primary text-xs">
               Add Your First Category
-            </Link>
+            </button>
           </div>
         ) : (
           <>
@@ -228,7 +223,11 @@ export default function CategoriesListPage() {
           onDelete={handleDelete}
           mode={modalMode}
         />
+        <AddCategoryModal
+          isOpen={isAddModalOpen}
+          onClose={() => setIsAddModalOpen(false)}
+          onCategoryAdded={fetchCategories}
+        />
       </div>
-    </AdminGate>
   );
 }
