@@ -120,20 +120,20 @@ export default function OrderListPage() {
                     <tbody className="divide-y divide-white/10">
                       {visibleOrders.map((order, index) => {
                         const paintingTitle =
-                          typeof order.paintingId === "object" ? order.paintingId.title : "Painting";
+                          typeof order?.paintingId === "object" ? order?.paintingId?.title : "Painting";
                         const paintingPrice =
-                          typeof order.paintingId === "object" ? order.paintingId.price : null;
+                          typeof order?.paintingId === "object" ? order?.paintingId?.price : null;
                         const serialNumber = startIndex + index + 1;
                         return (
                           <tr
-                            key={order._id}
+                            key={order?._id}
                             className="cursor-pointer transition-colors hover:bg-white/5"
                             onClick={() => openOrderDetails(order)}
                           >
                             <td className="px-4 py-3 text-white/70">{serialNumber}</td>
                             <td className="px-4 py-3 font-semibold text-white">#{order._id.slice(-8)}</td>
-                            <td className="px-4 py-3">{order.user.name}</td>
-                            <td className="px-4 py-3">{order.user.email}</td>
+                            <td className="px-4 py-3">{order?.user?.name}</td>
+                            <td className="px-4 py-3">{order?.user?.email}</td>
                             <td className="px-4 py-3">{paintingTitle}</td>
                             <td className="px-4 py-3">
                               {paintingPrice !== null ? `$${paintingPrice}` : "--"}

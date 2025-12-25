@@ -6,6 +6,19 @@ import { sendContactMessage } from "@/lib/api/public";
 
 const ContactClient = () => {
   const [submitted, setSubmitted] = useState(false);
+  const [phoneError, setPhoneError] = useState("");
+
+  const normalizePhone = (value: string) => value.replace(/[\s()-]/g, "");
+
+  const isValidPhone = (value: string) => {
+    const normalized = normalizePhone(value);
+    return (
+      /^\+852\d{8}$/.test(normalized) ||
+      /^\+91\d{10}$/.test(normalized) ||
+      /^\+1\d{10}$/.test(normalized) ||
+      /^\+971\d{9}$/.test(normalized)
+    );
+  };
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 lg:px-6 lg:py-16">
@@ -30,12 +43,20 @@ const ContactClient = () => {
               className="space-y-4 text-sm"
               onSubmit={async (e) => {
                 e.preventDefault();
-                const formData = new FormData(e.currentTarget);
+                const formData = new FormData(e?.currentTarget);
+                const rawPhone = String(formData?.get("phone") || "");
+                if (rawPhone && !isValidPhone(rawPhone)) {
+                  setPhoneError(
+                    "Phone must be +852XXXXXXXX, +91XXXXXXXXXX, +1XXXXXXXXXX, or +971XXXXXXXXX."
+                  );
+                  return;
+                }
                 try {
+                  const normalizedPhone = rawPhone ? normalizePhone(rawPhone) : undefined;
                   await sendContactMessage({
                     name: String(formData.get("name") || ""),
                     email: String(formData.get("email") || ""),
-                    phone: formData.get("phone") ? String(formData.get("phone")) : undefined,
+                    phone: normalizedPhone,
                     message: String(formData.get("message") || "")
                   });
                   setSubmitted(true);
@@ -47,7 +68,21 @@ const ContactClient = () => {
               <Input label="Name" name="name" placeholder="Your name" required />
               <div className="grid gap-4 md:grid-cols-2">
                 <Input label="Email" name="email" type="email" placeholder="you@example.com" required />
-                <Input label="Phone" name="phone" placeholder="Optional" />
+                <label className="block text-sm">
+                  <span className="mb-2 block text-white">Phone</span>
+                  <input
+                    type="tel"
+                    name="phone"
+                    placeholder="Optional (e.g. +1XXXXXXXXXX)"
+                    pattern="^\+?(?:852\d{8}|91\d{10}|1\d{10}|971\d{9})$"
+                    title="Use +852XXXXXXXX, +91XXXXXXXXXX, +1XXXXXXXXXX, or +971XXXXXXXXX."
+                    className="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-sand-400/60"
+                    onChange={() => {
+                      if (phoneError) setPhoneError("");
+                    }}
+                  />
+                  {phoneError ? <p className="mt-2 text-xs text-red-300">{phoneError}</p> : null}
+                </label>
               </div>
               <label className="block text-sm">
                 <span className="mb-2 block text-white">Message</span>
