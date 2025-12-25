@@ -73,7 +73,7 @@ const AdminLoginPage = () => {
           <Link href="/" className="hover:text-white">
             ← Back to site
           </Link>
-          <span className="text-xs text-white/50">Default: admin@example.com / password</span>
+          
         </div>
       </div>
     </div>

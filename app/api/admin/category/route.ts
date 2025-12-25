@@ -69,10 +69,10 @@ export const GET = async (req: NextRequest) => {
 
     // Transform _id to id for frontend compatibility
     const transformedCategories: CategoryResponse[] = categories.map((cat) => ({
+      id: (cat._id as mongoose.Types.ObjectId).toString(),
       categoryName: cat.categoryName as string,
       createdAt: cat.createdAt as string,
-      updatedAt: cat.updatedAt as string,
-      id: (cat._id as mongoose.Types.ObjectId).toString()
+      updatedAt: cat.updatedAt as string
     }));
 
     return NextResponse.json(transformedCategories);

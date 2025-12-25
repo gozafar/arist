@@ -42,7 +42,7 @@ const Navbar = () => {
               {item.label}
             </Link>
           ))}
-          <Link
+          {/* <Link
             href="/cart"
             className="relative rounded-full border border-white/20 px-4 py-2 text-sm text-black hover:border-white/30 hover:text-sand-700"
           >
@@ -50,7 +50,7 @@ const Navbar = () => {
             <span className="ml-2 inline-flex h-6 min-w-[1.5rem] items-center justify-center rounded-full bg-sand-500 px-2 text-xs font-semibold text-black shadow-card">
               {totalItems}
             </span>
-          </Link>
+          </Link> */}
         </nav>
 
         <button

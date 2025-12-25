@@ -84,14 +84,14 @@ export const adminCreateCategory = (categoryName: string) =>
   });
 
 export const adminUpdateCategory = (id: string, categoryName: string) =>
-  apiFetch(`${endpoints.admin.category}/${id}`, {
+  apiFetch<{ id: string; categoryName: string; createdAt: string; updatedAt: string }>(`${endpoints.admin.category}/${id}`, {
     method: "PUT",
     body: { categoryName },
     cache: "no-store"
   });
 
 export const adminDeleteCategory = (id: string) =>
-  apiFetch(`${endpoints.admin.category}/${id}`, {
+  apiFetch<{ message: string }>(`${endpoints.admin.category}/${id}`, {
     method: "DELETE",
     cache: "no-store"
   });

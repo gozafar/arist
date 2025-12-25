@@ -70,6 +70,10 @@ export const PUT = async (req: NextRequest, context: { params: Promise<{ id: str
             return NextResponse.json({ error: "Category ID is required" }, { status: 400 });
         }
 
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return NextResponse.json({ error: "Invalid Category ID format" }, { status: 400 });
+        }
+
         const { categoryName } = await req.json();
         if (!categoryName || typeof categoryName !== "string") {
             return NextResponse.json({ error: "categoryName is required" }, { status: 400 });
@@ -79,18 +83,9 @@ export const PUT = async (req: NextRequest, context: { params: Promise<{ id: str
 
         await dbConnect();
 
-        // Check if another category with same name exists
-        const exists = await Category.findOne({
-            categoryName: name,
-            _id: { $ne: new mongoose.Types.ObjectId(id) }
-        });
-        if (exists) {
-            return NextResponse.json({ error: "Category name already exists" }, { status: 409 });
-        }
-
         // Update the category
         const updated = await Category.findByIdAndUpdate(
-            id,
+            new mongoose.Types.ObjectId(id),
             { categoryName: name },
             { new: true }
         ).lean();
@@ -127,10 +122,18 @@ export const GET = async (
                 { status: 400 }
             );
         }
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return NextResponse.json(
+                { error: "Invalid Category ID format" },
+                { status: 400 }
+            );
+        }
+
         await dbConnect();
 
         // Fetch category by ID
-        const category = await Category.findById(id).lean();
+        const category = await Category.findById(new mongoose.Types.ObjectId(id)).lean();
 
         if (!category) {
             return NextResponse.json(
@@ -167,17 +170,25 @@ export const DELETE = async (
                 { status: 400 }
             );
         }
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return NextResponse.json(
+                { error: "Invalid Category ID format" },
+                { status: 400 }
+            );
+        }
+
         await dbConnect();
 
         // Delete category
-        const deleted = await Category.findByIdAndDelete(id).lean();
+        const deleted = await Category.findByIdAndDelete(new mongoose.Types.ObjectId(id)).lean();
 
-        if (!deleted) {
-            return NextResponse.json(
-                { error: "Category not found" },
-                { status: 404 }
-            );
-        }
+        // if (!deleted) {
+        //     return NextResponse.json(
+        //         { error: "Category not found" },
+        //         { status: 404 }
+        //     );
+        // }
 
         return NextResponse.json({ message: "Category deleted successfully" });
 
