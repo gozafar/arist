@@ -9,6 +9,7 @@ export interface PaintingOrderDoc{
     city: string;
     state: string;
     postal: string;
+    country: string;
   };
   paintingId: Types.ObjectId;
 //   quantity: number;
@@ -27,6 +28,7 @@ const PaintingOrderSchema = new Schema<PaintingOrderDoc>(
       city: { type: String, required: true },
       state: { type: String, required: true },
       postal: { type: String, required: true },
+      country:{type:String,required:true}
     },
     paintingId: { type: Schema.Types.ObjectId, required: true, ref: 'Painting' },
     // quantity: { type: Number, required: true },

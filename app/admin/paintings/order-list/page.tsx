@@ -22,6 +22,7 @@ interface Order {
     city: string;
     state: string;
     postal: string;
+    country: string;
   };
   paintingId: string | Painting;
   createdAt: string;
@@ -120,9 +121,9 @@ export default function OrderListPage() {
                     <tbody className="divide-y divide-white/10">
                       {visibleOrders.map((order, index) => {
                         const paintingTitle =
-                          typeof order.paintingId === "object" ? order.paintingId.title : "Painting";
+                          typeof order.paintingId === "object" ? order?.paintingId?.title : "Painting";
                         const paintingPrice =
-                          typeof order.paintingId === "object" ? order.paintingId.price : null;
+                          typeof order.paintingId === "object" ? order?.paintingId?.price : null;
                         const serialNumber = startIndex + index + 1;
                         return (
                           <tr
@@ -222,6 +223,7 @@ export default function OrderListPage() {
                       <p>
                         {selectedOrder.user.city}, {selectedOrder.user.state} {selectedOrder.user.postal}
                       </p>
+                      <p>{selectedOrder.user.country}</p>
                     </div>
                   </div>
                 </div>
@@ -239,25 +241,25 @@ export default function OrderListPage() {
                       <>
                         <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-3">
                           <img
-                            src={selectedOrder.paintingId.image}
-                            alt={selectedOrder.paintingId.title}
+                            src={selectedOrder?.paintingId?.image}
+                            alt={selectedOrder?.paintingId?.title}
                             className="h-20 w-20 rounded-xl object-cover"
                           />
                           <div>
                             <p className="text-xs uppercase text-slate-400">Painting</p>
-                            <p className="text-base font-semibold text-slate-900">{selectedOrder.paintingId.title}</p>
-                            <p className="text-sm text-slate-600">${selectedOrder.paintingId.price}</p>
+                            <p className="text-base font-semibold text-slate-900">{selectedOrder?.paintingId?.title}</p>
+                            <p className="text-sm text-slate-600">${selectedOrder?.paintingId?.price}</p>
                           </div>
                         </div>
                         <div className="flex flex-wrap gap-2">
                           <span
                             className={`rounded-full border px-3 py-1 text-xs font-semibold ${
-                              selectedOrder.paintingId.availability === "in-stock"
+                              selectedOrder?.paintingId?.availability === "in-stock"
                                 ? "border-emerald-200 bg-emerald-50 text-emerald-700"
                                 : "border-slate-200 bg-white text-slate-600"
                             }`}
                           >
-                            {selectedOrder.paintingId.availability}
+                            {selectedOrder?.paintingId?.availability}
                           </span>
                           <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-600">
                             Original artwork
@@ -267,7 +269,7 @@ export default function OrderListPage() {
                     ) : (
                       <div>
                         <p className="text-xs uppercase text-slate-400">Painting ID</p>
-                        <p>{selectedOrder.paintingId}</p>
+                        <p>{selectedOrder?.paintingId}</p>
                       </div>
                     )}
                   </div>

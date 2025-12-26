@@ -75,7 +75,7 @@ const ContactClient = () => {
             <div className="space-y-2">
               <p className="font-semibold text-white">Social</p>
               <div className="flex gap-4">
-                <a href="https://www.instagram.com" className="button-outline text-xs" target="_blank" rel="noreferrer">
+                <a href="https://www.instagram.com/rakhi_studio/" className="button-outline text-xs" target="_blank" rel="noreferrer">
                   Instagram
                 </a>
                 <a href="https://www.behance.net" className="button-outline text-xs" target="_blank" rel="noreferrer">
@@ -89,7 +89,8 @@ const ContactClient = () => {
             <div className="space-y-2 text-sm">
               <p className="font-semibold text-white">Studio</p>
               <p className="text-white/60">Indiranagar, Bangalore</p>
-              <p className="text-white/60">Call: +91 98765 43210</p>
+              <p className="text-white/60">Call: +852 97236007 ,+91 9899757066</p>
+              {/* <p className="text-white/60">Call: +91 9899757066</p> */}
             </div>
           </div>
         </div>

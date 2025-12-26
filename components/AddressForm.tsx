@@ -11,6 +11,7 @@ type Address = {
   city: string;
   state: string;
   postal: string;
+  country: string;
 };
 
 type Props = {
@@ -27,7 +28,8 @@ const AddressForm = ({ onSubmit, isLoading, resetForm }: Props) => {
     address: "",
     city: "",
     state: "",
-    postal: ""
+    postal: "",
+    country: ""
   });
 
   const handleChange = (key: keyof Address, value: string) => {
@@ -43,7 +45,8 @@ const AddressForm = ({ onSubmit, isLoading, resetForm }: Props) => {
         address: "",
         city: "",
         state: "",
-        postal: ""
+        postal: "",
+        country: ""
       });
     }
   }, [resetForm]);
@@ -61,13 +64,14 @@ const AddressForm = ({ onSubmit, isLoading, resetForm }: Props) => {
       </div>
       <div className="grid gap-4 md:grid-cols-2">
         <InputField label="Phone" value={form.phone} onChange={(v) => handleChange("phone", v)} required />
-        <InputField label="Postal Code" value={form.postal} onChange={(v) => handleChange("postal", v)} required />
+        <InputField label="PIN Code" value={form.postal} onChange={(v) => handleChange("postal", v)} required />
       </div>
       <InputField label="Street address" value={form.address} onChange={(v) => handleChange("address", v)} required />
       <div className="grid gap-4 md:grid-cols-2">
         <InputField label="City" value={form.city} onChange={(v) => handleChange("city", v)} required />
         <InputField label="State" value={form.state} onChange={(v) => handleChange("state", v)} required />
       </div>
+      <InputField label="Country" value={form.country} onChange={(v) => handleChange("country", v)} required />
       <div className="pt-2">
         <Button type="submit" className="w-full md:w-auto" disabled={isLoading}>
           {isLoading ? "Processing..." : "Continue to payment"}

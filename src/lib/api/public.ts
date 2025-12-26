@@ -20,6 +20,7 @@ interface Order {
     city: string;
     state: string;
     postal: string;
+    country: string;
   };
   paintingId: string | Painting;
   createdAt: string;

@@ -8,7 +8,7 @@ export async function POST(request: Request) {
     try {
         const body = await request.json();
         // Basic validation
-        const requiredFields = ['name', 'email', 'phone', 'address', 'city', 'state', 'postal', 'paintingId'];
+        const requiredFields = ['name', 'email', 'phone', 'address', 'city', 'state', 'postal', 'country', 'paintingId'];
         for (const field of requiredFields) {
             if (!body[field] || typeof body[field] !== 'string' || body[field].trim() === '') {
                 return NextResponse.json(
@@ -67,11 +67,11 @@ export async function POST(request: Request) {
                 city: body.city.trim(),
                 state: body.state.trim(),
                 postal: body.postal.trim(),
+                country: body.country.trim(),
             },
             paintingId: body.paintingId.trim(),
         });
 
-        console.log(order, "=============>52")
         return NextResponse.json(
             { success: true, payload: order },
             { status: 201 }
