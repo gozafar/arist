@@ -1,22 +1,27 @@
+import { headers } from "next/headers";
 import type { Metadata } from "next";
-import { siteUrl, defaultKeywords } from "@/lib/seo";
+import {
+  buildSeoMetadata,
+  getCountryConfig,
+  getCountryFromHeaders
+} from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Services",
-  description: "Commissions, studio visits, and collaborations with Rakhi Studio.",
-  keywords: [...defaultKeywords, "art commissions", "studio visits", "art workshops", "art collaborations"],
-  alternates: {
-    canonical: `${siteUrl}/services`
-  },
-  openGraph: {
-    title: "Services | Rakhi Studio",
-    description: "Explore commissions, studio visits, and collaboration opportunities with Rakhi Vashisht.",
-    url: `${siteUrl}/services`
-  },
-  twitter: {
-    title: "Services | Rakhi Studio",
-    description: "Commission bespoke artwork, schedule studio visits, and collaborate with Rakhi Studio."
-  }
+export const generateMetadata = async (): Promise<Metadata> => {
+  const country = getCountryFromHeaders(await headers());
+  const config = getCountryConfig(country);
+  const title = `Art Services & Commissions | ${config.label}`;
+  const description =
+    `Commission bespoke artwork, studio visits, and collaborations with delivery to ${config.label}.`;
+
+  return buildSeoMetadata({
+    path: "/services",
+    title,
+    description,
+    keywords: ["art commissions", "studio visits", "art workshops", "art collaborations"],
+    country,
+    ogTitle: `Art Services for ${config.label}`,
+    ogDescription: `Commission bespoke artwork and collaborations with worldwide delivery to ${config.label}.`
+  });
 };
 
 const ServicesPage = () => {
@@ -28,6 +33,9 @@ const ServicesPage = () => {
         <p className="max-w-2xl text-white/70">
           Commissions, studio visits, and collaborations tailored to your space, palette, and story.
         </p>
+      </div>
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/70">
+        Serving collectors and designers in the UAE, India, USA, and Hong Kong with global logistics support.
       </div>
 
       <div className="grid gap-8 lg:grid-cols-2">

@@ -18,7 +18,7 @@ const PaintingCard = ({ painting }: { painting: PaintingDTO }) => {
       <div className="relative aspect-[3/4] max-h-[320px] overflow-hidden">
         <Image
           src={painting.image}
-          alt={painting.title}
+          alt={`${painting.title} original painting`}
           fill
           className="object-cover transition duration-700 hover:scale-105"
           sizes="(min-width: 1280px) 240px, (min-width: 1024px) 260px, (min-width: 640px) 45vw, 90vw"

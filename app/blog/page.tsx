@@ -1,39 +1,51 @@
+import Link from "next/link";
+import { headers } from "next/headers";
 import type { Metadata } from "next";
-import { siteUrl, defaultKeywords } from "@/lib/seo";
+import {
+  buildSeoMetadata,
+  getCountryConfig,
+  getCountryFromHeaders
+} from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Art Stories & Guides",
-  description: "Insights on buying original paintings, styling wall art, and collecting art with Rakhi Studio.",
-  keywords: [...defaultKeywords, "art blog", "art tips", "home decor art", "collecting art"],
-  alternates: { canonical: `${siteUrl}/blog` },
-  openGraph: {
-    title: "Art Stories & Guides",
-    description: "Learn how to choose, style, and invest in original paintings.",
-    url: `${siteUrl}/blog`
-  },
-  twitter: {
-    title: "Art Stories & Guides",
-    description: "Learn how to choose, style, and invest in original paintings."
-  }
+export const generateMetadata = async (): Promise<Metadata> => {
+  const country = getCountryFromHeaders(await headers());
+  const config = getCountryConfig(country);
+  const title = `Art Insights & Guides | ${config.label}`;
+  const description =
+    `Global art buying guides, investment insights, and styling tips for collectors in ${config.label}.`;
+
+  return buildSeoMetadata({
+    path: "/blog",
+    title,
+    description,
+    keywords: ["art blog", "art investment", "wall art trends", "collector guides"],
+    country,
+    ogTitle: `Art Insights for ${config.label} Collectors`,
+    ogDescription: `Read global art guides, collecting tips, and trend reports curated for ${config.label}.`
+  });
 };
 
 const posts = [
   {
-    title: "Why Original Paintings Add Lasting Value to Your Home",
+    title: "Why Original Paintings Are a Smart Investment (UAE & USA)",
     summary:
-      "Discover how original art elevates your interiors, supports artists, and appreciates over time compared to mass prints."
+      "A collector’s guide to long-term value, authenticity, and how original artworks perform in premium markets."
   },
   {
-    title: "How to Choose Paintings for Your Living Room, Bedroom, and Office",
-    summary: "Room-by-room guidance on scale, palette, and mood so your wall art feels intentional and cohesive."
+    title: "How to Choose Paintings for Luxury Homes in Dubai",
+    summary: "Scale, palette, and statement pieces that elevate villas, penthouses, and hospitality interiors."
   },
   {
-    title: "Abstract vs Modern Art: Key Differences and When to Choose Each",
-    summary: "Understand styles, materials, and the stories behind abstract and modern art to pick the right fit."
+    title: "Best Wall Art Trends in USA & Hong Kong",
+    summary: "A year-ahead look at color palettes, large-scale canvases, and contemporary artist favorites."
   },
   {
-    title: "Beginner’s Guide to Investing in Art Without Overthinking",
-    summary: "Practical steps to start collecting original art confidently, from budgeting to provenance."
+    title: "Indian Traditional Art for Global Collectors",
+    summary: "Why heritage styles remain timeless and how collectors abroad are curating Indian originals."
+  },
+  {
+    title: "Abstract vs Modern Art: A Buyer’s Guide",
+    summary: "Quick comparisons, budget guidance, and styling tips to pick the right genre for your space."
   }
 ];
 
@@ -44,8 +56,8 @@ const BlogPage = () => {
         <p className="text-sm uppercase tracking-[0.3em] text-white/60">Art stories</p>
         <h1 className="section-heading">Art Stories & Guides</h1>
         <p className="max-w-3xl text-white/70">
-          Tips on selecting, styling, and collecting original paintings—written for homeowners, designers, and new
-          collectors.
+          Global guidance for collectors in the UAE, India, USA, and Hong Kong—covering investment insights, styling
+          tips, and artist stories.
         </p>
       </div>
       <div className="grid gap-6">
@@ -56,6 +68,17 @@ const BlogPage = () => {
             <p className="text-sm text-white/60">Coming soon</p>
           </article>
         ))}
+      </div>
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm text-white/70">
+        Explore the{" "}
+        <Link className="underline" href="/paintings#categories">
+          painting categories
+        </Link>{" "}
+        or browse the{" "}
+        <Link className="underline" href="/paintings">
+          full gallery
+        </Link>{" "}
+        to start your collection.
       </div>
     </div>
   );
