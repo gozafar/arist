@@ -100,3 +100,35 @@ export const adminGetCategories = () =>
   apiFetch<{ id: string; categoryName: string; createdAt: string; updatedAt: string }[]>(endpoints.admin.category, {
     cache: "no-store"
   });
+
+
+export const GetGallery = () =>
+  apiFetch<{ galleries: { _id: string; categoryId: { _id: string; categoryName: string }; imageIds: { _id: string; url: string; name: string }[]; createdAt: string; updatedAt: string }[] }>(endpoints.gallery.list, {
+    cache: "no-store"
+  });
+
+export const GetGalleryById = (id: string) =>
+  apiFetch<{ gallery: { _id: string; categoryId: { _id: string; categoryName: string }; imageIds: { _id: string; url: string; name: string }[]; createdAt: string; updatedAt: string } }>(endpoints.gallery.update(id), {
+    cache: "no-store"
+  });
+
+export const PostGallery = (data: FormData) =>
+  apiFetch<{ gallery: { _id: string; categoryId: string; images: { url: string; name: string }[]; createdAt: string } }>(endpoints.gallery.add, {
+    method: "POST",
+    body: data,
+    cache: "no-store"
+  });
+
+export const UpdateGallery = (id: string, data: FormData) =>
+  apiFetch<{ gallery: { _id: string; categoryId: string; images: { url: string; name: string }[]; updatedAt: string } }>(endpoints.gallery.update(id), {
+    method: "PUT",
+    body: data,
+    cache: "no-store"
+  });
+
+export const DeleteGallery = (id: string) =>
+  apiFetch<{ message: string }>(endpoints.gallery.delete(id), {
+    method: "DELETE",
+    cache: "no-store"
+  });
+

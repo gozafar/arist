@@ -1,4 +1,17 @@
 export const endpoints = {
+  contactUser:{
+    post:"/api/contact",
+    get:"/api/admin/contact",
+    update:(id: string) =>`/api/admin/contact/${id}`,
+    delete:(id:string) =>`/api/admin/contact/${id}`
+  },
+  gallery:{
+    list:"/api/gallery",
+    detail: (id: string) => `/api/admin/gallery/${id}`,
+    add:"/api/admin/gallery",
+    update: (id: string) => `/api/admin/gallery/${id}`,
+    delete: (id: string) => `/api/admin/gallery/${id}`
+  },
   paintings: {
     list: "/api/paintings",
     detail: (id: string) => `/api/paintings/${id}`

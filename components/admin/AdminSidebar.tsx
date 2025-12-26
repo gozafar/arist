@@ -8,7 +8,9 @@ const navItems = [
   { label: "Dashboard", href: "/admin/paintings" },
   { label: "List category", href: "/admin/paintings/list" },
   { label: "Order list", href: "/admin/paintings/order-list" },
-  { label: "Add new", href: "/admin/paintings/add" }
+  { label: "Add new", href: "/admin/paintings/add" },
+  { label: "Add Gallery", href: "/admin/paintings/gallery" },
+  { label: "Contact Messages", href: "/admin/paintings/contact" },
 ];
 
 const AdminSidebar = () => {

@@ -8,6 +8,7 @@ import { useCart } from "@/context/CartContext";
 const navItems = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
+  { href: "/gallery", label: "Gallery" },
   { href: "/paintings", label: "Paintings" },
   { href: "/contact", label: "Contact" },
   { href: "/admin/paintings", label: "Admin" }

@@ -1,11 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
-import Gallery, { GalleryImage } from "@/models/gallery";
+import Gallery from "@/models/gallery";
+import Image from "@/models/Image";
 import { dbConnect } from "@/lib/db";
-import { uploadOnCloudinary } from "../../../cloudinary";
+import { uploadOnCloudinary, deleteFromCloudinary } from "../../../cloudinary";
 import fs from "fs";
 import path from "path";
 import { requireRole } from "@/lib/rbac";
 
+interface ImageMeta {
+  _id: string;
+  name: string;
+  isDeleted: boolean;
+}
+
+interface GalleryImage {
+  _id: string;
+  url: string;
+  name: string;
+}
+
+interface GalleryData {
+  _id: string;
+  categoryId: string;
+  imageIds: GalleryImage[];
+}
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
@@ -13,148 +31,178 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         if (authError) return authError;
 
         const { id: galleryId } = await params;
-
         const formData = await request.formData();
-
-        const categoryId = formData.get('categoryId') as string;
-
-        // Get new image files and names from FormData
-        const newImageFiles = formData.getAll('images') as File[];
-        const imageNamesData = formData.get('imageNames') as string;
-        
-        // Handle imageNames - could be single string or JSON array
-        let newImageNames: string[] = [];
-        if (imageNamesData) {
-            try {
-                // Try parsing as JSON array first
-                const parsed = JSON.parse(imageNamesData);
-                newImageNames = Array.isArray(parsed) ? parsed : [imageNamesData];
-            } catch {
-                // If not JSON, treat as single string or comma-separated
-                newImageNames = imageNamesData.includes(',') ? imageNamesData.split(',') : [imageNamesData];
-            }
-        }
-
         await dbConnect();
 
-        // Find existing gallery
-        const gallery = await Gallery.findById(galleryId);
+        const gallery = await Gallery.findById(galleryId).populate({
+            path: 'imageIds',
+            select: 'url name'
+        });
         if (!gallery) {
-            return NextResponse.json(
-                { error: "Gallery not found" },
-                { status: 404 }
-            );
+            return NextResponse.json({ error: "Gallery not found" }, { status: 404 });
         }
 
-        // Get existing images to keep (from formData)
-        const existingImagesJson = formData.get('existingImages') as string;
-        let existingImages = existingImagesJson ? JSON.parse(existingImagesJson) : [];
+        const categoryId = formData.get('categoryId') as string;
+        const imagesMetaJson = formData.get('imagesMeta') as string;
+        const replacedImages = formData.getAll('replacedImages') as File[];
+        const replacedImageIds = formData.getAll('replacedImageIds') as string[];
 
-        // If no existingImages provided, use current gallery images
-        if (existingImages.length === 0 && gallery.images.length > 0) {
-            existingImages = gallery.images;
+        let imagesMeta: ImageMeta[] = [];
+        if (imagesMetaJson) {
+            imagesMeta = JSON.parse(imagesMetaJson);
         }
 
-        // Track what fields are being updated
         let hasUpdates = false;
-        let finalImages = [...existingImages];
 
-        // Handle categoryId update
-        if (categoryId) {
+        // Update category if changed
+        if (categoryId && categoryId !== "" && categoryId !== gallery.categoryId.toString()) {
             gallery.categoryId = categoryId;
             hasUpdates = true;
         }
 
-        // Handle new images upload
-        if (newImageFiles.length > 0) {
+        // Handle image name changes and deletions
+        for (const meta of imagesMeta) {
+            const existingImage = gallery.imageIds.find((img: GalleryImage) => img._id.toString() === meta._id);
             
-            // Process new images
-            const processedNewImages = [];
-            for (let i = 0; i < newImageFiles.length; i++) {
-                const file = newImageFiles[i];
-                // Preserve database names, don't change them
-                const imageName = existingImages[i]?.name || file.name;
+            if (meta.isDeleted && existingImage) {
+                await deleteImageById(existingImage._id);
+                gallery.imageIds = gallery.imageIds.filter((img: GalleryImage) => img._id.toString() !== meta._id);
+                hasUpdates = true;
+            } else if (existingImage && meta.name !== existingImage.name) {
+                await Image.findByIdAndUpdate(existingImage._id, { name: meta.name });
+                hasUpdates = true;
+            }
+        }
 
-                // Create temporary file
-                const tempDir = path.join(process.cwd(), 'temp');
-                if (!fs.existsSync(tempDir)) {
-                    fs.mkdirSync(tempDir, { recursive: true });
-                }
-
-                const tempFileName = `gallery-update-${Date.now()}-${Math.random().toString(36).substring(7)}-${file.name}`;
-                const tempFilePath = path.join(tempDir, tempFileName);
-
-                // Convert File to buffer and write to temp file
-                const buffer = Buffer.from(await file.arrayBuffer());
-                fs.writeFileSync(tempFilePath, buffer);
-
-                // Upload to Cloudinary
-                const uploadResult = await uploadOnCloudinary(tempFilePath, "rakhi-studio/gallery");
-
-                // Clean up temp file
-                if (fs.existsSync(tempFilePath)) {
-                    fs.unlinkSync(tempFilePath);
-                }
-
-                if (uploadResult) {
-                    processedNewImages.push({
-                        url: uploadResult.secure_url,
-                        name: imageName
-                    });
-                } else {
-                    throw new Error(`Failed to upload image ${file.name} to Cloudinary`);
+        // Handle image replacements
+        if (replacedImages.length > 0) {
+            for (let i = 0; i < replacedImages.length; i++) {
+                const file = replacedImages[i];
+                const imageId = replacedImageIds[i];
+                
+                if (file && imageId) {
+                    const uploadResult = await uploadImageToCloudinary(file);
+                    if (uploadResult) {
+                        const existingImage = await Image.findById(imageId);
+                        if (existingImage) {
+                            await deleteImageFromCloudinary(existingImage.url);
+                            const updatedName = imagesMeta.find((meta: ImageMeta) => meta._id === imageId)?.name;
+                            await Image.findByIdAndUpdate(imageId, {
+                                url: uploadResult.secure_url,
+                                name: updatedName || existingImage.name
+                            });
+                        } else {
+                            const newImageDoc = new Image({
+                                url: uploadResult.secure_url,
+                                name: imagesMeta.find((meta: ImageMeta) => meta._id === imageId)?.name || file.name,
+                                galleryId: gallery._id,
+                            });
+                            const savedImage = await newImageDoc.save();
+                            const index = gallery.imageIds.findIndex((img: GalleryImage) => img._id.toString() === imageId);
+                            if (index !== -1) {
+                                gallery.imageIds[index] = savedImage._id;
+                            }
+                        }
+                        hasUpdates = true;
+                    }
                 }
             }
-            
-            // If uploading new images, replace existing ones (don't combine)
-            finalImages = [...processedNewImages];
-            hasUpdates = true;
         }
 
-        // Handle only imageNames update (no new images, just rename existing ones)
-        if (newImageNames.length > 0 && newImageFiles.length === 0 && existingImages.length > 0) {
-            finalImages = existingImages.map((img: GalleryImage, index: number) => {
-                if (index < newImageNames.length) {
-                    return { ...img, name: newImageNames[index] };
-                }
-                return img;
-            });
-            hasUpdates = true;
+        if (hasUpdates) {
+            await gallery.save();
         }
 
-        // Validate total images count (must have 1-3 images)
-        if (finalImages.length === 0 || finalImages.length > 3) {
-            return NextResponse.json({
-                error: "Gallery must have 1 to 3 images",
-                errors: { images: "Between 1 and 3 images are required" }
-            }, { status: 400 });
-        }
-
-        // Only save if there are actual updates
-        if (!hasUpdates) {
-            return NextResponse.json({
-                gallery,
-                message: "No updates provided"
-            }, { status: 200 });
-        }
-
-        // Update gallery images
-        gallery.images = finalImages;
-
-        await gallery.save();
-        // Temporarily remove populate to avoid Category model issue
-        // await gallery.populate({ path: "categoryId", select: "categoryName" });
+        await gallery.populate([
+            { path: "imageIds", select: "url name" },
+            { path: "categoryId", select: "categoryName" }
+        ]);
 
         return NextResponse.json({
             gallery,
-            message: "Gallery updated successfully"
-        }, { status: 200 });
+            message: hasUpdates ? "Gallery updated successfully" : "No changes made"
+        });
 
-    } catch (error: unknown) {
-
+    } catch (error) {
         return NextResponse.json({
             error: "Failed to update gallery",
-            details: error instanceof Error ? error.message : String(error)
+            details: error instanceof Error ? error.message : "Unknown error"
         }, { status: 500 });
+    }
+}
+
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    try {
+        const authError = await requireRole(request, ["ADMIN", "SUPER_ADMIN"]);
+        if (authError) return authError;
+
+        const { id: galleryId } = await params;
+        await dbConnect();
+
+        const gallery = await Gallery.findById(galleryId).populate('imageIds');
+        if (!gallery) {
+            return NextResponse.json({ error: "Gallery not found" }, { status: 404 });
+        }
+
+        // Delete all images
+        await Promise.all(gallery.imageIds.map(async (imageId: string) => {
+            const image = await Image.findById(imageId);
+            if (image) {
+                await deleteImageFromCloudinary(image.url);
+                await Image.findByIdAndDelete(imageId);
+            }
+        }));
+
+        // Delete gallery
+        await Gallery.findByIdAndDelete(galleryId);
+
+        return NextResponse.json({ message: "Gallery deleted successfully" }, { status: 200 });
+
+    } catch (error) {
+        return NextResponse.json({
+            error: "Failed to delete gallery",
+            details: error instanceof Error ? error.message : "Unknown error"
+        }, { status: 500 });
+    }
+}
+
+async function uploadImageToCloudinary(file: File) {
+    const tempDir = path.join(process.cwd(), 'temp');
+    if (!fs.existsSync(tempDir)) {
+        fs.mkdirSync(tempDir, { recursive: true });
+    }
+
+    const tempFileName = `temp-${Date.now()}-${file.name}`;
+    const tempFilePath = path.join(tempDir, tempFileName);
+
+    try {
+        const buffer = Buffer.from(await file.arrayBuffer());
+        fs.writeFileSync(tempFilePath, buffer);
+        return await uploadOnCloudinary(tempFilePath, "rakhi-studio/gallery");
+    } finally {
+        if (fs.existsSync(tempFilePath)) {
+            fs.unlinkSync(tempFilePath);
+        }
+    }
+}
+
+async function deleteImageById(imageId: string) {
+    const image = await Image.findById(imageId);
+    if (image) {
+        await deleteImageFromCloudinary(image.url);
+        await Image.findByIdAndDelete(imageId);
+    }
+}
+
+async function deleteImageFromCloudinary(url: string) {
+    try {
+        const urlParts = url.split('/');
+        const fileName = urlParts[urlParts.length - 1]?.split('.')[0];
+        if (fileName) {
+            const publicId = `rakhi-studio/gallery/${fileName}`;
+            await deleteFromCloudinary(publicId);
+        }
+    } catch (error) {
+        // Silent error handling
     }
 }
