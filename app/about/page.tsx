@@ -1,24 +1,28 @@
-import Image from "next/image";
 import type { Metadata } from "next";
-import { siteUrl, defaultDescription, defaultKeywords } from "@/lib/seo";
+import Image from "next/image";
+import { headers } from "next/headers";
+import {
+  buildSeoMetadata,
+  getCountryConfig,
+  getCountryFromHeaders
+} from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "About",
-  description:
-    "Learn about Rakhi Vashisht, the Hong Kong-based artist behind Rakhi Studio, blending global influences into vibrant acrylic works.",
-  keywords: [...defaultKeywords, "artist story", "art philosophy", "original art Hong Kong"],
-  alternates: {
-    canonical: `${siteUrl}/about`
-  },
-  openGraph: {
-    title: "About Rakhi Vashisht",
-    description: defaultDescription,
-    url: `${siteUrl}/about`
-  },
-  twitter: {
-    title: "About Rakhi Vashisht",
-    description: defaultDescription
-  }
+export const generateMetadata = async (): Promise<Metadata> => {
+  const country = getCountryFromHeaders(await headers());
+  const config = getCountryConfig(country);
+  const title = `About Rakhi Studio | ${config.label} Art Gallery`;
+  const description =
+    `Discover Rakhi Studio’s international art story and certified originals for collectors in ${config.label}.`;
+
+  return buildSeoMetadata({
+    path: "/about",
+    title,
+    description,
+    keywords: ["artist profile", "international art gallery", "original art certificates"],
+    country,
+    ogTitle: `About the Artist – Rakhi Studio for ${config.label}`,
+    ogDescription: `Learn about our global collaborations, certified originals, and worldwide shipping for ${config.label} collectors.`
+  });
 };
 
 const AboutPage = () => {
@@ -49,12 +53,16 @@ const AboutPage = () => {
             that resonate with viewers. Beyond her own practice, she teaches, conducts workshops, and shares her vision
             through exhibitions worldwide.
           </p>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/70">
+            Rakhi Studio serves collectors and interior designers across the UAE, India, USA, and Hong Kong with certified
+            originals, provenance records, and worldwide shipping.
+          </div>
         </div>
       </div>
 
       <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
         <div className="space-y-4">
-          <h2 className="font-display text-3xl text-sand-200">Artistic Style</h2>
+          <h2 className="font-display text-3xl text-sand-200">Artist Profile & Style</h2>
           <p className="leading-relaxed text-white/80">
             Rakhi&apos;s art is a dance of vibrancy and detail. Bold hues and intricate strokes converge to create
             compositions that are both dynamic and contemplative, inspired by the mosaic of cultures and landscapes she
@@ -64,6 +72,11 @@ const AboutPage = () => {
             She delights in experimentation—exploring materials, techniques, and mediums—and moves fluidly between abstract
             explorations, human figures, landscapes, and seascapes. Each piece carries a quiet poetry that invites
             reflection.
+          </p>
+          <h3 className="text-lg font-semibold text-white">International collector focus</h3>
+          <p className="leading-relaxed text-white/70">
+            From luxury homes in Dubai to modern apartments in Hong Kong and design-led spaces in New York and Mumbai,
+            Rakhi&apos;s originals are collected for their emotional depth and investment value.
           </p>
         </div>
         <div className="relative aspect-[4/5] overflow-hidden rounded-[28px] border border-white/10 bg-white/5 shadow-card">

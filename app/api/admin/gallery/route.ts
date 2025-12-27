@@ -150,9 +150,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ gallery, message: "Gallery created successfully" }, { status: 201 });
   } catch (error) {
+    const message = error instanceof Error ? error.message : "Failed to create gallery";
+    console.error("Gallery create error:", error);
     return NextResponse.json({
-      error: "Failed to create gallery",
+      error: message,
     }, { status: 500 });
   }
 }
-

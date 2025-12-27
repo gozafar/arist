@@ -102,10 +102,20 @@ export const adminGetCategories = () =>
   });
 
 
-export const GetGallery = () =>
-  apiFetch<{ galleries: { _id: string; categoryId: { _id: string; categoryName: string }; imageIds: { _id: string; url: string; name: string }[]; createdAt: string; updatedAt: string }[] }>(endpoints.gallery.list, {
+export const GetGallery = (params?: { categoryId?: string; page?: number; limit?: number }) => {
+  const query = new URLSearchParams();
+  if (params?.categoryId) query.set("categoryId", params.categoryId);
+  if (params?.page) query.set("page", String(params.page));
+  if (params?.limit) query.set("limit", String(params.limit));
+  const suffix = query.size ? `?${query.toString()}` : "";
+
+  return apiFetch<{
+    galleries: { _id: string; categoryId: { _id: string; categoryName: string }; imageIds: { _id: string; url: string; name: string }[]; createdAt: string; updatedAt: string }[];
+    pagination?: { page: number; limit: number; total: number; pages: number };
+  }>(`${endpoints.gallery.list}${suffix}`, {
     cache: "no-store"
   });
+};
 
 export const GetGalleryById = (id: string) =>
   apiFetch<{ gallery: { _id: string; categoryId: { _id: string; categoryName: string }; imageIds: { _id: string; url: string; name: string }[]; createdAt: string; updatedAt: string } }>(endpoints.gallery.update(id), {
@@ -131,4 +141,3 @@ export const DeleteGallery = (id: string) =>
     method: "DELETE",
     cache: "no-store"
   });
-

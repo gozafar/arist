@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import { Playfair_Display, Inter } from "next/font/google";
 import "@/styles/globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { CartProvider } from "@/context/CartContext";
 import { PaintingProvider } from "@/context/PaintingContext";
-import { defaultDescription, defaultKeywords, siteUrl } from "@/lib/seo";
+import { defaultDescription, defaultKeywords, defaultOgImage, getCountryFromHeaders, getLangForCountry, siteUrl } from "@/lib/seo";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -20,21 +21,20 @@ export const metadata: Metadata = {
   description: defaultDescription,
   keywords: defaultKeywords,
   metadataBase: new URL(siteUrl),
-  alternates: {
-    canonical: siteUrl
-  },
   openGraph: {
     title: "Artistry – Online Painting Gallery",
     description: defaultDescription,
     url: siteUrl,
     siteName: "Artistry Gallery",
     locale: "en_US",
-    type: "website"
+    type: "website",
+    images: [{ url: defaultOgImage, alt: "Artistry Gallery online painting marketplace" }]
   },
   twitter: {
     card: "summary_large_image",
     title: "Artistry – Online Painting Gallery",
-    description: defaultDescription
+    description: defaultDescription,
+    images: [defaultOgImage]
   }
 };
 
@@ -44,9 +44,13 @@ export const viewport: Viewport = {
   themeColor: "#F8F5F0"
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const headerList = await headers();
+  const country = getCountryFromHeaders(headerList);
+  const lang = getLangForCountry(country);
+
   return (
-    <html lang="en">
+    <html lang={lang}>
       <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
         <PaintingProvider>
           <CartProvider>
@@ -62,7 +66,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                       name: "Rakhi Studio",
                       url: siteUrl,
                       logo: `${siteUrl}/logo.png`,
-                      sameAs: ["https://www.instagram.com", "https://www.behance.net"]
+                      sameAs: ["https://www.instagram.com", "https://www.behance.net"],
+                      areaServed: ["United States", "India", "United Arab Emirates", "Hong Kong"],
+                      contactPoint: [
+                        {
+                          "@type": "ContactPoint",
+                          contactType: "sales",
+                          areaServed: ["US", "IN", "AE", "HK"],
+                          availableLanguage: ["English"]
+                        }
+                      ]
                     })
                   }}
                 />

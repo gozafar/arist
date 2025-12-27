@@ -52,6 +52,46 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
             imagesMeta = JSON.parse(imagesMetaJson);
         }
 
+        if (replacedImages.length !== replacedImageIds.length) {
+            return NextResponse.json({ error: "Mismatched replacement images" }, { status: 400 });
+        }
+
+        const galleryImageIdSet = new Set(gallery.imageIds.map((img: GalleryImage) => img._id.toString()));
+        for (const repId of replacedImageIds) {
+            if (!galleryImageIdSet.has(repId)) {
+                return NextResponse.json({ error: "Invalid image to replace" }, { status: 400 });
+            }
+        }
+
+        // Validate meta references
+        for (const meta of imagesMeta) {
+            if (!galleryImageIdSet.has(meta._id)) {
+                return NextResponse.json({ error: "Invalid image reference" }, { status: 400 });
+            }
+        }
+
+        // Calculate resulting images to ensure at least one remains and names stay unique
+        const toDelete = new Set(imagesMeta.filter((m) => m.isDeleted).map((m) => m._id));
+        const nameUpdates = new Map(imagesMeta.filter((m) => !m.isDeleted && m.name).map((m) => [m._id, m.name.trim()]));
+
+        const resultingNames: string[] = [];
+        let resultingCount = 0;
+        for (const img of gallery.imageIds as GalleryImage[]) {
+            if (toDelete.has(img._id.toString())) continue;
+            const finalName = nameUpdates.get(img._id.toString()) || img.name;
+            resultingNames.push(finalName.trim().toLowerCase());
+            resultingCount += 1;
+        }
+
+        if (resultingCount === 0 && replacedImages.length === 0) {
+            return NextResponse.json({ error: "At least one image is required" }, { status: 400 });
+        }
+
+        const hasDuplicate = resultingNames.some((name, idx) => resultingNames.indexOf(name) !== idx);
+        if (hasDuplicate) {
+            return NextResponse.json({ error: "Image names must be unique" }, { status: 400 });
+        }
+
         let hasUpdates = false;
 
         // Update category if changed

@@ -1,21 +1,28 @@
-import type { Metadata } from "next";
 import PaintingsClient from "@/components/PaintingsClient";
-import { defaultKeywords, siteUrl } from "@/lib/seo";
+import { headers } from "next/headers";
+import type { Metadata } from "next";
+import {
+  buildSeoMetadata,
+  getCountryConfig,
+  getCountryFromHeaders
+} from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Paintings",
-  description: "Browse original paintings, abstract and modern wall art, and canvas collections by Rakhi Studio.",
-  keywords: [...defaultKeywords, "abstract paintings", "modern paintings", "canvas wall art", "wall art online"],
-  alternates: { canonical: `${siteUrl}/paintings` },
-  openGraph: {
-    title: "Shop Paintings",
-    description: "Original wall art and canvas paintings by Rakhi Vashisht.",
-    url: `${siteUrl}/paintings`
-  },
-  twitter: {
-    title: "Shop Paintings",
-    description: "Original wall art and canvas paintings by Rakhi Vashisht."
-  }
+export const generateMetadata = async (): Promise<Metadata> => {
+  const country = getCountryFromHeaders(await headers());
+  const config = getCountryConfig(country);
+  const title = `Original Paintings for Sale | ${config.label}`;
+  const description =
+    `Browse abstract, modern, and traditional paintings shipped to collectors in ${config.label}.`;
+
+  return buildSeoMetadata({
+    path: "/paintings",
+    title,
+    description,
+    keywords: ["abstract paintings", "modern art", "traditional art", "canvas wall art"],
+    country,
+    ogTitle: `Shop Original Paintings in ${config.label}`,
+    ogDescription: `Explore curated originals and wall art with secure delivery to ${config.label}.`
+  });
 };
 
 const PaintingsPage = () => <PaintingsClient />;

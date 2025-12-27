@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import AdminPagination from "@/components/admin/AdminPagination";
-import AddGalleryModal from "@/components/admin/AddGalleryModal";
-import { GetGallery, PostGallery, DeleteGallery } from "@/lib/api/admin";
+import { DeleteGallery, GetGallery } from "@/lib/api/admin";
 
 interface GalleryImage {
   _id: string;
@@ -40,7 +39,6 @@ export default function GalleryListPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [page, setPage] = useState(1);
 
   const PAGE_SIZE = 8;
@@ -84,18 +82,6 @@ export default function GalleryListPage() {
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Delete failed");
-    }
-  };
-
-  const handleAddGallery = async (formData: FormData) => {
-    try {
-      await PostGallery(formData);
-      setSuccess("Gallery created successfully");
-      fetchGalleries();
-      setIsAddModalOpen(false);
-      setTimeout(() => setSuccess(null), 3000);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Create failed");
     }
   };
 
@@ -152,7 +138,7 @@ export default function GalleryListPage() {
           <h1 className="section-heading">All Images</h1>
         </div>
         <button
-          onClick={() => setIsAddModalOpen(true)}
+          onClick={() => router.push("/admin/paintings/gallery/new")}
           className="button-primary text-xs"
         >
           Add New Gallery
@@ -245,12 +231,6 @@ export default function GalleryListPage() {
         </>
       )}
 
-      {/* ADD MODAL */}
-      <AddGalleryModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onGalleryAdded={fetchGalleries}
-      />
     </div>
   );
 }

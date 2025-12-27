@@ -17,14 +17,19 @@ export const uploadOnCloudinary = async (localFilePath: string, folder?: string)
     });
 
     return response;
-  } catch (error) {
+  } catch (error: any) {
     // remove temp file even if upload fails
     if (fs.existsSync(localFilePath)) {
       fs.unlinkSync(localFilePath);
     }
 
+    const message =
+      (error && error.message) ||
+      (error && error.error && error.error.message) ||
+      "Unknown Cloudinary upload error";
+
     console.error("Cloudinary Error:", error);
-    return null;
+    throw new Error(message);
   }
 };
 

@@ -4,21 +4,22 @@ import Image from "next/image";
 import Link from "next/link";
 import type { PaintingDTO } from "@/lib/dto";
 import Button from "./Button";
-import { useCart } from "@/context/CartContext";
+// import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
 // import { useRouter } from "next/router";
 
+
 const PaintingCard = ({ painting }: { painting: PaintingDTO }) => {
   const router = useRouter();
-  const { addToCart } = useCart();
-  const isSold = painting.availability === "sold";
+  // const { addToCart } = useCart();
+  // const isSold = painting.availability === "sold";
 
   return (
     <div className="card-glass flex h-full flex-col overflow-hidden rounded-3xl">
       <div className="relative aspect-[3/4] max-h-[320px] overflow-hidden">
         <Image
           src={painting.image}
-          alt={painting.title}
+          alt={`${painting.title} original painting`}
           fill
           className="object-cover transition duration-700 hover:scale-105"
           sizes="(min-width: 1280px) 240px, (min-width: 1024px) 260px, (min-width: 640px) 45vw, 90vw"
@@ -43,13 +44,13 @@ const PaintingCard = ({ painting }: { painting: PaintingDTO }) => {
             <Link href={`/paintings/${painting.id}`} className="button-outline px-4 py-2 text-xs">
               View
             </Link>
-            <Button
+            {/* <Button
               onClick={() => addToCart(painting)}
               className="px-4 py-2 text-xs"
               disabled={isSold}
             >
               {isSold ? "Sold" : "Add"}
-            </Button>
+            </Button> */}
             <Button
             onClick={() => router.push(`/paintings/${painting.id}/PaintingOrder`)}
             >

@@ -128,6 +128,13 @@ const ContactClient = () => {
               {/* <p className="text-white/60">Call: +91 9899757066</p> */}
             </div>
           </div>
+          <div className="space-y-2 text-sm text-white/70">
+            <h3 className="font-semibold text-white">Worldwide support</h3>
+            <p className="text-white/60">UAE &amp; Dubai: white-glove shipping and customs guidance.</p>
+            <p className="text-white/60">India: studio pickups and insured domestic delivery.</p>
+            <p className="text-white/60">USA: tracked international freight for collectors.</p>
+            <p className="text-white/60">Hong Kong: local framing coordination upon request.</p>
+          </div>
         </div>
       </div>
     </div>

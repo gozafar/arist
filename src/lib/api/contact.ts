@@ -43,11 +43,20 @@ export const createContact = (payload: ContactRequest) =>
     cache: "no-store"
   });
 
-export const getContacts = () =>
-  apiFetch<GetContactsResponse>(endpoints.contactUser.get, {
+export const getContacts = (params?: { page?: number; limit?: number; status?: string; search?: string }) => {
+  const query = new URLSearchParams();
+  if (params?.page) query.set("page", String(params.page));
+  if (params?.limit) query.set("limit", String(params.limit));
+  if (params?.status) query.set("status", params.status);
+  if (params?.search) query.set("search", params.search);
+
+  const suffix = query.size ? `?${query.toString()}` : "";
+
+  return apiFetch<GetContactsResponse>(`${endpoints.contactUser.get}${suffix}`, {
     method: "GET",
     cache: "no-store"
   });
+};
 
 export const updateContact = (id: string, payload: Partial<ContactRequest>) =>
   apiFetch<ContactResponse>(endpoints.contactUser.update(id), {

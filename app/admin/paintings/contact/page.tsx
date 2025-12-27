@@ -2,29 +2,49 @@
 
 import { useEffect, useState } from "react";
 import { getContacts, updateContact, deleteContact } from "@/lib/api/contact";
-import { ContactResponse } from "@/lib/api/contact";
+import { ContactResponse, GetContactsResponse } from "@/lib/api/contact";
 import { toast } from "react-toastify";
 import DeleteModal from "@/components/DeleteModal";
+import AdminPagination from "@/components/admin/AdminPagination";
+
+const STATUS_OPTIONS = [
+  { value: "NEW_LEAD", label: "New Lead" },
+  { value: "CONTACTED", label: "Contacted" },
+  { value: "IN_PROGRESS", label: "In Progress" },
+  { value: "COMPLETED", label: "Completed" },
+  { value: "CLOSED", label: "Closed" }
+];
 
 export default function ContactManagementPage() {
   const [contacts, setContacts] = useState<ContactResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState<Partial<ContactResponse>>({});
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [contactToDelete, setContactToDelete] = useState<string | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState<GetContactsResponse["pagination"]>({
+    page: 1,
+    limit: 10,
+    total: 0,
+    pages: 1,
+    hasNext: false,
+    hasPrev: false
+  });
 
   useEffect(() => {
-    fetchContacts();
-  }, []);
+    fetchContacts(page);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page]);
 
-  const fetchContacts = async () => {
+  const fetchContacts = async (pageToFetch: number) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await getContacts();
+      const response = await getContacts({ page: pageToFetch, limit: pagination.limit });
       setContacts(response.contacts || []);
+      setPagination(response.pagination);
+      setPage(response.pagination.page);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch contacts");
     } finally {
@@ -32,33 +52,18 @@ export default function ContactManagementPage() {
     }
   };
 
-  const handleEdit = (contact: ContactResponse) => {
-    setEditingId(contact._id);
-    setEditForm({
-      status: contact.status
-    });
-  };
-
-  const handleSave = async () => {
-    if (!editingId) return;
-
+  const handleStatusChange = async (contactId: string, status: string) => {
     try {
-      await updateContact(editingId, { status: editForm.status });
-      setContacts(contacts.map(c => 
-        c._id === editingId ? { ...c, status: editForm.status } as ContactResponse : c
-      ));
+      setUpdatingId(contactId);
+      await updateContact(contactId, { status });
       toast.success("Status updated successfully!");
-      setEditingId(null);
-      setEditForm({});
+      await fetchContacts(page);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to update status";
       toast.error(errorMessage);
+    } finally {
+      setUpdatingId(null);
     }
-  };
-
-  const handleCancel = () => {
-    setEditingId(null);
-    setEditForm({});
   };
 
   const handleDelete = (id: string) => {
@@ -71,10 +76,10 @@ export default function ContactManagementPage() {
 
     try {
       await deleteContact(contactToDelete);
-      setContacts(contacts.filter(c => c._id !== contactToDelete));
       toast.success("Contact deleted successfully!");
       setDeleteModalOpen(false);
       setContactToDelete(null);
+      await fetchContacts(page);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to delete contact";
       toast.error(errorMessage);
@@ -98,7 +103,7 @@ export default function ContactManagementPage() {
     return (
       <div className="text-center py-24">
         <p className="text-red-400 mb-4">{error}</p>
-        <button onClick={fetchContacts} className="button-primary text-xs">
+        <button onClick={() => fetchContacts(page)} className="button-primary text-xs">
           Retry
         </button>
       </div>
@@ -117,7 +122,7 @@ export default function ContactManagementPage() {
         </div>
         <div className="flex gap-3 text-xs text-white/70">
           <span className="rounded-full bg-white/5 px-4 py-2">
-            {contacts.length} messages
+            {pagination.total} messages
           </span>
         </div>
       </div>
@@ -127,103 +132,65 @@ export default function ContactManagementPage() {
           No contact messages found
         </div>
       ) : (
-        <div className="space-y-4">
-          {contacts.map((contact) => (
-            <div
-              key={contact._id}
-              className="card-glass rounded-2xl p-6"
-            >
-              {editingId === contact._id ? (
-                // Edit Form - Status Only
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-white mb-2">
-                      Status
-                    </label>
+        <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5">
+          <table className="w-full text-left text-sm text-white/80">
+            <thead className="bg-white/10 text-xs uppercase tracking-[0.2em] text-white/60">
+              <tr>
+                <th className="px-5 py-3">Name</th>
+                <th className="px-5 py-3">Email</th>
+                <th className="px-5 py-3">Phone</th>
+                <th className="px-5 py-3">Message</th>
+                <th className="px-5 py-3">Status</th>
+                <th className="px-5 py-3">Received</th>
+                <th className="px-5 py-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {contacts.map((contact) => (
+                <tr key={contact._id} className="border-t border-white/10">
+                  <td className="px-5 py-3 text-white font-medium">{contact.name}</td>
+                  <td className="px-5 py-3">{contact.email}</td>
+                  <td className="px-5 py-3">{contact.phone || "—"}</td>
+                  <td className="px-5 py-3 max-w-xs">
+                    <span className="line-clamp-2 text-white/80">{contact.message}</span>
+                  </td>
+                  <td className="px-5 py-3">
                     <select
-                      value={editForm.status || ""}
-                      onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
-                      className="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-white outline-none transition focus:border-white/30"
+                      value={contact.status}
+                      onChange={(e) => handleStatusChange(contact._id, e.target.value)}
+                      disabled={updatingId === contact._id}
+                      className="w-full rounded-lg border border-white/15 bg-white/5 px-2 py-1 text-sm text-white outline-none transition focus:border-white/30 disabled:opacity-50"
                     >
-                      <option value="NEW_LEAD">New Lead</option>
-                      <option value="CONTACTED">Contacted</option>
-                      <option value="IN_PROGRESS">In Progress</option>
-                      <option value="COMPLETED">Completed</option>
-                      <option value="CLOSED">Closed</option>
+                      {STATUS_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
                     </select>
-                  </div>
-                  <div className="flex gap-3">
+                  </td>
+                  <td className="px-5 py-3 text-white/70">
+                    {new Date(contact.createdAt).toLocaleString()}
+                  </td>
+                  <td className="px-5 py-3 text-right">
                     <button
-                      onClick={handleSave}
-                      className="button-primary text-xs"
+                      onClick={() => handleDelete(contact._id)}
+                      className="text-red-400 hover:text-red-300 text-xs"
                     >
-                      Update Status
+                      Delete
                     </button>
-                    <button
-                      onClick={handleCancel}
-                      className="button-outline text-xs"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                // View Mode
-                <div>
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-white mb-2">
-                        {contact.name}
-                      </h3>
-                      <div className="space-y-1 text-sm">
-                        <p className="text-white/70">
-                          Email: <span className="text-white">{contact.email}</span>
-                        </p>
-                        {contact.phone && (
-                          <p className="text-white/70">
-                            Phone: <span className="text-white">{contact.phone}</span>
-                          </p>
-                        )}
-                        <p className="text-white/70">
-                          Status: <span className={`inline-block px-2 py-1 rounded-full text-xs ${
-                            contact.status === 'NEW_LEAD' ? 'bg-blue-500/20 text-blue-300' :
-                            contact.status === 'CONTACTED' ? 'bg-yellow-500/20 text-yellow-300' :
-                            contact.status === 'IN_PROGRESS' ? 'bg-orange-500/20 text-orange-300' :
-                            contact.status === 'COMPLETED' ? 'bg-green-500/20 text-green-300' :
-                            'bg-gray-500/20 text-gray-300'
-                          }`}>
-                            {contact.status.replace('_', ' ')}
-                          </span>
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleEdit(contact)}
-                        className="button-outline text-xs"
-                      >
-                        Update Status
-                      </button>
-                      <button
-                        onClick={() => handleDelete(contact._id)}
-                        className="text-red-400 hover:text-red-300 text-xs"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                  <div className="border-t border-white/10 pt-4">
-                    <p className="text-sm text-white/80 leading-relaxed">
-                      {contact.message}
-                    </p>
-                  </div>
-                  <div className="mt-4 text-xs text-white/40">
-                    Received: {new Date(contact.createdAt).toLocaleString()}
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div className="px-5 pb-4">
+            <AdminPagination
+              total={pagination.total}
+              perPage={pagination.limit}
+              currentPage={pagination.page}
+              onPageChange={setPage}
+            />
+          </div>
         </div>
       )}
       
