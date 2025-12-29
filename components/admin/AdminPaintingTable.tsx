@@ -29,7 +29,17 @@ const AdminPaintingTable = ({ paintings, onEdit, onDelete, onToggle }: AdminPain
               <td className="px-4 py-3">
                 <div className="flex items-center gap-3">
                   <div className="relative h-14 w-12 overflow-hidden rounded-lg">
-                    <Image src={painting.image} alt={painting.title} fill className="object-cover" sizes="64px" />
+                      <Image 
+    src={painting.image} 
+    alt={painting.title} 
+    fill 
+    className="object-cover"
+    loading="lazy"
+    sizes="48px" // Matches the container width (w-12 = 3rem = 48px)
+    quality={75}
+    placeholder="blur"
+    blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiB2aWV3Qm94PSIwIDAgNDAwIDQwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YxZjFmMSIvPjwvc3ZnPg=="
+  />
                   </div>
                   <div>
                     <p className="font-semibold text-slate-900">{painting.title}</p>

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { UpdateGallery } from "@/lib/api/admin";
 import GalleryModal from "@/components/admin/GalleryModal";
+import Image from "next/image";
 
 interface GalleryImage {
   _id: string;
@@ -120,16 +121,16 @@ export default function EditGalleryPage({
 
   const confirmDeleteImage = () => {
     if (!imageToDelete) return;
-    
+
     // Mark image as deleted locally - no API call
-    setImages((prev) => 
+    setImages((prev) =>
       prev.map((img) =>
-        img._id === imageToDelete 
+        img._id === imageToDelete
           ? { ...img, isDeleted: true }
           : img
       )
     );
-    
+
     toast.success('Image marked for deletion');
     setDeleteModalOpen(false);
     setImageToDelete(null);
@@ -146,7 +147,7 @@ export default function EditGalleryPage({
 
     try {
       const activeImages = images.filter((img) => !img.isDeleted);
-      
+
       if (activeImages.length === 0) {
         toast.error("At least one image is required");
         setSubmitting(false);
@@ -283,7 +284,17 @@ export default function EditGalleryPage({
                     className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/5 shadow-sm transition hover:border-white/20"
                   >
                     <div className="relative h-40 w-full">
-                      <img src={img.url} className="h-full w-full object-cover" alt={img.name} />
+                      <Image
+                        src={img.url}
+                        alt={img.name}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        loading="lazy"
+                        quality={75}
+                        placeholder="blur"
+                        blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiB2aWV3Qm94PSIwIDAgNDAwIDQwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YxZjFmMSIvPjwvc3ZnPg=="
+                      />
                       <span className="absolute left-3 top-3 rounded-full bg-black/60 px-2 py-1 text-[10px] uppercase tracking-[0.15em] !text-white">
                         Existing
                       </span>

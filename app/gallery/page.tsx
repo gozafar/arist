@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { GetGallery } from "@/lib/api/admin";
+import Image from "next/image";
 
 const GALLERY_NAMES = [
   "Contemporary / Modern Art",
@@ -142,16 +143,37 @@ export default function GalleryPage() {
                 <div className="relative aspect-square overflow-hidden">
                   <div className="grid grid-cols-2 grid-rows-2 h-full gap-[2px]">
                     {gallery.imageIds.slice(0, 4).map((img, i) => (
-                      <img
+                      // <img
+                      //   key={img._id}
+                      //   src={img.url}
+                      //   alt={img.name}
+                      //   className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-110
+                      //     ${gallery.imageIds.length === 1 ? "col-span-2 row-span-2" : ""}
+                      //     ${gallery.imageIds.length === 2 && i === 0 ? "col-span-2" : ""}
+                      //     ${gallery.imageIds.length === 3 && i === 2 ? "col-span-2" : ""}
+                      //   `}
+                      // />
+
+                      <div 
                         key={img._id}
-                        src={img.url}
-                        alt={img.name}
-                        className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-110
+                        className={`relative h-full w-full overflow-hidden
                           ${gallery.imageIds.length === 1 ? "col-span-2 row-span-2" : ""}
                           ${gallery.imageIds.length === 2 && i === 0 ? "col-span-2" : ""}
                           ${gallery.imageIds.length === 3 && i === 2 ? "col-span-2" : ""}
                         `}
-                      />
+                      >
+                        <Image
+                          src={img.url}
+                          alt={img.name}
+                          fill
+                          className="object-cover transition-transform duration-500 group-hover:scale-110"
+                          sizes={gallery.imageIds.length === 1 ? "(max-width: 768px) 100vw, 50vw" : "(max-width: 768px) 50vw, 25vw"}
+                          loading="lazy"
+                          quality={75}
+                          placeholder="blur"
+                          blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiB2aWV3Qm94PSIwIDAgNDAwIDQwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YxZjFmMSIvPjwvc3ZnPg=="
+                        />
+                      </div>
                     ))}
 
                     {gallery.imageIds.length === 0 && (
