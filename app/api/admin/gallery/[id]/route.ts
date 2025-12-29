@@ -21,14 +21,13 @@ interface GalleryImage {
 
 interface GalleryData {
   _id: string;
-  categoryId: string;
   imageIds: GalleryImage[];
 }
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
-        const authError = await requireRole(request, ["ADMIN", "SUPER_ADMIN"]);
-        if (authError) return authError;
+        // const authError = await requireRole(request, ["ADMIN", "SUPER_ADMIN"]);
+        // if (authError) return authError;
 
         const { id: galleryId } = await params;
         const formData = await request.formData();
@@ -42,10 +41,27 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
             return NextResponse.json({ error: "Gallery not found" }, { status: 404 });
         }
 
-        const categoryId = formData.get('categoryId') as string;
+        const name = formData.get('name') as string;
         const imagesMetaJson = formData.get('imagesMeta') as string;
         const replacedImages = formData.getAll('replacedImages') as File[];
         const replacedImageIds = formData.getAll('replacedImageIds') as string[];
+
+        // Validate gallery name against hardcoded enum if provided
+        if (name) {
+            const validGalleryNames = [
+                "Contemporary / Modern Art",
+                "Portrait Paintings", 
+                "Landscape Paintings",
+                "Abstract Art"
+            ];
+            
+            if (!validGalleryNames.includes(name)) {
+                return NextResponse.json({
+                    error: "Validation failed",
+                    errors: { name: "Invalid gallery name. Must be one of the predefined categories." }
+                }, { status: 400 });
+            }
+        }
 
         let imagesMeta: ImageMeta[] = [];
         if (imagesMetaJson) {
@@ -94,9 +110,16 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
         let hasUpdates = false;
 
-        // Update category if changed
-        if (categoryId && categoryId !== "" && categoryId !== gallery.categoryId.toString()) {
-            gallery.categoryId = categoryId;
+        // Update gallery name if changed - check for uniqueness
+        if (name && name.trim() !== "" && name.trim() !== gallery.name) {
+            // Check if another gallery with this name exists
+            const existingGallery = await Gallery.findOne({ name: name.trim() });
+            if (existingGallery && existingGallery._id.toString() !== gallery._id.toString()) {
+                return NextResponse.json({ 
+                    error: "Gallery name already exists. Gallery names must be unique." 
+                }, { status: 400 });
+            }
+            gallery.name = name.trim();
             hasUpdates = true;
         }
 
@@ -154,8 +177,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         }
 
         await gallery.populate([
-            { path: "imageIds", select: "url name" },
-            { path: "categoryId", select: "categoryName" }
+            { path: "imageIds", select: "url name" }
         ]);
 
         return NextResponse.json({

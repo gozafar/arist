@@ -1,14 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import GalleryForm from "@/components/admin/GalleryForm";
-import { adminGetCategories } from "@/lib/api/admin";
-
-interface Category {
-  _id: string;
-  categoryName: string;
-}
-
 interface AddGalleryModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -16,39 +9,16 @@ interface AddGalleryModalProps {
 }
 
 export default function AddGalleryModal({ isOpen, onClose, onGalleryAdded }: AddGalleryModalProps) {
-  const [categories, setCategories] = useState<Category[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (isOpen) {
-      fetchCategories();
-    }
-  }, [isOpen]);
-
-  const fetchCategories = async () => {
-    try {
-      const response = await adminGetCategories();
-      if (response) {
-        // Transform API response to match GalleryForm's expected Category interface
-        const transformedCategories = response.map(cat => ({
-          _id: cat.id,
-          categoryName: cat.categoryName
-        }));
-        setCategories(transformedCategories);
-      }
-    } catch (err) {
-      setError('Error fetching categories');
-    }
-  };
-
-  const handleSubmit = async (data: { categoryId: string; images: File[]; imageNames: string[] }) => {
+  const handleSubmit = async (data: { name: string; images: File[]; imageNames: string[] }) => {
     try {
       setSubmitting(true);
       setError(null);
       
       const formData = new FormData();
-      formData.append('categoryId', data.categoryId);
+      formData.append('name', data.name);
       
       data.images.forEach((image) => {
         formData.append('images', image);
@@ -101,17 +71,10 @@ export default function AddGalleryModal({ isOpen, onClose, onGalleryAdded }: Add
             </div>
           )}
 
-          {categories.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-white/70">No categories found. Please create a category first.</p>
-            </div>
-          ) : (
-            <GalleryForm
-              onSubmit={handleSubmit}
-              isLoading={submitting}
-              categories={categories}
-            />
-          )}
+          <GalleryForm
+            onSubmit={handleSubmit}
+            isLoading={submitting}
+          />
         </div>
       </div>
     </div>

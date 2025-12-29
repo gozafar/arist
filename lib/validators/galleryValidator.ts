@@ -9,8 +9,11 @@ const objectIdSchema = Joi.string()
 // Gallery validation schemas
 export const gallerySchemas = {
   createGallery: Joi.object({
-    categoryId: objectIdSchema.required().messages({
-      'any.required': 'Category is required'
+    name: Joi.string().trim().min(1).max(200).required().messages({
+      'string.empty': 'Gallery name cannot be empty',
+      'string.min': 'Gallery name cannot be empty',
+      'string.max': 'Gallery name cannot exceed 200 characters',
+      'any.required': 'Gallery name is required'
     }),
     
     images: Joi.array().required().messages({
@@ -31,7 +34,11 @@ export const gallerySchemas = {
   }),
 
   updateGallery: Joi.object({
-    categoryId: objectIdSchema.optional(),
+    name: Joi.string().trim().min(1).max(200).optional().messages({
+      'string.empty': 'Gallery name cannot be empty',
+      'string.min': 'Gallery name cannot be empty',
+      'string.max': 'Gallery name cannot exceed 200 characters'
+    }),
     
     images: Joi.array().optional().messages({
       'array.min': 'At least one image is required',
@@ -51,7 +58,6 @@ export const gallerySchemas = {
   }),
 
   getGalleries: Joi.object({
-    categoryId: objectIdSchema.optional(),
     page: Joi.number()
       .integer()
       .min(1)

@@ -3,44 +3,15 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import GalleryForm from "@/components/admin/GalleryForm";
-import { adminGetCategories } from "@/lib/api/admin";
-
-interface Category {
-  _id: string;
-  categoryName: string;
-}
 
 export default function NewGalleryPage() {
   const router = useRouter();
 
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadCategories = async () => {
-      try {
-        const response = await adminGetCategories();
-        if (response) {
-          const transformed = response.map((cat) => ({
-            _id: cat.id,
-            categoryName: cat.categoryName,
-          }));
-          setCategories(transformed);
-        }
-      } catch (err) {
-        setError("Error fetching categories");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadCategories();
-  }, []);
-
   const handleSubmit = async (data: {
-    categoryId: string;
+    name: string;
     images: File[];
     imageNames: string[];
   }) => {
@@ -49,7 +20,7 @@ export default function NewGalleryPage() {
       setError(null);
 
       const formData = new FormData();
-      formData.append("categoryId", data.categoryId);
+      formData.append("name", data.name);
       data.images.forEach((image) => {
         formData.append("images", image);
       });
@@ -65,7 +36,7 @@ export default function NewGalleryPage() {
       if (response.ok) {
         router.push("/admin/paintings/gallery?created=true");
       } else {
-        setError("Failed to create gallery1");
+        setError("Failed to create gallery");
       }
     } catch (err) {
       setError("Error creating gallery");
@@ -73,10 +44,6 @@ export default function NewGalleryPage() {
       setSubmitting(false);
     }
   };
-
-  if (loading) {
-    return <div className="text-center py-20 text-white/70">Loading...</div>;
-  }
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
@@ -92,26 +59,17 @@ export default function NewGalleryPage() {
           className="text-xs text-white/70 hover:text-white"
         >
           Back
-        </button>
+        </button> 
       </div>
 
       {error && <p className="mb-4 text-center text-red-400">{error}</p>}
 
-      {categories.length === 0 ? (
-        <div className="text-center py-8">
-          <p className="text-white/70">
-            No categories found. Please create a category first.
-          </p>
-        </div>
-      ) : (
-        <div className="card-glass rounded-3xl border border-white/10 bg-white/5 p-6">
-          <GalleryForm
-            onSubmit={handleSubmit}
-            isLoading={submitting}
-            categories={categories}
-          />
-        </div>
-      )}
+      <div className="card-glass rounded-3xl border border-white/10 bg-white/5 p-6">
+        <GalleryForm
+          onSubmit={handleSubmit}
+          isLoading={submitting}
+        />
+      </div>
     </div>
   );
 }

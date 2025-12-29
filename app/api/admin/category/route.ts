@@ -4,12 +4,12 @@ import Category from "@/models/Category";
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 
-interface CategoryDocument {
-  _id: mongoose.Types.ObjectId;
-  categoryName: string;
-  createdAt: string;
-  updatedAt: string;
-}
+// interface CategoryDocument {
+//   _id: mongoose.Types.ObjectId;
+//   categoryName: string;
+//   createdAt: string;
+//   updatedAt: string;
+// }
 
 interface CategoryResponse {
   id: string;

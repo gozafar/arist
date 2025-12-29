@@ -15,9 +15,10 @@ import "@/models/Image";
 
 export async function POST(request: NextRequest) {
   // Declare variables outside try block for error logging
-  let categoryId: string = "";
   let imageFiles: File[] = [];
   let imageNames: string[] = [];
+  let name: string = "";
+
 
   try {
     // const authError = await requireRole(request, ["ADMIN", "SUPER_ADMIN"]);
@@ -25,26 +26,51 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
 
+    console.log("formData", formData);
+
 
     // Extract fields from FormData
-    categoryId = formData.get('categoryId') as string;
 
     // Get all image files and their names from FormData
     imageFiles = formData.getAll('images') as File[];
     imageNames = formData.getAll('imageNames') as string[];
+    name = formData.get('name') as string;
 
 
-    // Validate maximum 3 images
-    if (imageFiles.length > 3) {
+    // Validate maximum 3 images - REMOVED since galleries now support unlimited images
+
+    // Validate gallery name against hardcoded enum
+    const validGalleryNames = [
+      "Contemporary / Modern Art",
+      "Portrait Paintings", 
+      "Landscape Paintings",
+      "Abstract Art"
+    ];
+    
+    if (!validGalleryNames.includes(name)) {
       return NextResponse.json({
         error: "Validation failed",
-        errors: { images: "Maximum 3 images allowed" }
+        errors: { name: "Invalid gallery name. Must be one of the predefined categories." }
       }, { status: 400 });
     }
 
-    // Validate categoryId and imageNames with Joi (images array validation handled separately)
+    await dbConnect();
+
+    // Check if gallery with this name already exists
+    let gallery = await Gallery.findOne({ name }).populate('imageIds');
+
+    if (!gallery) {
+      // Create new gallery if none exists
+      gallery = new Gallery({
+        imageIds: [], // Will be populated after image creation
+        name,
+      });
+      await gallery.save();
+    }
+
+    // Validate name and imageNames with Joi (images array validation handled separately)
     const validation = validateRequest(gallerySchemas.createGallery, {
-      categoryId,
+      name: name,
       images: [], // Pass empty array to satisfy Joi, files validated separately
       imageNames: imageNames // Pass actual image names for validation
     });
@@ -117,17 +143,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-
-
-    // Create gallery first
-    const gallery = new Gallery({
-      imageIds: [], // Will be populated after image creation
-      categoryId,
-    });
-
-    await gallery.save();
-
-
     // Prepare image documents with gallery reference
     const imageDocuments = processedImages.map(image => ({
       url: image.url,
@@ -138,14 +153,13 @@ export async function POST(request: NextRequest) {
     // Use insertMany to create all images at once - each gets unique _id
     const insertedImages = await Image.insertMany(imageDocuments);
 
-    // Update gallery with image IDs
-    gallery.imageIds = insertedImages.map(img => img._id);
+    // Add new image IDs to existing gallery
+    gallery.imageIds.push(...insertedImages.map(img => img._id));
     await gallery.save();
 
     // Populate gallery with images and category
     await gallery.populate([
       { path: "imageIds", select: "url name" },
-      { path: "categoryId", select: "categoryName" }
     ]);
 
     return NextResponse.json({ gallery, message: "Gallery created successfully" }, { status: 201 });

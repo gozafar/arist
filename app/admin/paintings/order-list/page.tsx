@@ -47,7 +47,6 @@ export default function OrderListPage() {
       
       // Fetch all orders
       const response = await getAllOrders();
-      console.log(response,"======>39")
       
       if (response.success ) {
         setOrders(response.payload);

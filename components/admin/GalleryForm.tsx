@@ -4,25 +4,26 @@ import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import Button from "@/components/Button";
 
-interface Category {
-  _id: string;
-  categoryName: string;
-}
-
 interface GalleryFormProps {
   onSubmit: (data: {
-    categoryId: string;
+    name: string;
     images: File[];
     imageNames: string[];
   }) => void;
   isLoading?: boolean;
-  categories: Category[];
 }
 
-const GalleryForm = ({ onSubmit, isLoading = false, categories }: GalleryFormProps) => {
+const GALLERY_NAMES = [
+  "Contemporary / Modern Art",
+  "Portrait Paintings", 
+  "Landscape Paintings",
+  "Abstract Art"
+] as const;
+
+const GalleryForm = ({ onSubmit, isLoading = false }: GalleryFormProps) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const [categoryId, setCategoryId] = useState("");
+  const [galleryName, setGalleryName] = useState("");
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [imageNames, setImageNames] = useState<string[]>([]);
@@ -90,8 +91,8 @@ const GalleryForm = ({ onSubmit, isLoading = false, categories }: GalleryFormPro
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!categoryId) {
-      toast.error("Please select a category");
+    if (!galleryName) {
+      toast.error("Please select a gallery name");
       return;
     }
     if (imageFiles.length === 0) {
@@ -100,7 +101,7 @@ const GalleryForm = ({ onSubmit, isLoading = false, categories }: GalleryFormPro
     }
 
     onSubmit({
-      categoryId,
+      name: galleryName,
       images: imageFiles,
       imageNames: imageNames.slice(0, imageFiles.length),
     });
@@ -109,15 +110,18 @@ const GalleryForm = ({ onSubmit, isLoading = false, categories }: GalleryFormPro
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Gallery Name
+        </label>
         <select
-          value={categoryId}
-          onChange={(e) => setCategoryId(e.target.value)}
-          className="w-full rounded-xl border border-gray-300 px-4 py-3"
+          value={galleryName}
+          onChange={(e) => setGalleryName(e.target.value)}
+          className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none"
         >
-          <option value="">Select Category</option>
-          {categories.map((cat) => (
-            <option key={cat._id} value={cat._id}>
-              {cat.categoryName}
+          <option value="">Select a gallery name</option>
+          {GALLERY_NAMES.map((name) => (
+            <option key={name} value={name}>
+              {name}
             </option>
           ))}
         </select>
@@ -198,7 +202,7 @@ const GalleryForm = ({ onSubmit, isLoading = false, categories }: GalleryFormPro
             >
               🗑
             </button>
-            <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-2 py-1 text-xs text-white">
+            <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-2 py-1 text-xs !text-white">
               {imageNames[index] || "Untitled"}
             </div>
           </div>

@@ -11,12 +11,13 @@ import {
   getCountryFromHeaders,
   siteUrl
 } from "@/lib/seo";
+import { endpoints } from "@/lib/api/endpoints";
 
 type PaintingResponse = PaintingDTO;
 
 async function fetchPainting(id: string): Promise<PaintingResponse | null> {
   const base = process.env.NEXT_PUBLIC_API_BASE_URL || "";
-  const res = await fetch(`${base}/api/paintings/${id}`, {
+  const res = await fetch(`${base}${endpoints.paintings.detail(id)}`, {
     next: { tags: ["paintings"] }
   });
   if (res.status === 404) return null;
@@ -24,10 +25,11 @@ async function fetchPainting(id: string): Promise<PaintingResponse | null> {
   return (await res.json()) as PaintingResponse;
 }
 
-export const generateMetadata = async ({ params }: { params: { id: string } }): Promise<Metadata> => {
+export const generateMetadata = async ({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> => {
   const country = getCountryFromHeaders(await headers());
   const config = getCountryConfig(country);
-  const painting = await fetchPainting(params?.id);
+  const resolvedParams = await params;
+  const painting = await fetchPainting(resolvedParams.id);
   if (!painting) {
     return { title: "Painting not found", robots: { index: false } };
   }
@@ -45,8 +47,9 @@ export const generateMetadata = async ({ params }: { params: { id: string } }): 
   });
 };
 
-const PaintingDetailPage = async ({ params }: { params: { id: string } }) => {
-  const painting = await fetchPainting(params?.id);
+const PaintingDetailPage = async ({ params }: { params: Promise<{ id: string }> }) => {
+  const resolvedParams = await params;
+  const painting = await fetchPainting(resolvedParams.id);
   if (!painting) {
     notFound();
   }

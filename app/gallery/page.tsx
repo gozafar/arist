@@ -1,7 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { GetGallery, adminGetCategories } from "@/lib/api/admin";
+import { useEffect, useState, useRef } from "react";
+import { GetGallery } from "@/lib/api/admin";
+
+const GALLERY_NAMES = [
+  "Contemporary / Modern Art",
+  "Portrait Paintings", 
+  "Landscape Paintings",
+  "Abstract Art"
+] as const;
 
 interface GalleryImage {
   _id: string;
@@ -11,18 +18,15 @@ interface GalleryImage {
 
 interface Gallery {
   _id: string;
+  name: string;
   imageIds: GalleryImage[];
-  categoryId: {
-    _id: string;
-    categoryName: string;
-  };
   createdAt: string;
 }
 
 export default function GalleryPage() {
   const [galleries, setGalleries] = useState<Gallery[]>([]);
-  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
-  const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
+  const [filteredGalleries, setFilteredGalleries] = useState<Gallery[]>([]);
+  const [selectedGallery, setSelectedGallery] = useState<string>("");
   const [pagination, setPagination] = useState<{ page: number; limit: number; total: number; pages: number }>({
     page: 1,
     limit: 10,
@@ -33,36 +37,28 @@ export default function GalleryPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchCategories();
-  }, []);
+    fetchGalleries();
+  }, [pagination.page]);
 
   useEffect(() => {
-    if (activeCategoryId) {
-      fetchGalleries(activeCategoryId, pagination.page);
+    if (selectedGallery) {
+      // Filter by selected hardcoded gallery name
+      const filtered = galleries.filter(gallery => gallery.name === selectedGallery);
+      setFilteredGalleries(filtered);
+    } else {
+      // Filter galleries to only show those with hardcoded names
+      const hardcodedFiltered = galleries.filter(gallery => 
+        GALLERY_NAMES.includes(gallery.name as any)
+      );
+      setFilteredGalleries(hardcodedFiltered);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeCategoryId, pagination.page]);
+  }, [selectedGallery, galleries]);
 
-  const fetchCategories = async () => {
+  const fetchGalleries = async () => {
     try {
       setLoading(true);
-      const res = await adminGetCategories();
-      const mapped = (res || []).map((c) => ({ id: c.id, name: c.categoryName }));
-      setCategories(mapped);
-      setActiveCategoryId(mapped[0]?.id || null);
-      setError(null);
-    } catch (err) {
-      setError("Failed to load categories");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchGalleries = async (categoryId: string, page: number) => {
-    try {
-      setLoading(true);
-      const res = await GetGallery({ categoryId, page, limit: pagination.limit });
-      setGalleries(res?.galleries || []);
+      const res = await GetGallery({ page: pagination.page, limit: pagination.limit });
+      setGalleries((res?.galleries as any) || []);
       if (res?.pagination) {
         setPagination(res.pagination);
       }
@@ -86,7 +82,7 @@ export default function GalleryPage() {
     return (
       <div className="text-center py-24">
         <p className="text-red-400 mb-4">{error}</p>
-        <button onClick={fetchCategories} className="button-primary text-xs">
+        <button onClick={fetchGalleries} className="button-primary text-xs">
           Retry
         </button>
       </div>
@@ -105,50 +101,39 @@ export default function GalleryPage() {
             Art Gallery
           </h1>
           <p className="mt-3 max-w-xl text-white/60 text-sm">
-            Browse collections by category. Switch tabs to load a category and page through its galleries.
+            Browse through our gallery collections. Page through to explore all available galleries.
           </p>
         </div>
 
-        <div className="flex gap-3 text-xs text-white/70">
+        <div className="flex flex-col sm:flex-row gap-3 text-xs text-white/70">
+          <select
+            value={selectedGallery}
+            onChange={(e) => setSelectedGallery(e.target.value)}
+            className="rounded-full bg-white/5 px-4 py-2 border border-white/10 focus:border-white/20 outline-none"
+          >
+            <option value="">All Galleries</option>
+            {GALLERY_NAMES.map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
+          </select>
           <span className="rounded-full bg-white/5 px-4 py-2">
-            {galleries.length} collections
+            {filteredGalleries.length} collections
           </span>
           <span className="rounded-full bg-white/5 px-4 py-2">
-            {galleries.reduce((t, g) => t + g.imageIds.length, 0)} works
+            {filteredGalleries.reduce((t, g) => t + g.imageIds.length, 0)} works
           </span>
         </div>
       </div>
 
-      {/* CATEGORY TABS */}
-      {categories.length > 0 && (
-        <div className="mb-8 flex flex-wrap items-center justify-center gap-3">
-          {categories.map((cat) => {
-            const isActive = cat.id === activeCategoryId;
-            return (
-              <button
-                key={cat.id}
-                onClick={() => {
-                  setActiveCategoryId(cat.id);
-                  setPagination((prev) => ({ ...prev, page: 1 }));
-                }}
-                className={`whitespace-nowrap rounded-full border px-4 py-2 text-sm transition ${
-                  isActive
-                    ? "border-white/60 bg-white/10 text-white shadow-md shadow-black/20"
-                    : "border-white/15 bg-white/5 text-white/70 hover:border-white/30"
-                }`}
-              >
-                {cat.name}
-              </button>
-            );
-          })}
-        </div>
-      )}
+      {/* selected category: {selectedCategory} */}
 
-      {/* ACTIVE CATEGORY GRID */}
-      {activeCategoryId ? (
+      {/* GALLERY GRID */}
+      {filteredGalleries.length > 0 ? (
         <section className="space-y-6">
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {galleries.map((gallery) => (
+            {filteredGalleries.map((gallery) => (
               <div
                 key={gallery._id}
                 className="group relative overflow-hidden rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 transition"
@@ -188,7 +173,7 @@ export default function GalleryPage() {
                 <div className="p-5">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-lg font-medium text-white">
-                      {gallery.categoryId.categoryName}
+                      {gallery.name}
                     </h3>
                     <span className="text-xs text-white/50">
                       {gallery.imageIds.length} works
@@ -238,7 +223,7 @@ export default function GalleryPage() {
           </div>
         </section>
       ) : (
-        <div className="text-white/60 text-sm">No category selected.</div>
+        <div className="text-white/60 text-sm">No galleries found.</div>
       )}
     </div>
   );

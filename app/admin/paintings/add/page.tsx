@@ -17,7 +17,7 @@ const AdminAddPaintingPage = () => {
           </div>
           <Link
             href="/admin/paintings"
-            className="inline-flex items-center justify-center rounded-full border border-[rgb(161,44,116)] px-4 py-2 text-xs font-semibold text-[rgb(161,44,116)] transition hover:bg-[rgb(161,44,116)] hover:text-white"
+            className="button-primary text-xs"
           >
             View list
           </Link>

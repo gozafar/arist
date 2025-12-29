@@ -5,6 +5,13 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { GetGalleryById, UpdateGallery, adminGetCategories } from "@/lib/api/admin";
 
+const GALLERY_NAMES = [
+  "Contemporary / Modern Art",
+  "Portrait Paintings", 
+  "Landscape Paintings",
+  "Abstract Art"
+] as const;
+
 
 interface Category {
   id: string;
@@ -19,11 +26,8 @@ interface GalleryImage {
 
 interface GalleryData {
   _id: string;
+  name: string;
   imageIds: GalleryImage[];
-  categoryId: {
-    _id: string;
-    categoryName: string;
-  };
 }
 
 interface EditableImage {
@@ -45,10 +49,9 @@ export default function EditGalleryPage({
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [categoryId, setCategoryId] = useState("");
+  const [galleryName, setGalleryName] = useState("");
   const [images, setImages] = useState<EditableImage[]>([]);
-  const [initialCategoryId, setInitialCategoryId] = useState("");
+  const [initialGalleryName, setInitialGalleryName] = useState("");
   const [initialImages, setInitialImages] = useState<EditableImage[]>([]);
 
   useEffect(() => {
@@ -57,16 +60,13 @@ export default function EditGalleryPage({
 
   const loadData = async () => {
     try {
-      const categoryRes = await adminGetCategories();
-      setCategories(categoryRes);
-
       const urlParams = new URLSearchParams(window.location.search);
       const galleryParam = urlParams.get('gallery');
 
       if (galleryParam) {
         const galleryData: GalleryData = JSON.parse(decodeURIComponent(galleryParam));
-        setCategoryId(galleryData.categoryId._id);
-        setInitialCategoryId(galleryData.categoryId._id);
+        setGalleryName(galleryData.name);
+        setInitialGalleryName(galleryData.name);
         setImages(
           galleryData.imageIds.map((img: GalleryImage) => ({
             _id: img._id,
@@ -84,17 +84,19 @@ export default function EditGalleryPage({
       } else {
         const fetched = await GetGalleryById(galleryId);
         if (fetched?.gallery) {
-          setCategoryId(fetched.gallery.categoryId._id);
-          setInitialCategoryId(fetched.gallery.categoryId._id);
+          // Type assertion to handle the new gallery structure
+          const gallery = fetched.gallery as any;
+          setGalleryName(gallery.name || '');
+          setInitialGalleryName(gallery.name || '');
           setImages(
-            fetched.gallery.imageIds.map((img: GalleryImage) => ({
+            gallery.imageIds.map((img: GalleryImage) => ({
               _id: img._id,
               name: img.name,
               url: img.url,
             }))
           );
           setInitialImages(
-            fetched.gallery.imageIds.map((img: GalleryImage) => ({
+            gallery.imageIds.map((img: GalleryImage) => ({
               _id: img._id,
               name: img.name,
               url: img.url,
@@ -142,11 +144,13 @@ export default function EditGalleryPage({
 
     try {
       const activeImages = images.filter((img) => !img.isDeleted);
-      if (!categoryId) {
-        toast.error("Select a category");
+      
+      if (!galleryName) {
+        toast.error("Please select a gallery name");
         setSubmitting(false);
         return;
       }
+      
       if (activeImages.length === 0) {
         toast.error("At least one image is required");
         setSubmitting(false);
@@ -167,7 +171,7 @@ export default function EditGalleryPage({
         return;
       }
 
-      const hasCategoryChange = categoryId !== initialCategoryId;
+      const hasGalleryNameChange = galleryName !== initialGalleryName;
       const imageDiffs = images
         .map((img) => {
           const initial = initialImages.find((orig) => orig._id === img._id);
@@ -187,28 +191,30 @@ export default function EditGalleryPage({
 
       const hasImageChange = imageDiffs.length > 0;
 
-      if (!hasCategoryChange && !hasImageChange) {
+      if (!hasGalleryNameChange && !hasImageChange) {
         toast.info("No changes to save");
         setSubmitting(false);
         return;
       }
 
       const formData = new FormData();
-      formData.append("categoryId", categoryId);
+      formData.append("name", galleryName);
 
-      formData.append(
-        "imagesMeta",
-        JSON.stringify(
-          imageDiffs
-        )
-      );
+      if (hasImageChange) {
+        formData.append(
+          "imagesMeta",
+          JSON.stringify(
+            imageDiffs
+          )
+        );
 
-      images.forEach((img) => {
-        if (img.file) {
-          formData.append("replacedImages", img.file);
-          formData.append("replacedImageIds", img._id);
-        }
-      });
+        images.forEach((img) => {
+          if (img.file) {
+            formData.append("replacedImages", img.file);
+            formData.append("replacedImageIds", img._id);
+          }
+        });
+      }
 
       await UpdateGallery(galleryId, formData);
       toast.success("Gallery updated");
@@ -251,18 +257,18 @@ export default function EditGalleryPage({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <div>
-              <label className="block text-sm text-white/70 mb-2">Category</label>
+              <label className="block text-sm text-white/70 mb-2">Gallery Name</label>
               <select
-                value={categoryId}
-                onChange={(e) => setCategoryId(e.target.value)}
+                value={galleryName}
+                onChange={(e) => setGalleryName(e.target.value)}
                 className="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-white outline-none transition focus:border-white/30"
               >
-                <option value="">Select Category</option>
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.categoryName}
+                <option value="">Select a gallery name</option>
+                {GALLERY_NAMES.map((name) => (
+                  <option key={name} value={name}>
+                    {name}
                   </option>
                 ))}
               </select>
@@ -291,7 +297,7 @@ export default function EditGalleryPage({
                   >
                     <div className="relative h-40 w-full">
                       <img src={img.url} className="h-full w-full object-cover" alt={img.name} />
-                      <span className="absolute left-3 top-3 rounded-full bg-black/60 px-2 py-1 text-[10px] uppercase tracking-[0.15em] text-white">
+                      <span className="absolute left-3 top-3 rounded-full bg-black/60 px-2 py-1 text-[10px] uppercase tracking-[0.15em] !text-white">
                         Existing
                       </span>
                     </div>

@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import AdminPagination from "@/components/admin/AdminPagination";
+import Button from "@/components/Button";
+import GalleryModal from "@/components/admin/GalleryModal";
 import { DeleteGallery, GetGallery } from "@/lib/api/admin";
 
 interface GalleryImage {
@@ -13,11 +15,8 @@ interface GalleryImage {
 
 interface GalleryItem {
   _id: string;
+  name: string;
   imageIds: GalleryImage[];
-  categoryId: {
-    _id: string;
-    categoryName: string;
-  };
   createdAt: string;
   updatedAt: string;
 }
@@ -39,6 +38,9 @@ export default function GalleryListPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [selectedGallery, setSelectedGallery] = useState<GalleryItem | null>(null);
+  const [modalMode, setModalMode] = useState<"view" | "delete">("view");
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [page, setPage] = useState(1);
 
   const PAGE_SIZE = 8;
@@ -53,7 +55,15 @@ export default function GalleryListPage() {
       setLoading(true);
       setError(null);
       const response = await GetGallery();
-      setGalleries(response?.galleries);
+      // Transform API response to match GalleryItem interface
+      const transformedGalleries = response?.galleries?.map((gallery: any) => ({
+        _id: gallery._id,
+        name: gallery.name || "Untitled Gallery",
+        imageIds: gallery.imageIds || [],
+        createdAt: gallery.createdAt,
+        updatedAt: gallery.updatedAt,
+      })) || [];
+      setGalleries(transformedGalleries);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch galleries");
     } finally {
@@ -72,46 +82,41 @@ export default function GalleryListPage() {
     }
   };
 
-  const handleDeleteGallery = async (galleryId: string) => {
-    if (!confirm("Are you sure you want to delete this gallery?")) return;
+  const handleDeleteGallery = (gallery: GalleryItem) => {
+    setSelectedGallery(gallery);
+    setModalMode("delete");
+    setIsModalOpen(true);
+  };
 
-    try {
-      await DeleteGallery(galleryId);
-      setSuccess("Gallery deleted successfully");
-      fetchGalleries();
-      setTimeout(() => setSuccess(null), 3000);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Delete failed");
-    }
+  const handleViewGallery = (gallery: GalleryItem) => {
+    setSelectedGallery(gallery);
+    setModalMode("view");
+    setIsModalOpen(true);
+  };
+
+  const handleConfirmDelete = async (id: string) => {
+    setSuccess("Gallery deleted successfully");
+    fetchGalleries();
+    setTimeout(() => setSuccess(null), 3000);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedGallery(null);
   };
 
   /* ===============================
-     FLATTEN GALLERIES → IMAGES
+     GALLERY BASED PAGINATION
   ================================ */
-  const imageRows: ImageRow[] = galleries.flatMap((gallery) =>
-    (gallery.imageIds || []).map((img, index) => ({
-      galleryId: gallery._id,
-      imageId: img._id,
-      imageUrl: img.url,
-      imageName: img.name,
-      galleryName: `Gallery ${index + 1}`, // Simple gallery naming
-      categoryName: gallery.categoryId?.categoryName || "Uncategorized",
-      createdAt: gallery.createdAt,
-    }))
-  );
-
-  /* ===============================
-     IMAGE BASED PAGINATION
-  ================================ */
-  const totalPages = Math.max(1, Math.ceil(imageRows.length / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(galleries.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
   const start = (currentPage - 1) * PAGE_SIZE;
-  const paginatedImages = imageRows.slice(start, start + PAGE_SIZE);
+  const paginatedGalleries = galleries.slice(start, start + PAGE_SIZE);
 
   if (loading) {
     return (
       <div className="text-center py-20 text-white/70">
-        Loading images...
+        Loading galleries...
       </div>
     );
   }
@@ -135,7 +140,7 @@ export default function GalleryListPage() {
           <p className="text-sm uppercase tracking-[0.3em] text-white/60">
             Admin · Gallery
           </p>
-          <h1 className="section-heading">All Images</h1>
+          <h1 className="section-heading">All Galleries</h1>
         </div>
         <button
           onClick={() => router.push("/admin/paintings/gallery/new")}
@@ -149,9 +154,15 @@ export default function GalleryListPage() {
         <p className="mb-4 text-center text-green-400">{success}</p>
       )}
 
-      {imageRows.length === 0 ? (
+      {galleries.length === 0 ? (
         <div className="text-center py-16 text-white/70">
-          No images found
+          <p className="mb-4">No galleries found</p>
+          <button
+            onClick={() => router.push("/admin/paintings/gallery/new")}
+            className="button-primary text-xs"
+          >
+            Create Your First Gallery
+          </button>
         </div>
       ) : (
         <>
@@ -160,59 +171,51 @@ export default function GalleryListPage() {
             <table className="w-full text-left text-sm text-white/80">
               <thead className="bg-white/10 text-xs uppercase tracking-[0.2em] text-white/60">
                 <tr>
-                  <th className="px-6 py-4">Image</th>
-                  <th className="px-6 py-4">Image Name</th>
-                  <th className="px-6 py-4">Gallery</th>
+                  <th className="px-6 py-4">Gallery Name</th>
+                  <th className="px-6 py-4">Images</th>
                   <th className="px-6 py-4">Category</th>
                   <th className="px-6 py-4">Created</th>
                   <th className="px-6 py-4">Actions</th>
                 </tr>
               </thead>
-
               <tbody>
-                {paginatedImages.map((item) => (
+                {paginatedGalleries.map((gallery: GalleryItem) => (
                   <tr
-                    key={item.imageId}
+                    key={gallery._id}
                     className="border-t border-white/10 hover:bg-white/10 transition"
                   >
-                    <td className="px-6 py-4">
-                      <img
-                        src={item.imageUrl}
-                        alt={item.imageName}
-                        className="h-16 w-16 rounded-lg object-cover border border-white/20"
-                      />
-                    </td>
-
                     <td className="px-6 py-4 font-medium text-white">
-                      {item.imageName}
+                      {gallery.name}
                     </td>
 
                     <td className="px-6 py-4">
-                      <span className="px-2 py-1 bg-white/10 rounded text-xs">
-                        {item.galleryName}
+                      <span className="px-2 py-1 ">
+                        {gallery.imageIds?.length || 0} images
                       </span>
                     </td>
 
-                    <td className="px-6 py-4">{item.categoryName}</td>
-
                     <td className="px-6 py-4">
-                      {new Date(item.createdAt).toLocaleDateString()}
+                      {new Date(gallery.createdAt).toLocaleDateString()}
                     </td>
 
                     <td className="px-6 py-4">
-                      <div className="flex gap-3">
-                        <button
-                          onClick={() => handleEditGallery(item?.galleryId)}
-                          className="text-blue-400 text-xs hover:text-blue-300"
+                      <div className="flex  gap-2 text-xs">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="px-3 py-1"
+                          onClick={() => handleEditGallery(gallery._id)}
                         >
                           Edit
-                        </button>
-                        <button
-                          onClick={() => handleDeleteGallery(item?.galleryId)}
-                          className="text-red-400 text-xs hover:text-red-300"
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="px-3 py-1 text-red-200 hover:text-red-100"
+                          onClick={() => handleDeleteGallery(gallery)}
                         >
                           Delete
-                        </button>
+                        </Button>
                       </div>
                     </td>
                   </tr>
@@ -223,13 +226,22 @@ export default function GalleryListPage() {
 
           {/* PAGINATION */}
           <AdminPagination
-            total={imageRows.length}
+            total={galleries.length}
             perPage={PAGE_SIZE}
             currentPage={currentPage}
             onPageChange={setPage}
           />
         </>
       )}
+
+      {/* Gallery Modal */}
+      <GalleryModal
+        gallery={selectedGallery}
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onDelete={handleConfirmDelete}
+        mode={modalMode}
+      />
 
     </div>
   );

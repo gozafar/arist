@@ -2,7 +2,7 @@ import { Schema, Types, model, models } from "mongoose";
 
 export interface GalleryDoc {
   imageIds: Types.ObjectId[];  // Array of image document IDs
-  categoryId: Types.ObjectId;
+  name: String;  // This will act as the category/section - UNIQUE
   createdAt: Date;
   updatedAt: Date;
 }
@@ -19,11 +19,16 @@ const GallerySchema = new Schema<GalleryDoc>(
       }],
       default: []  // Default to empty array
     },
-    categoryId: {
-      type: Schema.Types.ObjectId,
-      ref: "Category",
+    name: {
+      type: String,
       required: true,
-      index: true,
+      unique: true,  // Enforce uniqueness at database level
+      enum: [
+        "Contemporary / Modern Art",
+        "Portrait Paintings", 
+        "Landscape Paintings",
+        "Abstract Art"
+      ]
     },
   },
   { timestamps: true }
@@ -31,21 +36,12 @@ const GallerySchema = new Schema<GalleryDoc>(
 
 // Add validation as pre-save hook to avoid validation on initial empty array
 GallerySchema.pre('save', function(next) {
-  // Only validate if imageIds is being modified and has content
-  if (this.isModified('imageIds') && this.imageIds.length > 0) {
-    if (this.imageIds.length > 3) {
-      const error = new Error('Maximum 3 images allowed');
-      return next(error);
-    }
-  }
-  // For new documents, only validate if they already have images
-  if (this.isNew && this.imageIds.length > 0 && this.imageIds.length > 3) {
-    const error = new Error('Maximum 3 images allowed');
-    return next(error);
-  }
+  // No image limit needed since galleries with same name are merged
+  // Allow unlimited images per gallery
   next();
 });
 
-GallerySchema.index({ categoryId: 1, createdAt: -1 });
+GallerySchema.index({ name: 1 }, { unique: true });  // Explicit unique index
+GallerySchema.index({ name: 1, createdAt: -1 });
 
 export default models.Gallery || model<GalleryDoc>("Gallery", GallerySchema);

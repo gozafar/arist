@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import { getContacts, updateContact, deleteContact } from "@/lib/api/contact";
 import { ContactResponse, GetContactsResponse } from "@/lib/api/contact";
 import { toast } from "react-toastify";
-import DeleteModal from "@/components/DeleteModal";
+import GalleryModal from "@/components/admin/GalleryModal";
 import AdminPagination from "@/components/admin/AdminPagination";
+import Button from "@/components/Button";
 
 const STATUS_OPTIONS = [
   { value: "NEW_LEAD", label: "New Lead" },
@@ -19,8 +20,9 @@ export default function ContactManagementPage() {
   const [contacts, setContacts] = useState<ContactResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [contactToDelete, setContactToDelete] = useState<string | null>(null);
+  const [selectedContact, setSelectedContact] = useState<ContactResponse | null>(null);
+  const [modalMode, setModalMode] = useState<"view" | "delete">("view");
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState<GetContactsResponse["pagination"]>({
@@ -66,19 +68,22 @@ export default function ContactManagementPage() {
     }
   };
 
-  const handleDelete = (id: string) => {
-    setContactToDelete(id);
-    setDeleteModalOpen(true);
+  const handleDelete = (contact: ContactResponse) => {
+    setSelectedContact(contact);
+    setModalMode("delete");
+    setIsModalOpen(true);
   };
 
-  const confirmDelete = async () => {
-    if (!contactToDelete) return;
+  const handleViewContact = (contact: ContactResponse) => {
+    setSelectedContact(contact);
+    setModalMode("view");
+    setIsModalOpen(true);
+  };
 
+  const confirmDelete = async (id: string) => {
     try {
-      await deleteContact(contactToDelete);
+      await deleteContact(id);
       toast.success("Contact deleted successfully!");
-      setDeleteModalOpen(false);
-      setContactToDelete(null);
       await fetchContacts(page);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to delete contact";
@@ -86,9 +91,9 @@ export default function ContactManagementPage() {
     }
   };
 
-  const cancelDelete = () => {
-    setDeleteModalOpen(false);
-    setContactToDelete(null);
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedContact(null);
   };
 
   if (loading) {
@@ -172,12 +177,14 @@ export default function ContactManagementPage() {
                     {new Date(contact.createdAt).toLocaleString()}
                   </td>
                   <td className="px-5 py-3 text-right">
-                    <button
-                      onClick={() => handleDelete(contact._id)}
-                      className="text-red-400 hover:text-red-300 text-xs"
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="px-3 py-1 text-red-200 hover:text-red-100"
+                      onClick={() => handleDelete(contact)}
                     >
                       Delete
-                    </button>
+                    </Button>
                   </td>
                 </tr>
               ))}
@@ -194,14 +201,12 @@ export default function ContactManagementPage() {
         </div>
       )}
       
-      <DeleteModal
-        isOpen={deleteModalOpen}
-        onClose={cancelDelete}
-        onConfirm={confirmDelete}
-        title="Delete Contact Message"
-        message="Are you sure you want to delete this contact message? This action cannot be undone."
-        confirmText="Delete"
-        cancelText="Cancel"
+      <GalleryModal
+        contact={selectedContact}
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onDeleteContact={confirmDelete}
+        mode={modalMode}
       />
     </div>
   );
