@@ -11,7 +11,17 @@ const ImagePreview = ({ src, alt }: { src?: string; alt: string }) => {
 
   return (
     <div className="relative h-64 overflow-hidden rounded-2xl border border-white/15 bg-black/40">
-      <Image src={src} alt={alt} fill className="object-cover" />
+        <Image 
+    src={src} 
+    alt={alt} 
+    fill 
+    className="object-cover"
+    loading="lazy"
+    sizes="(max-width: 768px) 100vw, 50vw"
+    quality={75}
+    placeholder="blur"
+    blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiB2aWV3Qm94PSIwIDAgNDAwIDQwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YxZjFmMSIvPjwvc3ZnPg=="
+  />
     </div>
   );
 };

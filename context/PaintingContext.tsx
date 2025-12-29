@@ -1,19 +1,27 @@
 "use client";
 
-import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from "react";
-import { Painting, paintings as seedPaintings } from "@/data/paintings";
+import { createContext, ReactNode, useContext, useEffect, useMemo, useRef, useState } from "react";
+import type { PaintingDTO } from "@/lib/dto";
+import { getPaintings } from "@/lib/api/public";
+import {
+  adminCreatePainting,
+  adminDeletePainting,
+  adminToggleAvailability,
+  adminUpdatePainting
+} from "@/lib/api/admin";
 
-type NewPaintingInput = Omit<Painting, "id" | "year"> & { year?: number };
+type Painting = PaintingDTO;
+
+type NewPaintingInput = Omit<PaintingDTO, "id" | "createdAt" | "updatedAt" | "year"> & { year?: number };
 
 type PaintingContextValue = {
   paintings: Painting[];
-  addPainting: (painting: NewPaintingInput) => void;
+  addPainting: (painting: NewPaintingInput | FormData) => void;
   updatePainting: (id: string, painting: Partial<NewPaintingInput>) => void;
   deletePainting: (id: string) => void;
   toggleAvailability: (id: string) => void;
+  loaded: boolean;
 };
-
-const STORAGE_KEY = "anand-paintings";
 
 const PaintingContext = createContext<PaintingContextValue | undefined>(undefined);
 
@@ -25,71 +33,95 @@ const generateId = () => {
 };
 
 export const PaintingProvider = ({ children }: { children: ReactNode }) => {
-  const [paintings, setPaintings] = useState<Painting[]>(seedPaintings);
+  const [paintings, setPaintings] = useState<Painting[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  const fetched = useRef(false); // prevent double-fetch in React Strict Mode (dev)
 
   useEffect(() => {
-    const stored = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null;
-    if (stored) {
+    if (fetched.current) return;
+    fetched.current = true;
+    const load = async () => {
       try {
-        const parsed = JSON.parse(stored) as Painting[];
-        if (Array.isArray(parsed) && parsed.length) {
-          setPaintings(parsed);
-        }
+        const data = await getPaintings({ page: 1, limit: 200 });
+        setPaintings(data.items);
       } catch {
-        // Ignore malformed data
+        // fall back to empty list if API fails
+        setPaintings([]);
       }
-    }
+      setLoaded(true);
+    };
+    void load();
   }, []);
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(paintings));
-    }
-  }, [paintings]);
-
-  const addPainting = (painting: NewPaintingInput) => {
-    const newPainting: Painting = {
-      ...painting,
-      year: painting.year ?? new Date().getFullYear(),
-      id: generateId(),
-      tags: painting.tags ?? [],
-      availability: painting.availability ?? "in-stock"
+  const addPainting = (painting: NewPaintingInput | FormData) => {
+    const create = async () => {
+      try {
+        const saved = await adminCreatePainting(painting as any);
+        setPaintings((prev) => [saved, ...prev]);
+      } catch {
+        // For FormData, we can't create a local fallback
+        console.error('Failed to create painting');
+      }
     };
-    setPaintings((prev) => [newPainting, ...prev]);
+    void create();
   };
 
   const updatePainting = (id: string, painting: Partial<NewPaintingInput>) => {
-    setPaintings((prev) =>
-      prev.map((p) =>
-        p.id === id
-          ? {
-              ...p,
-              ...painting,
-              year: painting.year ?? p.year,
-              availability: painting.availability ?? p.availability
-            }
-          : p
-      )
-    );
+    const apply = async () => {
+      try {
+        const updated = await adminUpdatePainting(id, painting);
+        setPaintings((prev) => prev.map((p) => (p.id === id ? updated : p)));
+      } catch {
+        setPaintings((prev) =>
+          prev.map((p) =>
+            p.id === id
+              ? {
+                  ...p,
+                  ...painting,
+                  year: painting.year ?? p.year,
+                  availability: painting.availability ?? p.availability
+                }
+              : p
+          )
+        );
+      }
+    };
+    void apply();
   };
 
   const deletePainting = (id: string) => {
-    setPaintings((prev) => prev.filter((p) => p.id !== id));
+    const run = async () => {
+      try {
+        await adminDeletePainting(id);
+      } catch {
+        // ignore delete failure for now
+      }
+      setPaintings((prev) => prev.filter((p) => p.id !== id));
+    };
+    void run();
   };
 
   const toggleAvailability = (id: string) => {
-    setPaintings((prev) =>
-      prev.map((p) =>
-        p.id === id
-          ? { ...p, availability: p.availability === "sold" ? "in-stock" : "sold" }
-          : p
-      )
-    );
+    const run = async () => {
+      const current = paintings.find((p) => p.id === id);
+      const nextAvailability = current?.availability === "sold" ? "in-stock" : "sold";
+      try {
+        const updated = await adminToggleAvailability(id, nextAvailability ?? "in-stock");
+        setPaintings((prev) => prev.map((p) => (p.id === id ? updated : p)));
+      } catch {
+        setPaintings((prev) =>
+          prev.map((p) =>
+            p.id === id ? { ...p, availability: nextAvailability ?? "in-stock" } : p
+          )
+        );
+      }
+    };
+    void run();
   };
 
   const value = useMemo(
-    () => ({ paintings, addPainting, updatePainting, deletePainting, toggleAvailability }),
-    [paintings]
+    () => ({ paintings, addPainting, updatePainting, deletePainting, toggleAvailability, loaded }),
+    [paintings, loaded]
   );
 
   return <PaintingContext.Provider value={value}>{children}</PaintingContext.Provider>;

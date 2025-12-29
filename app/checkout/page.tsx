@@ -1,15 +1,20 @@
 "use client";
-
 import Link from "next/link";
 import AddressForm, { Address } from "@/components/AddressForm";
 import Button from "@/components/Button";
 import { useCart } from "@/context/CartContext";
+import { checkout } from "@/lib/api/public";
 
 const CheckoutPage = () => {
   const { items, subtotal } = useCart();
 
-  const handleSubmit = (_address: Address) => {
-    // In a real app we'd persist the address; here we just route forward
+  const handleSubmit = async (address: Address) => {
+    try {
+      const order = await checkout({ shipping: address });
+      sessionStorage.setItem("pending-order-id", order.orderId);
+    } catch {
+      // noop; proceed to payment screen for demo parity
+    }
     window.location.href = "/payment";
   };
 

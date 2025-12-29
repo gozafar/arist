@@ -3,24 +3,30 @@
 @tailwind utilities;
 
 :root {
-  --bg: #0c0a08;
-  --ink: #eae4dc;
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface-soft: #ffffff;
+  --ink: #2e2e2e;
+  --muted: rgb(100, 116, 139);
+  --muted-soft: rgba(100, 116, 139, 0.7);
+  --accent: rgb(10, 201, 188);
+  --accent-hover: rgb(8, 176, 165);
+  --border: rgba(10, 201, 188, 0.35);
 }
 
 body {
-  background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.04), transparent 30%),
-    radial-gradient(circle at 80% 0%, rgba(255, 255, 255, 0.05), transparent 25%),
-    radial-gradient(circle at 50% 80%, rgba(255, 255, 255, 0.03), transparent 35%),
-    linear-gradient(135deg, #0c0a08, #0f0c0a);
+  background: #ffffff;
   color: var(--ink);
+  line-height: 1.7;
 }
 
 a {
+  color: inherit;
   transition: color 0.2s ease, opacity 0.2s ease;
 }
 
 a:hover {
-  color: #e1c9aa;
+  color: var(--accent-hover);
 }
 
 ::-webkit-scrollbar {
@@ -28,11 +34,11 @@ a:hover {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0c0a08;
+  background: var(--surface-soft);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #3a2a22;
+  background: #cbb9a6;
   border-radius: 9999px;
 }
 
@@ -44,22 +50,116 @@ a:hover {
 
 .section-heading {
   @apply font-display text-3xl md:text-4xl lg:text-5xl tracking-tight;
+  color: var(--ink);
 }
 
 .card-glass {
-  @apply bg-white/5 backdrop-blur-md border border-white/10 shadow-card;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 28px 80px -48px rgba(46, 46, 46, 0.22);
 }
 
 .button-primary {
-  @apply inline-flex items-center justify-center rounded-full px-5 py-3 font-semibold text-sm tracking-wide transition hover:-translate-y-0.5 hover:shadow-soft bg-gradient-to-r from-sand-500 via-sand-400 to-sand-600 text-black shadow-card;
+  @apply inline-flex items-center justify-center rounded-full px-5 py-3 font-semibold text-sm tracking-wide transition hover:-translate-y-0.5 hover:shadow-soft;
+  background: var(--accent);
+  color: #f8f5f0;
+  box-shadow: 0 16px 40px -20px rgba(10, 201, 188, 0.45);
+}
+
+.button-primary:hover {
+  background: var(--accent-hover);
 }
 
 .button-outline {
-  @apply inline-flex items-center justify-center rounded-full px-5 py-3 font-semibold text-sm tracking-wide transition border border-white/20 text-white hover:bg-white/10;
+  @apply inline-flex items-center justify-center rounded-full px-5 py-3 font-semibold text-sm tracking-wide transition;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  background: #ffffff;
+  box-shadow: 0 10px 26px -18px rgba(46, 46, 46, 0.18);
+  backdrop-filter: blur(4px);
+}
+
+.button-outline:hover {
+  border-color: var(--accent-hover);
+  color: var(--accent-hover);
+  background: #ffffff;
+}
+
+button:not(.button-primary):not(.button-outline) {
+  color: var(--accent);
+}
+
+button:not(.button-primary):not(.button-outline):hover {
+  color: var(--accent-hover);
 }
 
 .hero-gradient {
-  background: radial-gradient(circle at 20% 20%, rgba(229, 196, 146, 0.3), transparent 35%),
-    radial-gradient(circle at 80% 10%, rgba(255, 255, 255, 0.18), transparent 30%),
-    linear-gradient(135deg, rgba(26, 18, 14, 0.9), rgba(13, 10, 8, 0.9));
+  background: #ffffff;
+  box-shadow: 0 30px 90px -60px rgba(46, 46, 46, 0.26);
+}
+
+/* Palette overrides to match the light gallery theme */
+.text-white {
+  color: var(--ink) !important;
+}
+
+.text-white\/80 {
+  color: rgba(100, 116, 139, 0.8) !important;
+}
+
+.text-white\/70 {
+  color: rgba(100, 116, 139, 0.7) !important;
+}
+
+.text-white\/60 {
+  color: rgba(100, 116, 139, 0.6) !important;
+}
+
+.text-white\/50 {
+  color: rgba(100, 116, 139, 0.5) !important;
+}
+
+.text-white\/40 {
+  color: rgba(100, 116, 139, 0.4) !important;
+}
+
+.border-white\/10 {
+  border-color: rgba(100, 116, 139, 0.2) !important;
+}
+
+.border-white\/15 {
+  border-color: rgba(100, 116, 139, 0.24) !important;
+}
+
+.border-white\/20 {
+  border-color: rgba(100, 116, 139, 0.28) !important;
+}
+
+.border-white\/30 {
+  border-color: rgba(100, 116, 139, 0.36) !important;
+}
+
+.bg-white\/5 {
+  background-color: rgba(100, 116, 139, 0.06) !important;
+}
+
+.bg-white\/10 {
+  background-color: rgba(100, 116, 139, 0.1) !important;
+}
+
+.bg-black\/40 {
+  background-color: rgba(100, 116, 139, 0.08) !important;
+}
+
+.bg-black\/50 {
+  background-color: rgba(100, 116, 139, 0.1) !important;
+}
+
+.bg-black\/70 {
+  background-color: rgba(100, 116, 139, 0.14) !important;
+}
+
+.bg-white {
+  background-color: var(--surface-soft) !important;
 }

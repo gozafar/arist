@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useEffect } from "react";
 import Button from "./Button";
 
 type Address = {
@@ -11,13 +11,16 @@ type Address = {
   city: string;
   state: string;
   postal: string;
+  country: string;
 };
 
 type Props = {
   onSubmit?: (address: Address) => void;
+  isLoading?: boolean;
+  resetForm?: boolean;
 };
 
-const AddressForm = ({ onSubmit }: Props) => {
+const AddressForm = ({ onSubmit, isLoading, resetForm }: Props) => {
   const [form, setForm] = useState<Address>({
     name: "",
     email: "",
@@ -25,12 +28,28 @@ const AddressForm = ({ onSubmit }: Props) => {
     address: "",
     city: "",
     state: "",
-    postal: ""
+    postal: "",
+    country: ""
   });
 
   const handleChange = (key: keyof Address, value: string) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
+
+  useEffect(() => {
+    if (resetForm) {
+      setForm({
+        name: "",
+        email: "",
+        phone: "",
+        address: "",
+        city: "",
+        state: "",
+        postal: "",
+        country: ""
+      });
+    }
+  }, [resetForm]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -45,16 +64,17 @@ const AddressForm = ({ onSubmit }: Props) => {
       </div>
       <div className="grid gap-4 md:grid-cols-2">
         <InputField label="Phone" value={form.phone} onChange={(v) => handleChange("phone", v)} required />
-        <InputField label="Postal Code" value={form.postal} onChange={(v) => handleChange("postal", v)} required />
+        <InputField label="PIN Code" value={form.postal} onChange={(v) => handleChange("postal", v)} required />
       </div>
       <InputField label="Street address" value={form.address} onChange={(v) => handleChange("address", v)} required />
       <div className="grid gap-4 md:grid-cols-2">
         <InputField label="City" value={form.city} onChange={(v) => handleChange("city", v)} required />
         <InputField label="State" value={form.state} onChange={(v) => handleChange("state", v)} required />
       </div>
+      <InputField label="Country" value={form.country} onChange={(v) => handleChange("country", v)} required />
       <div className="pt-2">
-        <Button type="submit" className="w-full md:w-auto">
-          Continue to payment
+        <Button type="submit" className="w-full md:w-auto" disabled={isLoading}>
+          {isLoading ? "Processing..." : "Continue to payment"}
         </Button>
       </div>
     </form>

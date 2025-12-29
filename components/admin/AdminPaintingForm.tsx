@@ -8,14 +8,21 @@ import PriceInput from "@/components/PriceInput";
 import SubmitButton from "@/components/SubmitButton";
 import ImagePreview from "@/components/ImagePreview";
 import { NewPaintingInput } from "@/context/PaintingContext";
+import { adminGetCategories } from "@/lib/api/admin";
+
+interface Category {
+  id: string;
+  categoryName: string;
+}
+
 
 export type AdminPaintingFormProps = {
   initial?: NewPaintingInput & { id?: string };
-  onSubmit: (payload: NewPaintingInput) => void;
+  onSubmit: (payload: FormData) => void;
   mode?: "create" | "edit";
 };
 
-const emptyState: NewPaintingInput = {
+const emptyState: NewPaintingInput & { categoryId?: string } = {
   title: "",
   description: "",
   price: 0,
@@ -24,14 +31,31 @@ const emptyState: NewPaintingInput = {
   year: new Date().getFullYear(),
   availability: "in-stock",
   image: "",
-  tags: []
+  tags: [],
+  categoryId: ""
 };
 
 const AdminPaintingForm = ({ initial, onSubmit, mode = "create" }: AdminPaintingFormProps) => {
-  const [form, setForm] = useState<NewPaintingInput>(initial ?? emptyState);
+  const [form, setForm] = useState<NewPaintingInput & { categoryId?: string }>(initial ?? emptyState);
   const [preview, setPreview] = useState<string>(initial?.image ?? "");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [status, setStatus] = useState<{ type: "success" | "error" | null; message: string } | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Fetch categories on component mount
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const data = await adminGetCategories();
+        setCategories(data);
+      } catch (error) {
+        console.error("Failed to load categories", error);
+        setStatus({ type: "error", message: "Failed to load categories" });
+      }
+    };
+    loadCategories();
+  }, []);
 
   useEffect(() => {
     if (initial) {
@@ -43,24 +67,29 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = "create" }: AdminPainting
   const handleImage = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    
+    // Store the actual file for FormData upload
+    setImageFile(file);
+    
+    // Create preview URL
     const reader = new FileReader();
     reader.onload = (ev) => {
       const result = ev.target?.result as string;
-      setForm((prev) => ({ ...prev, image: result }));
       setPreview(result);
     };
     reader.readAsDataURL(file);
   };
 
-  const handleChange = (key: keyof NewPaintingInput, value: string | number) => {
+  const handleChange = (key: keyof (NewPaintingInput & { categoryId?: string }), value: string | number) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!form.title.trim()) newErrors.title = "Title is required";
-    if (!form.image) newErrors.image = "Image is required";
+    if (!imageFile && !form.image) newErrors.image = "Image is required";
     if (!form.price || Number.isNaN(Number(form.price))) newErrors.price = "Price is required";
+    if (!form.categoryId) newErrors.category = "Category is required";
     return newErrors;
   };
 
@@ -72,13 +101,36 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = "create" }: AdminPainting
       setStatus({ type: "error", message: "Please fix the highlighted fields." });
       return;
     }
-    onSubmit({ ...form, price: Number(form.price) });
+
+
+    
+    // Create FormData for API call
+    const formData = new FormData();
+    if (imageFile) {
+      formData.append('image', imageFile);
+    }
+    formData.append('title', form.title);
+    formData.append('description', form.description);
+    formData.append('price', String(form.price));
+    formData.append('medium', form.medium);
+    formData.append('size', form.size);
+    formData.append('year', String(form.year));
+    formData.append('availability', form.availability);
+    formData.append('categoryId', form.categoryId || '');
+    formData.append('tags', JSON.stringify(form.tags));
+    
+    // Call onSubmit with FormData
+    onSubmit(formData);
+    
     if (mode === "create") {
       setForm(emptyState);
       setPreview("");
+      setImageFile(null);
     }
     setStatus({ type: "success", message: mode === "create" ? "Painting added." : "Painting updated." });
   };
+
+
 
   return (
     <form className="space-y-6" onSubmit={handleSubmit}>
@@ -123,21 +175,40 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = "create" }: AdminPainting
               max={new Date().getFullYear() + 1}
             />
           </div>
-          <label className="block text-sm">
-            <span className="mb-2 block text-white">Availability</span>
-            <select
-              value={form.availability}
-              onChange={(e) => handleChange("availability", e.target.value)}
-              className="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-sand-400/60"
-            >
-              <option value="in-stock" className="bg-black text-white">
-                In Stock
-              </option>
-              <option value="sold" className="bg-black text-white">
-                Sold
-              </option>
-            </select>
-          </label>
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className="block text-sm">
+              <span className="mb-2 block text-white">Category</span>
+              <select
+                value={form.categoryId || ""}
+                onChange={(e) => handleChange("categoryId", e.target.value)}
+                className="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-sand-400/60"
+                required
+              >
+                <option value="" disabled>Select a category</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id} className="bg-gray-800 text-white">
+                    {category.categoryName}
+                  </option>
+                ))}
+              </select>
+              {errors.category && <p className="mt-1 text-xs text-red-300">{errors.category}</p>}
+            </label>
+            <label className="block text-sm">
+              <span className="mb-2 block text-white">Availability</span>
+              <select
+                value={form.availability}
+                onChange={(e) => handleChange("availability", e.target.value)}
+                className="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-sand-400/60"
+              >
+                <option value="in-stock" className="bg-black text-white">
+                  In Stock
+                </option>
+                <option value="sold" className="bg-black text-white">
+                  Sold
+                </option>
+              </select>
+            </label>
+          </div>
         </div>
         <div className="space-y-4">
           <label className="block text-sm">
@@ -164,6 +235,7 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = "create" }: AdminPainting
       </div>
       {errors.title && <p className="text-sm text-red-300">{errors.title}</p>}
       {errors.price && <p className="text-sm text-red-300">{errors.price}</p>}
+      {errors.category && <p className="text-sm text-red-300">{errors.category}</p>}
     </form>
   );
 };

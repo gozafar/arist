@@ -32,6 +32,12 @@
       "@/context/*": [
         "./context/*"
       ],
+      "@/lib/*": [
+        "./src/lib/*"
+      ],
+      "@/models/*": [
+        "./models/*"
+      ],
       "@/styles/*": [
         "./styles/*"
       ]

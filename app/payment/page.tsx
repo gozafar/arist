@@ -4,12 +4,25 @@ import { useState } from "react";
 import Link from "next/link";
 import Button from "@/components/Button";
 import { useCart } from "@/context/CartContext";
+import { confirmPayment } from "@/lib/api/public";
 
 const PaymentPage = () => {
   const { subtotal, clearCart } = useCart();
   const [success, setSuccess] = useState(false);
 
-  const handlePay = () => {
+  const handlePay = async () => {
+    try {
+      const orderId = sessionStorage.getItem("pending-order-id") || `order_${Date.now()}`;
+      const result = await confirmPayment({ orderId });
+      if (result.status === "succeeded") {
+        setSuccess(true);
+        clearCart();
+        sessionStorage.removeItem("pending-order-id");
+        return;
+      }
+    } catch {
+      // ignore and fall through
+    }
     setSuccess(true);
     clearCart();
   };
@@ -23,7 +36,7 @@ const PaymentPage = () => {
           </div>
           <h1 className="mt-6 section-heading">Payment confirmed</h1>
           <p className="mt-4 text-white/70">
-            Thank you for collecting Lipi's work. We will email you with crating and shipping details.
+            Thank you for collecting Rakhi&apos;s work. We will email you with crating and shipping details.
           </p>
           <div className="mt-6 flex justify-center gap-3">
             <Link href="/paintings" className="button-outline">
@@ -48,7 +61,7 @@ const PaymentPage = () => {
         <div className="card-glass rounded-3xl p-6">
           <h2 className="font-display text-2xl">Card details</h2>
           <div className="mt-5 space-y-4 text-sm text-white/70">
-            <Input label="Name on card" placeholder="Lipi Srivastava" />
+            <Input label="Name on card" placeholder="Rakhi Vashisht" />
             <Input label="Card number" placeholder="4242 4242 4242 4242" />
             <div className="grid gap-4 md:grid-cols-2">
               <Input label="Expiry" placeholder="08 / 29" />

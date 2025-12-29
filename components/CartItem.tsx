@@ -5,7 +5,8 @@ import { CartItem as CartItemType, useCart } from "@/context/CartContext";
 import Button from "./Button";
 
 const CartItem = ({ item }: { item: CartItemType }) => {
-  const { updateQuantity, removeFromCart } = useCart();
+  const { updateQuantity, removeFromCart, deleting, updatingId } = useCart();
+  const isBusy = deleting || updatingId === item.painting.id;
 
   return (
     <div className="card-glass flex items-center gap-4 rounded-2xl p-4">
@@ -30,12 +31,19 @@ const CartItem = ({ item }: { item: CartItemType }) => {
             min={1}
             value={item.quantity}
             onChange={(e) => updateQuantity(item.painting.id, Number(e.target.value))}
-            className="w-16 rounded-lg border border-white/20 bg-white/5 px-2 py-1 text-center text-white"
+            className="w-16 rounded-lg border border-white/20 bg-white/5 px-2 py-1 text-center text-white disabled:opacity-50"
+            disabled={isBusy}
           />
-          <Button variant="outline" className="px-4 py-2 text-xs" onClick={() => removeFromCart(item.painting.id)}>
+          <Button
+            variant="outline"
+            className="px-4 py-2 text-xs disabled:opacity-60"
+            onClick={() => removeFromCart(item.painting.id)}
+            disabled={isBusy}
+          >
             Remove
           </Button>
         </div>
+        {isBusy && <p className="text-xs text-white/50">Updating…</p>}
       </div>
     </div>
   );

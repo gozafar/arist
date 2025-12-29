@@ -1,4 +1,29 @@
+import type { Metadata } from "next";
 import Image from "next/image";
+import { headers } from "next/headers";
+import {
+  buildSeoMetadata,
+  getCountryConfig,
+  getCountryFromHeaders
+} from "@/lib/seo";
+
+export const generateMetadata = async (): Promise<Metadata> => {
+  const country = getCountryFromHeaders(await headers());
+  const config = getCountryConfig(country);
+  const title = `About Rakhi Studio | ${config.label} Art Gallery`;
+  const description =
+    `Discover Rakhi Studio’s international art story and certified originals for collectors in ${config.label}.`;
+
+  return buildSeoMetadata({
+    path: "/about",
+    title,
+    description,
+    keywords: ["artist profile", "international art gallery", "original art certificates"],
+    country,
+    ogTitle: `About the Artist – Rakhi Studio for ${config.label}`,
+    ogDescription: `Learn about our global collaborations, certified originals, and worldwide shipping for ${config.label} collectors.`
+  });
+};
 
 const AboutPage = () => {
   return (
@@ -6,8 +31,8 @@ const AboutPage = () => {
       <div className="grid gap-8 lg:grid-cols-[1fr_1.1fr] lg:items-center">
         <div className="relative aspect-[4/5] overflow-hidden rounded-[28px] border border-white/10 bg-white/5 shadow-card">
           <Image
-            src="https://images.unsplash.com/photo-1523419400525-dc6c1e105d58?auto=format&fit=crop&w=1400&q=80"
-            alt="Lipi Srivastava in her studio"
+            src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80"
+            alt="Rakhi Vashisht in her studio"
             fill
             className="object-cover"
             priority
@@ -15,48 +40,49 @@ const AboutPage = () => {
         </div>
         <div className="space-y-5">
           <p className="text-sm uppercase tracking-[0.3em] text-white/60">About the artist</p>
-          <h1 className="section-heading">Meet Lipi Srivastava</h1>
+          <h1 className="section-heading">Meet Rakhi Vashisht</h1>
           <p className="text-lg leading-relaxed text-white/80">
-            Hello! I’m Lipi Srivastava – an artist based in Hong Kong, a corporate professional, a wife, a mother of two
-            teenage boys, and a proud pet parent to our Beagle.
+            Born amidst the vibrant landscapes of Madhya Pradesh, India, Rakhi discovered her calling in colors and forms
+            early on—earning Elementary and Intermediate certifications from JJ School of Arts by age ten. Though her
+            academic path spanned Textile Engineering and an MBA in Finance, art remained her quiet rhythm, returning with
+            renewed intensity as acrylics became her chosen language.
           </p>
           <p className="leading-relaxed text-white/70">
-            My journey as an artist was not something I had planned. For over 25 years, I built a career in Human
-            Resources, working in global leadership roles across multinational companies in India and Hong Kong. With a
-            background in Psychology and Organizational Behavior, my professional life was always about people, strategy,
-            and leadership.
+            Her professional journey carried her across Delhi, Dubai, Moscow, Bangalore, and now Hong Kong—each city
+            leaving its imprint on her palette. Rakhi&apos;s canvases weave bold colors, dynamic compositions, and emotions
+            that resonate with viewers. Beyond her own practice, she teaches, conducts workshops, and shares her vision
+            through exhibitions worldwide.
           </p>
-          <p className="leading-relaxed text-white/70">
-            But life took an unexpected turn in 2021 when I was diagnosed with cancer. What followed were multiple
-            surgeries and chemotherapy – a phase that completely changed me. During this time, I turned to painting and
-            music as a way to cope, heal, and rediscover myself. What started as a therapeutic outlet soon became a
-            passion.
-          </p>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/70">
+            Rakhi Studio serves collectors and interior designers across the UAE, India, USA, and Hong Kong with certified
+            originals, provenance records, and worldwide shipping.
+          </div>
         </div>
       </div>
 
       <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
         <div className="space-y-4">
-          <h2 className="font-display text-3xl text-sand-200">The Art I Create</h2>
+          <h2 className="font-display text-3xl text-sand-200">Artist Profile & Style</h2>
           <p className="leading-relaxed text-white/80">
-            I am a self-taught artist, and my work is mostly in acrylic and oil. I love bringing bold, vibrant themes to
-            life on canvas and even on recycled bottles. For me, art is meditative – it connects me to my inner self,
-            keeps me grounded in gratitude, and fills me with positive energy.
+            Rakhi&apos;s art is a dance of vibrancy and detail. Bold hues and intricate strokes converge to create
+            compositions that are both dynamic and contemplative, inspired by the mosaic of cultures and landscapes she
+            has lived within.
           </p>
           <p className="leading-relaxed text-white/70">
-            My inspirations come from many places – from nature, spirituality, and photography to my Indian roots and
-            global experiences. But most of all, they come from my own journey of resilience and self-discovery.
+            She delights in experimentation—exploring materials, techniques, and mediums—and moves fluidly between abstract
+            explorations, human figures, landscapes, and seascapes. Each piece carries a quiet poetry that invites
+            reflection.
           </p>
-          <p className="leading-relaxed text-white/80">
-            Some of my most loved works include <em>Dreams Have No Boundaries</em>, <em>Cheers to Life</em>, <em>Finding
-            the Buddha Within You</em>, <em>Womaniya – The Joys of Friendship</em>, <em>Still Waters</em>, <em>Third Eye</em>, and
-            <em> Unbroken Bond</em>.
+          <h3 className="text-lg font-semibold text-white">International collector focus</h3>
+          <p className="leading-relaxed text-white/70">
+            From luxury homes in Dubai to modern apartments in Hong Kong and design-led spaces in New York and Mumbai,
+            Rakhi&apos;s originals are collected for their emotional depth and investment value.
           </p>
         </div>
         <div className="relative aspect-[4/5] overflow-hidden rounded-[28px] border border-white/10 bg-white/5 shadow-card">
           <Image
-            src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1400&q=80"
-            alt="Lipi Srivastava presenting her paintings"
+            src="https://images.unsplash.com/photo-1523419400525-dc6c1e105d58?auto=format&fit=crop&w=1400&q=80"
+            alt="Rakhi Vashisht presenting her paintings"
             fill
             className="object-cover"
           />
@@ -64,16 +90,50 @@ const AboutPage = () => {
       </div>
 
       <div className="card-glass rounded-[28px] border border-white/10 bg-white/5 p-6 md:p-8 space-y-4">
-        <h2 className="font-display text-3xl text-sand-200">Exhibitions & Community Work</h2>
+        <h2 className="font-display text-3xl text-sand-200">Exhibitions (timeline)</h2>
+        <div className="space-y-5 text-white/80 leading-relaxed">
+          <div>
+            <p className="text-xs uppercase tracking-[0.25em] text-white/60">Early</p>
+            <ul className="mt-2 space-y-1">
+              <li className="flex items-start gap-2"><span className="mt-1 h-1.5 w-1.5 rounded-full bg-sand-300" />Lalit Kala Academy, Delhi – Kalidas Mahotsav (1989–1992)</li>
+            </ul>
+          </div>
+          <div>
+            <p className="text-xs uppercase tracking-[0.25em] text-white/60">2010–2016</p>
+            <ul className="mt-2 space-y-1">
+              <li className="flex items-start gap-2"><span className="mt-1 h-1.5 w-1.5 rounded-full bg-sand-300" />Dubai, UAE galleries (2010–2013)</li>
+              <li className="flex items-start gap-2"><span className="mt-1 h-1.5 w-1.5 rounded-full bg-sand-300" />Art fairs, Moscow, Russia (2013–2016)</li>
+            </ul>
+          </div>
+          <div>
+            <p className="text-xs uppercase tracking-[0.25em] text-white/60">2017–2019</p>
+            <ul className="mt-2 space-y-1">
+              <li className="flex items-start gap-2"><span className="mt-1 h-1.5 w-1.5 rounded-full bg-sand-300" />Group shows, Chitra Kala Parishad, Bangalore (2017)</li>
+              <li className="flex items-start gap-2"><span className="mt-1 h-1.5 w-1.5 rounded-full bg-sand-300" />Chitra Santhe, Bangalore (2018 &amp; 2019)</li>
+              <li className="flex items-start gap-2"><span className="mt-1 h-1.5 w-1.5 rounded-full bg-sand-300" />Venkatappa Art Gallery, Bangalore (2018)</li>
+            </ul>
+          </div>
+          <div>
+            <p className="text-xs uppercase tracking-[0.25em] text-white/60">2020–2025</p>
+            <ul className="mt-2 space-y-1">
+              <li className="flex items-start gap-2"><span className="mt-1 h-1.5 w-1.5 rounded-full bg-sand-300" />Online show “Canvas of Unity” (2020)</li>
+              <li className="flex items-start gap-2"><span className="mt-1 h-1.5 w-1.5 rounded-full bg-sand-300" />B&amp;S Arts Gallery, Sheraton, Hong Kong (2021)</li>
+              <li className="flex items-start gap-2"><span className="mt-1 h-1.5 w-1.5 rounded-full bg-sand-300" />“Streets of HK” by Watermark Church, Hong Kong (2021)</li>
+              <li className="flex items-start gap-2"><span className="mt-1 h-1.5 w-1.5 rounded-full bg-sand-300" />Visual Art Center, Hong Kong (2023)</li>
+              <li className="flex items-start gap-2"><span className="mt-1 h-1.5 w-1.5 rounded-full bg-sand-300" />Katha – Stories of India, HK Walls Project (2023–2025)</li>
+              <li className="flex items-start gap-2"><span className="mt-1 h-1.5 w-1.5 rounded-full bg-sand-300" />Indian Consulate, Hong Kong – Republic Day &amp; Women’s Day Celebrations (2024 &amp; 2025)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div className="card-glass rounded-[28px] border border-white/10 bg-white/5 p-6 md:p-8 space-y-4">
+        <h2 className="font-display text-3xl text-sand-200">Artist Statement</h2>
         <p className="leading-relaxed text-white/80">
-          Since beginning this journey, I’ve been fortunate to showcase my art at exhibitions such as the Indian
-          Affordable Art Fair at the Hong Kong Visual Arts Centre, the Consulate General of India (Hong Kong), Lamma Art
-          Collective, Expo Metro, Watermark Community Church in Sai Ying Pun, and ISKCON Temple Hong Kong, among others.
-        </p>
-        <p className="leading-relaxed text-white/80">
-          Art has also given me a way to give back. I’ve conducted bottle art jamming workshops, contributed to mental
-          wellbeing initiatives, and raised funds for NGOs such as Phenomenally Pink, The Zubin Foundation, and
-          Dubai-based Spunk Go.
+          For Rakhi, art is meditation—a sanctuary where mind and soul find harmony. Each brushstroke is an offering, a way
+          to inspire, provoke thought, and build bridges of connection. She believes art is both personal and communal,
+          driving her to teach children, guide communities through workshops, and bring creativity into corporate spaces.
+          Through her work, Rakhi reminds us that art is a reflection of the self and a celebration of humanity.
         </p>
       </div>
     </div>

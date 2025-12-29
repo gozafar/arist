@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useState,useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 
 const navItems = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
+  { href: "/gallery", label: "Gallery" },
   { href: "/paintings", label: "Paintings" },
   { href: "/contact", label: "Contact" },
   { href: "/admin/paintings", label: "Admin" }
@@ -15,22 +16,28 @@ const navItems = [
 
 const Navbar = () => {
   const pathname = usePathname();
-  const { totalItems } = useCart();
+  // const { totalItems } = useCart();
+   const router = useRouter();
   const [open, setOpen] = useState(false);
+
+
+
 
   const linkClass = (href: string) =>
     `relative px-3 py-2 text-sm font-medium transition ${
-      pathname === href ? "text-sand-200" : "text-white/80 hover:text-white"
+      pathname === href
+        ? "text-sand-700"
+        : "text-black/70 hover:text-sand-700"
     }`;
 
   return (
-    <header className="sticky top-0 z-40 backdrop-blur-xl bg-black/40 border-b border-white/10">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 lg:px-6">
+    <header className="sticky top-0 z-40 backdrop-blur-xl bg-white/80 border-b border-white/15">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 lg:px-6">
         <Link href="/" className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-sand-500 to-sand-700 shadow-card" />
+          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-sand-400 via-sand-500 to-sand-700 shadow-card" />
           <div>
-            <p className="text-xs uppercase tracking-[0.35em] text-white/70">Artist Portfolio</p>
-            <p className="font-display text-xl">Lipi Srivastava</p>
+            <p className="text-xs uppercase tracking-[0.35em] text-black/60">Artistry</p>
+            <p className="font-display text-xl text-black">Online Gallery</p>
           </div>
         </Link>
 
@@ -40,32 +47,33 @@ const Navbar = () => {
               {item.label}
             </Link>
           ))}
-          <Link
+          {/* <Link
             href="/cart"
-            className="relative rounded-full border border-white/10 px-4 py-2 text-sm text-white hover:border-white/30"
+            className="relative rounded-full border border-white/20 px-4 py-2 text-sm text-black hover:border-white/30 hover:text-sand-700"
           >
             Cart
             <span className="ml-2 inline-flex h-6 min-w-[1.5rem] items-center justify-center rounded-full bg-sand-500 px-2 text-xs font-semibold text-black shadow-card">
               {totalItems}
             </span>
-          </Link>
+          </Link> */}
+
         </nav>
 
         <button
-          className="md:hidden rounded-full border border-white/20 p-2 text-white"
-          onClick={() => setOpen((prev) => !prev)}
+          className="md:hidden rounded-full border border-white/20 p-2 text-black"
+          onClick={() => setOpen(!open)}
           aria-label="Toggle navigation"
         >
           <div className="flex flex-col gap-1">
-            <span className="block h-0.5 w-5 bg-white" />
-            <span className="block h-0.5 w-5 bg-white" />
-            <span className="block h-0.5 w-5 bg-white" />
+            <span className="block h-0.5 w-5 bg-black" />
+            <span className="block h-0.5 w-5 bg-black" />
+            <span className="block h-0.5 w-5 bg-black" />
           </div>
         </button>
       </div>
 
       {open && (
-        <div className="md:hidden border-t border-white/10 bg-black/70">
+        <div className="md:hidden border-t border-white/15 bg-white/90">
           <div className="mx-auto flex max-w-6xl flex-col px-4 py-4 gap-3 text-sm">
             {navItems.map((item) => (
               <Link
@@ -77,16 +85,16 @@ const Navbar = () => {
                 {item.label}
               </Link>
             ))}
-            <Link
+            {/* <Link
               href="/cart"
-              className="flex items-center justify-between rounded-xl border border-white/15 px-4 py-3 text-white"
+              className="flex items-center justify-between rounded-xl border border-white/20 px-4 py-3 text-black"
               onClick={() => setOpen(false)}
             >
               <span>Cart</span>
               <span className="ml-2 inline-flex h-7 min-w-[1.75rem] items-center justify-center rounded-full bg-sand-500 px-2 text-xs font-semibold text-black shadow-card">
                 {totalItems}
               </span>
-            </Link>
+            </Link> */}
           </div>
         </div>
       )}
