@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { GetGallery } from "@/lib/api/admin";
 import Image from "next/image";
+import Pagination from "@/components/Pagination";
 
 const GALLERY_NAMES = [
   "Contemporary / Modern Art",
@@ -13,8 +14,12 @@ const GALLERY_NAMES = [
 
 interface GalleryImage {
   _id: string;
+  imageId?: string;
   url: string;
   name: string;
+  galleryName?: string;
+  createdAt?: string;
+  [key: string]: any;
 }
 
 interface Gallery {
@@ -28,53 +33,99 @@ export default function GalleryPage() {
   const [galleries, setGalleries] = useState<Gallery[]>([]);
   const [filteredGalleries, setFilteredGalleries] = useState<Gallery[]>([]);
   const [selectedGallery, setSelectedGallery] = useState<string>("");
-  const [pagination, setPagination] = useState<{ page: number; limit: number; total: number; pages: number }>({
-    page: 1,
-    limit: 10,
-    total: 0,
-    pages: 1,
-  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [imageList, setImageList] = useState<GalleryImage[]>([]);
+  
+  const PAGE_SIZE = 12;
+  
+  // Pagination state similar to paintings
+  const [currentPage, setCurrentPage] = useState(1);
+  
+  // Calculate pagination values
+  const totalPages = useMemo(() => Math.max(1, Math.ceil(imageList.length / PAGE_SIZE)), [imageList.length]);
+  const clampedPage = useMemo(() => Math.min(currentPage, totalPages), [currentPage, totalPages]);
+  const start = useMemo(() => (clampedPage - 1) * PAGE_SIZE, [clampedPage]);
+  const end = useMemo(() => start + PAGE_SIZE, [start]);
+  const visibleImages = useMemo(() => imageList.slice(start, end), [imageList, start, end]);
 
   useEffect(() => {
     fetchGalleries();
-  }, [pagination.page]);
+  }, []);
 
   useEffect(() => {
     if (selectedGallery) {
-      // Filter by selected hardcoded gallery name
       const filtered = galleries.filter(gallery => gallery.name === selectedGallery);
       setFilteredGalleries(filtered);
+      const images = filtered[0]?.imageIds || [];
+      setImageList(images);
+      setCurrentPage(1); // Reset to page 1 when gallery changes
     } else {
-      // Filter galleries to only show those with hardcoded names
       const hardcodedFiltered = galleries.filter(gallery => 
         GALLERY_NAMES.includes(gallery.name as any)
       );
       setFilteredGalleries(hardcodedFiltered);
+      
+      const allImages = hardcodedFiltered.flatMap(gallery => 
+        gallery.imageIds.map(img => ({
+          ...img,
+          galleryName: gallery.name,
+          createdAt: (img as any).createdAt || gallery.createdAt
+        }))
+      );
+      setImageList(allImages);
+      setCurrentPage(1); // Reset to page 1 when gallery changes
     }
   }, [selectedGallery, galleries]);
 
   const fetchGalleries = async () => {
     try {
       setLoading(true);
-      const res = await GetGallery({ page: pagination.page, limit: pagination.limit });
-      setGalleries((res?.galleries as any) || []);
-      if (res?.pagination) {
-        setPagination(res.pagination);
+      const res = await GetGallery({ page: 1, limit: 100 }); // Fetch all galleries for client-side pagination
+      
+      if (res?.galleries) {
+        setGalleries(res.galleries);
+        
+        // Extract images from galleries based on selection
+        let images: GalleryImage[] = [];
+        if (selectedGallery) {
+          const filtered = res.galleries.filter(gallery => gallery.name === selectedGallery);
+          images = filtered[0]?.imageIds || [];
+        } else {
+          const hardcodedFiltered = res.galleries.filter(gallery => 
+            GALLERY_NAMES.includes(gallery.name as any)
+          );
+          images = hardcodedFiltered.flatMap(gallery => 
+            gallery.imageIds.map(img => ({
+              ...img,
+              galleryName: gallery.name,
+              createdAt: (img as any).createdAt || gallery.createdAt
+            }))
+          );
+        }
+        
+        setImageList(images);
       }
+      
       setError(null);
     } catch (err) {
-      setError("Failed to load galleries");
+      console.error("Failed to load galleries:", err);
+      setError("Failed to load galleries. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   if (loading) {
     return (
-      <div className="flex justify-center py-24 text-white/60">
-        Loading galleries…
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="h-64 bg-white/5 animate-pulse rounded-2xl" />
+        ))}
       </div>
     );
   }
@@ -83,7 +134,10 @@ export default function GalleryPage() {
     return (
       <div className="text-center py-24">
         <p className="text-red-400 mb-4">{error}</p>
-        <button onClick={fetchGalleries} className="button-primary text-xs">
+        <button 
+          onClick={fetchGalleries} 
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+        >
           Retry
         </button>
       </div>
@@ -95,12 +149,8 @@ export default function GalleryPage() {
       {/* HEADER */}
       <div className="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
         <div>
-          <p className="text-xs tracking-[0.35em] uppercase text-white/50">
-            Collections
-          </p>
-          <h1 className="text-3xl md:text-4xl font-semibold text-white mt-2">
-            Art Gallery
-          </h1>
+          <p className="text-xs tracking-[0.35em] uppercase text-white/50">Collections</p>
+          <h1 className="text-3xl md:text-4xl font-semibold text-white mt-2">Art Gallery</h1>
           <p className="mt-3 max-w-xl text-white/60 text-sm">
             Browse through our gallery collections. Page through to explore all available galleries.
           </p>
@@ -111,126 +161,94 @@ export default function GalleryPage() {
             value={selectedGallery}
             onChange={(e) => setSelectedGallery(e.target.value)}
             className="rounded-full bg-white/5 px-4 py-2 border border-white/10 focus:border-white/20 outline-none"
+            aria-label="Filter galleries"
+            disabled={loading}
           >
             <option value="">All Galleries</option>
             {GALLERY_NAMES.map((name) => (
-              <option key={name} value={name}>
-                {name}
-              </option>
+              <option key={name} value={name}>{name}</option>
             ))}
           </select>
           <span className="rounded-full bg-white/5 px-4 py-2">
             {filteredGalleries.length} collections
           </span>
           <span className="rounded-full bg-white/5 px-4 py-2">
-            {filteredGalleries.reduce((t, g) => t + g.imageIds.length, 0)} works
+            {imageList.length} works
           </span>
         </div>
       </div>
 
-      {/* selected category: {selectedCategory} */}
-
       {/* GALLERY GRID */}
-      {filteredGalleries.length > 0 ? (
-        <section className="space-y-6">
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredGalleries.map((gallery) => (
-              <div
-                key={gallery._id}
-                className="group relative overflow-hidden rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 transition"
-              >
-                {/* IMAGE GRID */}
-                <div className="relative aspect-square overflow-hidden">
-                  <div className="grid grid-cols-2 grid-rows-2 h-full gap-[2px]">
-                    {gallery.imageIds.slice(0, 4).map((img, i) => (
-                     <Image
-  key={img._id}
-  src={img.url}
-  alt={img.name}
-  fill
-  className={`object-cover transition-transform duration-500 group-hover:scale-110
-    ${gallery.imageIds.length === 1 ? "col-span-2 row-span-2" : ""}
-    ${gallery.imageIds.length === 2 && i === 0 ? "col-span-2" : ""}
-    ${gallery.imageIds.length === 3 && i === 2 ? "col-span-2" : ""}
-  `}
-  sizes="(max-width: 768px) 50vw, 25vw"
-  loading="lazy"
-  quality={75}
-  placeholder="blur"
-  blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiB2aWV3Qm94PSIwIDAgNDAwIDQwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YxZjFmMSIvPjwvc3ZnPg=="
-/>
-                    ))}
+      {visibleImages.length > 0 ? (
+        <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {visibleImages.map((item: GalleryImage) => (
+            <div
+              key={item._id || item.imageId}
+              className="group rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-white/20 transition"
+            >
+              {/* IMAGE */}
+              <div className="relative aspect-square">
+                <Image
+                  src={item.url}
+                  alt={item.name || "Artwork"}
+                  fill
+                  className="object-cover object-center transition-transform duration-500 group-hover:scale-110"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  loading="lazy"
+                  quality={75}
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = '/placeholder.jpg';
+                  }}
+                />
+              </div>
 
-                    {gallery.imageIds.length === 0 && (
-                      <div className="col-span-2 row-span-2 flex items-center justify-center text-white/40 text-sm">
-                        No images
-                      </div>
-                    )}
-                  </div>
-
-                  {/* OVERLAY */}
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                    <span className="text-white text-sm tracking-wide">
-                      View Collection →
-                    </span>
-                  </div>
-                </div>
-
-                {/* CONTENT */}
-                <div className="p-5">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-lg font-medium text-white">
-                      {gallery.name}
-                    </h3>
-                    <span className="text-xs text-white/50">
-                      {gallery.imageIds.length} works
-                    </span>
-                  </div>
-
-                  <p className="text-xs text-white/40">
-                    Created{" "}
-                    {new Date(gallery.createdAt).toLocaleDateString("en-US", {
+              {/* CONTENT */}
+              <div className="p-4 space-y-1">
+                <h3 className="text-white font-medium text-sm">
+                  {item.name || "Untitled"}
+                </h3>
+                {item.galleryName && (
+                  <p className="text-xs text-white/60">
+                    {item.galleryName}
+                  </p>
+                )}
+                <p className="text-xs text-white/40">
+                  {item.createdAt ? (
+                    new Date(item.createdAt).toLocaleDateString("en-US", {
                       month: "short",
                       year: "numeric",
-                    })}
-                  </p>
-                </div>
+                    })
+                  ) : (
+                    "Date not available"
+                  )}
+                </p>
               </div>
-            ))}
-          </div>
-
-          <div className="flex items-center justify-center gap-3 text-xs text-white/70">
-            <button
-              className="button-outline px-3 py-2 text-xs disabled:opacity-50"
-              onClick={() =>
-                setPagination((prev) => ({
-                  ...prev,
-                  page: Math.max(1, prev.page - 1),
-                }))
-              }
-              disabled={pagination.page === 1 || loading}
-            >
-              Prev
-            </button>
-            <span>
-              Page {pagination.page} of {Math.max(1, pagination.pages || 1)}
-            </span>
-            <button
-              className="button-outline px-3 py-2 text-xs disabled:opacity-50"
-              onClick={() =>
-                setPagination((prev) => ({
-                  ...prev,
-                  page: Math.min(prev.pages || 1, prev.page + 1),
-                }))
-              }
-              disabled={pagination.pages === pagination.page || loading}
-            >
-              Next
-            </button>
-          </div>
+            </div>
+          ))}
         </section>
       ) : (
-        <div className="text-white/60 text-sm">No galleries found.</div>
+        <div className="text-center py-12">
+          <p className="text-white/60">No artworks found.</p>
+          {selectedGallery && (
+            <button
+              onClick={() => setSelectedGallery("")}
+              className="mt-2 text-blue-400 hover:text-blue-300 text-sm"
+            >
+              Clear filters
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* PAGINATION */}
+      {imageList.length > 0 && (
+        <Pagination
+          total={imageList.length}
+          perPage={PAGE_SIZE}
+          currentPage={clampedPage}
+          onPageChange={handlePageChange}
+        />
       )}
     </div>
   );
