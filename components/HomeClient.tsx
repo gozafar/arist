@@ -63,16 +63,16 @@ const HomeClient = () => {
           </div>
           <div className="relative h-[420px] overflow-hidden rounded-3xl border border-white/15 bg-white shadow-card">
             <Image
-              src="https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1600&q=80"
+              src="/MainPaing.png"
               alt="Colorful abstract painting in a studio"
               fill
               className="object-cover"
               priority
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-white/20 to-transparent" />
-            <div className="absolute bottom-4 left-4 right-4 rounded-2xl bg-white/90 p-4 text-sm text-black/70 backdrop-blur">
+            {/* <div className="absolute bottom-4 left-4 right-4 rounded-2xl bg-white/90 p-4 text-sm text-black/70 backdrop-blur">
               Certified originals with authenticity certificates and global delivery.
-            </div>
+            </div> */}
           </div>
         </div>
       </section>

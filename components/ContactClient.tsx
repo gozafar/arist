@@ -113,8 +113,11 @@ const ContactClient = () => {
                 <a href="https://www.instagram.com/rakhi_studio/" className="button-outline text-xs" target="_blank" rel="noreferrer">
                   Instagram
                 </a>
-                <a href="https://www.behance.net" className="button-outline text-xs" target="_blank" rel="noreferrer">
-                  Behance
+                {/* <a href="https://www.behance.net" className="button-outline text-xs" target="_blank" rel="noreferrer">
+                  Facebook
+                </a> */}
+                <a href="https://www.linkedin.com/in/rakhi-vashisht-b373858/" className="button-outline text-xs" target="_blank" rel="noreferrer">
+                  Linkdin
                 </a>
                 <a href="mailto:studio@anandnarayan.art" className="button-outline text-xs">
                   Email

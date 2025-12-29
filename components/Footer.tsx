@@ -24,11 +24,16 @@ const Footer = () => {
             Instagram
           </a>
           <span className="text-black/30">•</span>
-          <a href="https://dribbble.com" target="_blank" rel="noreferrer" className="hover:text-sand-700">
-            Dribbble
+          <a href="https://www.facebook.com/RakhisArt/" target="_blank" rel="noreferrer" className="hover:text-sand-700">
+            Facebook
           </a>
           <span className="text-black/30">•</span>
-          <a href="mailto:hello@artsylipsri.com" className="hover:text-sand-700">
+           <a href="https://www.linkedin.com/in/rakhi-vashisht-b373858/" className="hover:text-sand-700">
+            Linkdin
+          </a>
+          <span className="text-black/30">•</span>
+
+          <a href="mailto:rakhistudio1010@gmail.com" className="hover:text-sand-700">
             Email
           </a>
         </div>
