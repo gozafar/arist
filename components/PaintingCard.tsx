@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 const PaintingCard = ({ painting }: { painting: PaintingDTO }) => {
   const router = useRouter();
   // const { addToCart } = useCart();
-  // const isSold = painting.availability === "sold";
+  const isSold = painting.availability === "sold";
 
   return (
     <div className="card-glass flex h-full flex-col overflow-hidden rounded-3xl">
@@ -52,9 +52,11 @@ const PaintingCard = ({ painting }: { painting: PaintingDTO }) => {
               {isSold ? "Sold" : "Add"}
             </Button> */}
             <Button
-            onClick={() => router.push(`/paintings/${painting.id}/PaintingOrder`)}
+              onClick={() => router.push(`/paintings/${painting.id}/PaintingOrder`)}
+              disabled={isSold}
+              className={isSold ? " hover:bg-red-100 cursor-not-allowed" : ""}
             >
-              contact
+              {isSold ? "Sold" : "Contact"}
             </Button>
           </div>
         </div>

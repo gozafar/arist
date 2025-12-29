@@ -95,9 +95,15 @@ export default function GalleryListPage() {
   };
 
   const handleConfirmDelete = async (id: string) => {
-    setSuccess("Gallery deleted successfully");
-    fetchGalleries();
-    setTimeout(() => setSuccess(null), 3000);
+    try {
+      await DeleteGallery(id);
+      setSuccess("Gallery deleted successfully");
+      fetchGalleries();
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (error) {
+      setError("Failed to delete gallery");
+      setTimeout(() => setError(null), 3000);
+    }
   };
 
   const closeModal = () => {
@@ -173,7 +179,7 @@ export default function GalleryListPage() {
                 <tr>
                   <th className="px-6 py-4">Gallery Name</th>
                   <th className="px-6 py-4">Images</th>
-                  <th className="px-6 py-4">Category</th>
+                  {/* <th className="px-6 py-4">Category</th> */}
                   <th className="px-6 py-4">Created</th>
                   <th className="px-6 py-4">Actions</th>
                 </tr>

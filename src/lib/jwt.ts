@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 
 const ACCESS_SECRET = process.env.JWT_SECRET || "dev-secret";
 const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || "dev-refresh";
-const ACCESS_TTL_SECONDS = Number(process.env.ACCESS_TOKEN_TTL || 60); // 1mint
+const ACCESS_TTL_SECONDS = Number(process.env.ACCESS_TOKEN_TTL || 60*7); // 1mint
 const REFRESH_TTL_SECONDS = Number(process.env.REFRESH_TOKEN_TTL || 60 * 60 * 24 * 7); // 7 days
 
 export type JwtRole = "USER" | "ADMIN" | "SUPER_ADMIN";

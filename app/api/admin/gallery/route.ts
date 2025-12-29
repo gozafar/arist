@@ -7,37 +7,19 @@ import { dbConnect } from "@/lib/db";
 import { uploadOnCloudinary } from "../../cloudinary";
 import fs from "fs";
 import path from "path";
-import { gallerySchemas, validateRequest, validateFiles } from "../../../../lib/validators/galleryValidator";
 
 // Ensure Category model is registered
 import "@/models/Category";
 import "@/models/Image";
 
 export async function POST(request: NextRequest) {
-  // Declare variables outside try block for error logging
-  let imageFiles: File[] = [];
-  let imageNames: string[] = [];
-  let name: string = "";
-
-
   try {
-    // const authError = await requireRole(request, ["ADMIN", "SUPER_ADMIN"]);
-    // if (authError) return authError;
-
     const formData = await request.formData();
 
-    console.log("formData", formData);
-
-
     // Extract fields from FormData
-
-    // Get all image files and their names from FormData
-    imageFiles = formData.getAll('images') as File[];
-    imageNames = formData.getAll('imageNames') as string[];
-    name = formData.get('name') as string;
-
-
-    // Validate maximum 3 images - REMOVED since galleries now support unlimited images
+    const imageFiles = formData.getAll('images') as File[];
+    const imageNames = formData.getAll('imageNames') as string[];
+    const name = formData.get('name') as string;
 
     // Validate gallery name against hardcoded enum
     const validGalleryNames = [
@@ -57,60 +39,20 @@ export async function POST(request: NextRequest) {
     await dbConnect();
 
     // Check if gallery with this name already exists
-    let gallery = await Gallery.findOne({ name }).populate('imageIds');
+    let gallery = await Gallery.findOne({ name });
 
     if (!gallery) {
       // Create new gallery if none exists
       gallery = new Gallery({
-        imageIds: [], // Will be populated after image creation
+        imageIds: [],
         name,
       });
       await gallery.save();
     }
 
-    // Validate name and imageNames with Joi (images array validation handled separately)
-    const validation = validateRequest(gallerySchemas.createGallery, {
-      name: name,
-      images: [], // Pass empty array to satisfy Joi, files validated separately
-      imageNames: imageNames // Pass actual image names for validation
-    });
-
-
-
-    // Validate files separately for detailed checks
-    const fileValidation = validateFiles(imageFiles);
-
-
-
-    if (!validation.isValid || !fileValidation.isValid) {
-      const errors: { [key: string]: string } = {};
-
-      // Add Joi validation errors
-      if (validation.errors) {
-        Object.assign(errors, validation.errors);
-      }
-
-      // Add file validation errors
-      if (fileValidation.errors) {
-        errors.images = fileValidation.errors.join(', ');
-      }
-
-      return NextResponse.json({
-        error: "Validation failed",
-        errors
-      }, { status: 400 });
-    }
-
-
-
-    await dbConnect();
-
-    // Process images - upload FormData files to Cloudinary
-    const processedImages = [];
-
-    for (let i = 0; i < imageFiles.length; i++) {
-      const file = imageFiles[i];
-      const imageName = imageNames[i] || file.name; // Fallback to file.name if no client name provided
+    // Process images in parallel for better performance
+    const imageUploadPromises = imageFiles.map(async (file, index) => {
+      const imageName = imageNames[index] || file.name;
 
       // Create temporary file
       const tempDir = path.join(process.cwd(), 'temp');
@@ -121,26 +63,34 @@ export async function POST(request: NextRequest) {
       const tempFileName = `gallery-${Date.now()}-${Math.random().toString(36).substring(7)}-${file.name}`;
       const tempFilePath = path.join(tempDir, tempFileName);
 
-      // Convert File to buffer and write to temp file
-      const buffer = Buffer.from(await file.arrayBuffer());
-      fs.writeFileSync(tempFilePath, buffer);
+      try {
+        // Convert File to buffer and write to temp file
+        const buffer = Buffer.from(await file.arrayBuffer());
+        fs.writeFileSync(tempFilePath, buffer);
 
-      // Upload to Cloudinary
-      const uploadResult = await uploadOnCloudinary(tempFilePath, "rakhi-studio/gallery");
+        // Upload to Cloudinary
+        const uploadResult = await uploadOnCloudinary(tempFilePath, "rakhi-studio/gallery");
 
-      // Clean up temp file
-      if (fs.existsSync(tempFilePath)) {
-        fs.unlinkSync(tempFilePath);
-      }
-
-      if (uploadResult) {
-        processedImages.push({
-          url: uploadResult.secure_url,
+        return {
+          url: uploadResult?.secure_url,
           name: imageName
-        });
-      } else {
-        throw new Error(`Failed to upload image ${file.name} to Cloudinary`);
+        };
+      } finally {
+        // Clean up temp file
+        if (fs.existsSync(tempFilePath)) {
+          fs.unlinkSync(tempFilePath);
+        }
       }
+    });
+
+    // Wait for all uploads to complete
+    const uploadResults = await Promise.all(imageUploadPromises);
+
+    // Filter out failed uploads
+    const processedImages = uploadResults.filter(result => result.url);
+
+    if (processedImages.length === 0) {
+      throw new Error("Failed to upload any images to Cloudinary");
     }
 
     // Prepare image documents with gallery reference
@@ -150,19 +100,20 @@ export async function POST(request: NextRequest) {
       galleryId: gallery._id,
     }));
 
-    // Use insertMany to create all images at once - each gets unique _id
+    // Use insertMany to create all images at once
     const insertedImages = await Image.insertMany(imageDocuments);
 
     // Add new image IDs to existing gallery
     gallery.imageIds.push(...insertedImages.map(img => img._id));
     await gallery.save();
 
-    // Populate gallery with images and category
+    // Populate gallery with images
     await gallery.populate([
       { path: "imageIds", select: "url name" },
     ]);
 
     return NextResponse.json({ gallery, message: "Gallery created successfully" }, { status: 201 });
+
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to create gallery";
     console.error("Gallery create error:", error);

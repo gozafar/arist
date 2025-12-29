@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useState,useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 
 const navItems = [
@@ -16,8 +16,12 @@ const navItems = [
 
 const Navbar = () => {
   const pathname = usePathname();
-  const { totalItems } = useCart();
+  // const { totalItems } = useCart();
+   const router = useRouter();
   const [open, setOpen] = useState(false);
+
+
+
 
   const linkClass = (href: string) =>
     `relative px-3 py-2 text-sm font-medium transition ${
@@ -52,11 +56,12 @@ const Navbar = () => {
               {totalItems}
             </span>
           </Link> */}
+
         </nav>
 
         <button
           className="md:hidden rounded-full border border-white/20 p-2 text-black"
-          onClick={() => setOpen((prev) => !prev)}
+          onClick={() => setOpen(!open)}
           aria-label="Toggle navigation"
         >
           <div className="flex flex-col gap-1">

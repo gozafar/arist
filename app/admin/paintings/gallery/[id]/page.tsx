@@ -1,22 +1,10 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState, use, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { GetGalleryById, UpdateGallery, adminGetCategories } from "@/lib/api/admin";
-
-const GALLERY_NAMES = [
-  "Contemporary / Modern Art",
-  "Portrait Paintings", 
-  "Landscape Paintings",
-  "Abstract Art"
-] as const;
-
-
-interface Category {
-  id: string;
-  categoryName: string;
-}
+import { UpdateGallery } from "@/lib/api/admin";
+import GalleryModal from "@/components/admin/GalleryModal";
 
 interface GalleryImage {
   _id: string;
@@ -53,6 +41,17 @@ export default function EditGalleryPage({
   const [images, setImages] = useState<EditableImage[]>([]);
   const [initialGalleryName, setInitialGalleryName] = useState("");
   const [initialImages, setInitialImages] = useState<EditableImage[]>([]);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [imageToDelete, setImageToDelete] = useState<string | null>(null);
+
+  // Create a dummy gallery object for GalleryModal with image deletion context
+  const dummyGallery = useMemo(() => ({
+    _id: imageToDelete || '',
+    name: 'Image',
+    imageIds: [{ _id: imageToDelete || '', url: '', name: 'Image' }], // Show 1 image
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  }), [imageToDelete]);
 
   useEffect(() => {
     loadData();
@@ -82,31 +81,15 @@ export default function EditGalleryPage({
           }))
         );
       } else {
-        const fetched = await GetGalleryById(galleryId);
-        if (fetched?.gallery) {
-          // Type assertion to handle the new gallery structure
-          const gallery = fetched.gallery as any;
-          setGalleryName(gallery.name || '');
-          setInitialGalleryName(gallery.name || '');
-          setImages(
-            gallery.imageIds.map((img: GalleryImage) => ({
-              _id: img._id,
-              name: img.name,
-              url: img.url,
-            }))
-          );
-          setInitialImages(
-            gallery.imageIds.map((img: GalleryImage) => ({
-              _id: img._id,
-              name: img.name,
-              url: img.url,
-            }))
-          );
-        }
+        // No gallery data in URL params - show error or redirect
+        toast.error("Gallery data not found");
+        router.push("/admin/paintings/gallery");
+        return;
       }
     } catch (err) {
       console.error("Load error:", err);
       toast.error("Failed to load gallery");
+      router.push("/admin/paintings/gallery");
     }
     setLoading(false);
   };
@@ -131,11 +114,30 @@ export default function EditGalleryPage({
   };
 
   const deleteImage = (id: string) => {
-    setImages((prev) =>
+    setImageToDelete(id);
+    setDeleteModalOpen(true);
+  };
+
+  const confirmDeleteImage = () => {
+    if (!imageToDelete) return;
+    
+    // Mark image as deleted locally - no API call
+    setImages((prev) => 
       prev.map((img) =>
-        img._id === id ? { ...img, isDeleted: true } : img
+        img._id === imageToDelete 
+          ? { ...img, isDeleted: true }
+          : img
       )
     );
+    
+    toast.success('Image marked for deletion');
+    setDeleteModalOpen(false);
+    setImageToDelete(null);
+  };
+
+  const cancelDelete = () => {
+    setDeleteModalOpen(false);
+    setImageToDelete(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -144,12 +146,6 @@ export default function EditGalleryPage({
 
     try {
       const activeImages = images.filter((img) => !img.isDeleted);
-      
-      if (!galleryName) {
-        toast.error("Please select a gallery name");
-        setSubmitting(false);
-        return;
-      }
       
       if (activeImages.length === 0) {
         toast.error("At least one image is required");
@@ -171,7 +167,6 @@ export default function EditGalleryPage({
         return;
       }
 
-      const hasGalleryNameChange = galleryName !== initialGalleryName;
       const imageDiffs = images
         .map((img) => {
           const initial = initialImages.find((orig) => orig._id === img._id);
@@ -191,14 +186,14 @@ export default function EditGalleryPage({
 
       const hasImageChange = imageDiffs.length > 0;
 
-      if (!hasGalleryNameChange && !hasImageChange) {
+      if (!hasImageChange) {
         toast.info("No changes to save");
         setSubmitting(false);
         return;
       }
 
       const formData = new FormData();
-      formData.append("name", galleryName);
+      formData.append("name", galleryName); // Keep current gallery name
 
       if (hasImageChange) {
         formData.append(
@@ -260,18 +255,10 @@ export default function EditGalleryPage({
           <div className="grid grid-cols-1 gap-4">
             <div>
               <label className="block text-sm text-white/70 mb-2">Gallery Name</label>
-              <select
-                value={galleryName}
-                onChange={(e) => setGalleryName(e.target.value)}
-                className="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-white outline-none transition focus:border-white/30"
-              >
-                <option value="">Select a gallery name</option>
-                {GALLERY_NAMES.map((name) => (
-                  <option key={name} value={name}>
-                    {name}
-                  </option>
-                ))}
-              </select>
+              <div className="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-white/70">
+                {galleryName || "Loading..."}
+              </div>
+              <p className="text-xs text-white/50 mt-1">Gallery name cannot be changed</p>
             </div>
           </div>
         </div>
@@ -359,6 +346,15 @@ export default function EditGalleryPage({
           </button>
         </div>
       </form>
+
+      {/* Delete Confirmation Modal */}
+      <GalleryModal
+        gallery={dummyGallery}
+        isOpen={deleteModalOpen}
+        onClose={cancelDelete}
+        onDelete={confirmDeleteImage}
+        mode="delete"
+      />
     </div>
   );
 }

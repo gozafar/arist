@@ -10,7 +10,10 @@ export const endpoints = {
     detail: (id: string) => `/api/admin/gallery/${id}`,
     add:"/api/admin/gallery",
     update: (id: string) => `/api/admin/gallery/${id}`,
-    delete: (id: string) => `/api/admin/gallery/${id}`
+    delete: (id: string) => `/api/admin/gallery/${id}`,
+    images: {
+      delete: (id: string) => `/api/admin/gallery/images/${id}`
+    }
   },
   paintings: {
     list: "/api/paintings",
@@ -44,6 +47,10 @@ export const endpoints = {
       availability: (id: string) => `/api/admin/paintings/${id}/availability`
     },
     uploadSign: "/api/admin/uploads/sign",
-    category: "/api/admin/category"
+    category: {
+      root: "/api/admin/category",
+      detail: (id: string) => `/api/admin/category/${id}`
+    },
+    cloudinary: "/api/admin/cloudinary"
   }
 };

@@ -26,17 +26,13 @@ interface GalleryData {
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
-        // const authError = await requireRole(request, ["ADMIN", "SUPER_ADMIN"]);
-        // if (authError) return authError;
-
+        const authError = await requireRole(request, ["ADMIN", "SUPER_ADMIN"]);
+        if (authError) return authError;
         const { id: galleryId } = await params;
         const formData = await request.formData();
         await dbConnect();
 
-        const gallery = await Gallery.findById(galleryId).populate({
-            path: 'imageIds',
-            select: 'url name'
-        });
+        const gallery = await Gallery.findById(galleryId);
         if (!gallery) {
             return NextResponse.json({ error: "Gallery not found" }, { status: 404 });
         }
@@ -46,7 +42,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         const replacedImages = formData.getAll('replacedImages') as File[];
         const replacedImageIds = formData.getAll('replacedImageIds') as string[];
 
-        // Validate gallery name against hardcoded enum if provided
+        // Validate gallery name
         if (name) {
             const validGalleryNames = [
                 "Contemporary / Modern Art",
@@ -72,30 +68,39 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
             return NextResponse.json({ error: "Mismatched replacement images" }, { status: 400 });
         }
 
-        const galleryImageIdSet = new Set(gallery.imageIds.map((img: GalleryImage) => img._id.toString()));
+        // Get current images once
+        const currentImages = await Image.find({ _id: { $in: gallery.imageIds } });
+        const galleryImageIdSet = new Set(currentImages.map(img => img._id.toString()));
+
+        // Validate image references
         for (const repId of replacedImageIds) {
             if (!galleryImageIdSet.has(repId)) {
                 return NextResponse.json({ error: "Invalid image to replace" }, { status: 400 });
             }
         }
 
-        // Validate meta references
         for (const meta of imagesMeta) {
             if (!galleryImageIdSet.has(meta._id)) {
                 return NextResponse.json({ error: "Invalid image reference" }, { status: 400 });
             }
         }
 
-        // Calculate resulting images to ensure at least one remains and names stay unique
-        const toDelete = new Set(imagesMeta.filter((m) => m.isDeleted).map((m) => m._id));
-        const nameUpdates = new Map(imagesMeta.filter((m) => !m.isDeleted && m.name).map((m) => [m._id, m.name.trim()]));
+        // Check for unique names efficiently
+        const toDelete = new Set(imagesMeta.filter(m => m.isDeleted).map(m => m._id));
+        const nameUpdates = new Map(imagesMeta.filter(m => !m.isDeleted && m.name).map(m => [m._id, m.name.trim()]));
 
-        const resultingNames: string[] = [];
+        const resultingNames = new Set<string>();
         let resultingCount = 0;
-        for (const img of gallery.imageIds as GalleryImage[]) {
+
+        for (const img of currentImages) {
             if (toDelete.has(img._id.toString())) continue;
             const finalName = nameUpdates.get(img._id.toString()) || img.name;
-            resultingNames.push(finalName.trim().toLowerCase());
+            const normalizedName = finalName.trim().toLowerCase();
+            
+            if (resultingNames.has(normalizedName)) {
+                return NextResponse.json({ error: `Duplicate image name: ${finalName}` }, { status: 400 });
+            }
+            resultingNames.add(normalizedName);
             resultingCount += 1;
         }
 
@@ -103,18 +108,12 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
             return NextResponse.json({ error: "At least one image is required" }, { status: 400 });
         }
 
-        const hasDuplicate = resultingNames.some((name, idx) => resultingNames.indexOf(name) !== idx);
-        if (hasDuplicate) {
-            return NextResponse.json({ error: "Image names must be unique" }, { status: 400 });
-        }
-
         let hasUpdates = false;
 
-        // Update gallery name if changed - check for uniqueness
+        // Update gallery name if changed
         if (name && name.trim() !== "" && name.trim() !== gallery.name) {
-            // Check if another gallery with this name exists
-            const existingGallery = await Gallery.findOne({ name: name.trim() });
-            if (existingGallery && existingGallery._id.toString() !== gallery._id.toString()) {
+            const existingGallery = await Gallery.findOne({ name: name.trim(), _id: { $ne: gallery._id } });
+            if (existingGallery) {
                 return NextResponse.json({ 
                     error: "Gallery name already exists. Gallery names must be unique." 
                 }, { status: 400 });
@@ -123,59 +122,64 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
             hasUpdates = true;
         }
 
-        // Handle image name changes and deletions
+        // Prepare all operations in parallel
+        const operations: Promise<any>[] = [];
+
+        // Handle image deletions and name updates
         for (const meta of imagesMeta) {
-            const existingImage = gallery.imageIds.find((img: GalleryImage) => img._id.toString() === meta._id);
-            
-            if (meta.isDeleted && existingImage) {
-                await deleteImageById(existingImage._id);
-                gallery.imageIds = gallery.imageIds.filter((img: GalleryImage) => img._id.toString() !== meta._id);
-                hasUpdates = true;
-            } else if (existingImage && meta.name !== existingImage.name) {
-                await Image.findByIdAndUpdate(existingImage._id, { name: meta.name });
-                hasUpdates = true;
+            if (meta.isDeleted) {
+                // Delete image from Cloudinary and DB
+                operations.push((async () => {
+                    const image = currentImages.find(img => img._id.toString() === meta._id);
+                    if (image) {
+                        await deleteImageFromCloudinary(image.url);
+                        await Image.findByIdAndDelete(meta._id);
+                        // Remove from gallery imageIds
+                        gallery.imageIds = gallery.imageIds.filter((id: any) => id.toString() !== meta._id);
+                    }
+                })());
+            } else if (meta.name) {
+                const image = currentImages.find(img => img._id.toString() === meta._id);
+                if (image && image.name !== meta.name) {
+                    operations.push(Image.findByIdAndUpdate(meta._id, { name: meta.name }).exec());
+                }
             }
         }
 
-        // Handle image replacements
+        // Handle image replacements in parallel
         if (replacedImages.length > 0) {
-            for (let i = 0; i < replacedImages.length; i++) {
-                const file = replacedImages[i];
-                const imageId = replacedImageIds[i];
+            const replacementPromises = replacedImages.map(async (file, index) => {
+                const imageId = replacedImageIds[index];
                 
                 if (file && imageId) {
                     const uploadResult = await uploadImageToCloudinary(file);
                     if (uploadResult) {
-                        const existingImage = await Image.findById(imageId);
+                        const existingImage = currentImages.find(img => img._id.toString() === imageId);
                         if (existingImage) {
                             await deleteImageFromCloudinary(existingImage.url);
-                            const updatedName = imagesMeta.find((meta: ImageMeta) => meta._id === imageId)?.name;
+                            const updatedName = imagesMeta.find(meta => meta._id === imageId)?.name;
                             await Image.findByIdAndUpdate(imageId, {
                                 url: uploadResult.secure_url,
                                 name: updatedName || existingImage.name
                             });
-                        } else {
-                            const newImageDoc = new Image({
-                                url: uploadResult.secure_url,
-                                name: imagesMeta.find((meta: ImageMeta) => meta._id === imageId)?.name || file.name,
-                                galleryId: gallery._id,
-                            });
-                            const savedImage = await newImageDoc.save();
-                            const index = gallery.imageIds.findIndex((img: GalleryImage) => img._id.toString() === imageId);
-                            if (index !== -1) {
-                                gallery.imageIds[index] = savedImage._id;
-                            }
                         }
-                        hasUpdates = true;
                     }
                 }
-            }
+            });
+            operations.push(...replacementPromises);
+        }
+
+        // Execute all operations in parallel
+        if (operations.length > 0) {
+            await Promise.all(operations);
+            hasUpdates = true;
         }
 
         if (hasUpdates) {
             await gallery.save();
         }
 
+        // Final populate
         await gallery.populate([
             { path: "imageIds", select: "url name" }
         ]);
@@ -202,18 +206,22 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
         await dbConnect();
 
         const gallery = await Gallery.findById(galleryId).populate('imageIds');
+        
+        // If gallery doesn't exist, just return success (idempotent)
         if (!gallery) {
-            return NextResponse.json({ error: "Gallery not found" }, { status: 404 });
+            return NextResponse.json({ message: "Gallery not found or already deleted" }, { status: 200 });
         }
 
-        // Delete all images
-        await Promise.all(gallery.imageIds.map(async (imageId: string) => {
-            const image = await Image.findById(imageId);
-            if (image) {
-                await deleteImageFromCloudinary(image.url);
-                await Image.findByIdAndDelete(imageId);
-            }
-        }));
+        // Delete all images (only if images exist)
+        if (gallery.imageIds && gallery.imageIds.length > 0) {
+            await Promise.all(gallery.imageIds.map(async (imageId: string) => {
+                const image = await Image.findById(imageId);
+                if (image) {
+                    await deleteImageFromCloudinary(image.url);
+                    await Image.findByIdAndDelete(imageId);
+                }
+            }));
+        }
 
         // Delete gallery
         await Gallery.findByIdAndDelete(galleryId);
@@ -226,7 +234,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
             details: error instanceof Error ? error.message : "Unknown error"
         }, { status: 500 });
     }
-}
+}   
 
 async function uploadImageToCloudinary(file: File) {
     const tempDir = path.join(process.cwd(), 'temp');

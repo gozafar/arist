@@ -52,7 +52,7 @@ export const adminToggleAvailability = (id: string, availability: "in-stock" | "
   });
 
 export const adminDeleteImage = (publicId: string) =>
-  apiFetch<{ message: string; success: boolean }>(`/api/admin/cloudinary?publicId=${encodeURIComponent(publicId)}`, {
+  apiFetch<{ message: string; success: boolean }>(`${endpoints.admin.cloudinary}?publicId=${encodeURIComponent(publicId)}`, {
     method: "DELETE",
     cache: "no-store"
   });
@@ -69,7 +69,7 @@ export const adminUpdateImage = (imageFile: File, existingPublicId?: string) => 
     success: boolean; 
     image: string; 
     publicId: string; 
-  }>('/api/admin/cloudinary', {
+  }>(endpoints.admin.cloudinary, {
     method: "POST",
     body: formData,
     cache: "no-store"
@@ -77,40 +77,39 @@ export const adminUpdateImage = (imageFile: File, existingPublicId?: string) => 
 };
 
 export const adminCreateCategory = (categoryName: string) =>
-  apiFetch(endpoints.admin.category, {
+  apiFetch(endpoints.admin.category.root, {
     method: "POST",
     body: { categoryName },
     cache: "no-store"
   });
 
 export const adminUpdateCategory = (id: string, categoryName: string) =>
-  apiFetch<{ id: string; categoryName: string; createdAt: string; updatedAt: string }>(`${endpoints.admin.category}/${id}`, {
+  apiFetch<{ id: string; categoryName: string; createdAt: string; updatedAt: string }>(endpoints.admin.category.detail(id), {
     method: "PUT",
     body: { categoryName },
     cache: "no-store"
   });
 
 export const adminDeleteCategory = (id: string) =>
-  apiFetch<{ message: string }>(`${endpoints.admin.category}/${id}`, {
+  apiFetch<{ message: string }>(endpoints.admin.category.detail(id), {
     method: "DELETE",
     cache: "no-store"
   });
 
 export const adminGetCategories = () =>
-  apiFetch<{ id: string; categoryName: string; createdAt: string; updatedAt: string }[]>(endpoints.admin.category, {
+  apiFetch<{ id: string; categoryName: string; createdAt: string; updatedAt: string }[]>(endpoints.admin.category.root, {
     cache: "no-store"
   });
 
 
-export const GetGallery = (params?: { categoryId?: string; page?: number; limit?: number }) => {
+export const GetGallery = (params?: { page?: number; limit?: number }) => {
   const query = new URLSearchParams();
-  if (params?.categoryId) query.set("categoryId", params.categoryId);
   if (params?.page) query.set("page", String(params.page));
   if (params?.limit) query.set("limit", String(params.limit));
   const suffix = query.size ? `?${query.toString()}` : "";
 
   return apiFetch<{
-    galleries: { _id: string; categoryId: { _id: string; categoryName: string }; imageIds: { _id: string; url: string; name: string }[]; createdAt: string; updatedAt: string }[];
+    galleries: { _id: string; name: string; imageIds: { _id: string; url: string; name: string }[]; createdAt: string; updatedAt: string }[];
     pagination?: { page: number; limit: number; total: number; pages: number };
   }>(`${endpoints.gallery.list}${suffix}`, {
     cache: "no-store"
@@ -118,19 +117,19 @@ export const GetGallery = (params?: { categoryId?: string; page?: number; limit?
 };
 
 export const GetGalleryById = (id: string) =>
-  apiFetch<{ gallery: { _id: string; categoryId: { _id: string; categoryName: string }; imageIds: { _id: string; url: string; name: string }[]; createdAt: string; updatedAt: string } }>(endpoints.gallery.update(id), {
+  apiFetch<{ gallery: { _id: string; name: string; imageIds: { _id: string; url: string; name: string }[]; createdAt: string; updatedAt: string } }>(endpoints.gallery.detail(id), {
     cache: "no-store"
   });
 
 export const PostGallery = (data: FormData) =>
-  apiFetch<{ gallery: { _id: string; categoryId: string; images: { url: string; name: string }[]; createdAt: string } }>(endpoints.gallery.add, {
+  apiFetch<{ gallery: { _id: string; name: string; imageIds: { _id: string; url: string; name: string }[]; createdAt: string } }>(endpoints.gallery.add, {
     method: "POST",
     body: data,
     cache: "no-store"
   });
 
 export const UpdateGallery = (id: string, data: FormData) =>
-  apiFetch<{ gallery: { _id: string; categoryId: string; images: { url: string; name: string }[]; updatedAt: string } }>(endpoints.gallery.update(id), {
+  apiFetch<{ gallery: { _id: string; name: string; imageIds: { _id: string; url: string; name: string }[]; updatedAt: string } }>(endpoints.gallery.update(id), {
     method: "PUT",
     body: data,
     cache: "no-store"
@@ -138,6 +137,12 @@ export const UpdateGallery = (id: string, data: FormData) =>
 
 export const DeleteGallery = (id: string) =>
   apiFetch<{ message: string }>(endpoints.gallery.delete(id), {
+    method: "DELETE",
+    cache: "no-store"
+  });
+
+export const deleteImage = (id: string) =>
+  apiFetch<{ message: string }>(endpoints.gallery.images.delete(id), {
     method: "DELETE",
     cache: "no-store"
   });

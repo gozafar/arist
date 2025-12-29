@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 import GalleryForm from "@/components/admin/GalleryForm";
 
 export default function NewGalleryPage() {
@@ -34,12 +35,18 @@ export default function NewGalleryPage() {
       });
 
       if (response.ok) {
+        toast.success("Gallery created successfully!");
         router.push("/admin/paintings/gallery?created=true");
       } else {
-        setError("Failed to create gallery");
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || errorData.message || "Failed to create gallery";
+        setError(errorMessage);
+        toast.error(errorMessage);
       }
     } catch (err) {
-      setError("Error creating gallery");
+      const errorMessage = err instanceof Error ? err.message : "Error creating gallery";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setSubmitting(false);
     }
