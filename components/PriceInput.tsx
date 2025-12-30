@@ -3,17 +3,19 @@ import InputField from "./InputField";
 type Props = {
   value: number | "";
   onChange: (value: number) => void;
+  step?: number;
+  min?: number;
 };
 
-const PriceInput = ({ value, onChange }: Props) => {
+const PriceInput = ({ value, onChange, step = 50, min = 0 }: Props) => {
   return (
     <InputField
       label="Price (USD)"
       type="number"
-      min={0}
-      step="50"
+      min={min}
+      // step={step}
       value={value}
-      onChange={(e) => onChange(Number(e.target.value))}
+      onChange={(e) => onChange(Number(e))}
       placeholder="1200"
       required
     />

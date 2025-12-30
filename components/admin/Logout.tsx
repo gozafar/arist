@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { logout } from "@/lib/api/auth";
 
 interface LogoutModalProps {
   isOpen: boolean;
@@ -18,17 +19,7 @@ export default function LogoutModal({ isOpen, onClose }: LogoutModalProps) {
     setError(null);
 
     try {
-      const response = await fetch("/api/auth/logout", { 
-        method: "POST",
-        credentials: "same-origin"
-      });
-
-      if (!response.ok) {
-        throw new Error("Logout failed");
-      }
-
-      // Clear any client-side auth state
-      document.cookie = "access_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+      await logout();
       
       // Redirect to login page
       router.push("/admin/login");

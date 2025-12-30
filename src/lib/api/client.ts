@@ -123,7 +123,7 @@ export const apiFetch = async <T>(path: string, options: FetchOptions = {}): Pro
 
     // For non-401 errors, throw immediately (including 404)
     if (!response.ok) {
-      throw new ApiResponseError({
+      const error = new ApiResponseError({
         status: response.status,
         message: (() => {
           const record = isJson && payload && typeof payload === "object" 
@@ -133,6 +133,10 @@ export const apiFetch = async <T>(path: string, options: FetchOptions = {}): Pro
         })(),
         details: payload
       });
+      
+      // Properly reject the promise
+      reject(error);
+      return;
     }
 
     resolve(payload as T);

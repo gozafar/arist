@@ -39,7 +39,9 @@ export const endpoints = {
   admin: {
       paintingOrder: {
         root: "/api/admin/painting-order",
-        detail: (id: string) => `/api/admin/painting-order/${id}`
+        detail: (id: string) => `/api/admin/painting-order/${id}`,
+        delete: (id: string) => `/api/admin/painting-order/${id}`,
+        // update: (id: string) => `/api/admin/painting-order/${id}`
       },
     paintings: {
       root: "/api/admin/paintings",
