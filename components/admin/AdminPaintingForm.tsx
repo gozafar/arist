@@ -140,7 +140,7 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = "create" }: AdminPainting
             label="Painting title"
             placeholder="Monsoon Script"
             value={form.title}
-            onChange={(e) => handleChange("title", e.target.value)}
+            onChange={(value) => handleChange("title", value)}
             required
           />
           <TextArea
@@ -156,7 +156,7 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = "create" }: AdminPainting
               label="Medium"
               placeholder="Acrylic on canvas"
               value={form.medium}
-              onChange={(e) => handleChange("medium", e.target.value)}
+              onChange={(value) => handleChange("medium", value)}
             />
           </div>
           <div className="grid gap-4 md:grid-cols-2">
@@ -164,13 +164,13 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = "create" }: AdminPainting
               label="Size / Dimensions"
               placeholder="30 x 40 in"
               value={form.size}
-              onChange={(e) => handleChange("size", e.target.value)}
+              onChange={(value) => handleChange("size", value)}
             />
             <InputField
               label="Year"
               type="number"
-              value={form.year}
-              onChange={(e) => handleChange("year", Number(e.target.value))}
+              value={form.year?.toString() || ""}
+              onChange={(value) => handleChange("year", Number(value))}
               min={2015}
               max={new Date().getFullYear() + 1}
             />

@@ -1,9 +1,18 @@
 "use client";
 
-import { FormEvent, useState, useEffect } from "react";
-import Button from "./Button";
+import { FormEvent, useEffect, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
+import { Country, State, City } from "country-state-city";
+import { toast } from "react-toastify";
 
-type Address = {
+// Dynamically import components
+const Button = dynamic(() => import("./Button"), { ssr: false });
+const InputField = dynamic(() => import("./InputField"), { ssr: false });
+const SelectField = dynamic(() => import("./SelectField"), { ssr: false });
+const PhoneInputField = dynamic(() => import("./PhoneInputField"), { ssr: false });
+
+// -------------------- Types --------------------
+export type Address = {
   name: string;
   email: string;
   phone: string;
@@ -15,11 +24,27 @@ type Address = {
 };
 
 type Props = {
-  onSubmit?: (address: Address) => void;
+  onSubmit?: (address: Address) => Promise<void>;
   isLoading?: boolean;
   resetForm?: boolean;
 };
 
+type BackendError =
+  | { errors?: Record<string, string> }
+  | { errors?: { field: keyof Address; message: string }[] }
+  | { message?: string }
+  | string;
+
+// -------------------- Helper --------------------
+const detectCountryFromPhone = (phone: string) => {
+  const clean = phone.replace(/\D/g, "");
+  if (!clean) return null;
+  const countries = Country.getAllCountries();
+  const sorted = [...countries].sort((a, b) => b.phonecode.length - a.phonecode.length);
+  return sorted.find((c) => clean.startsWith(c.phonecode)) || null;
+};
+
+// -------------------- Component --------------------
 const AddressForm = ({ onSubmit, isLoading, resetForm }: Props) => {
   const [form, setForm] = useState<Address>({
     name: "",
@@ -29,13 +54,22 @@ const AddressForm = ({ onSubmit, isLoading, resetForm }: Props) => {
     city: "",
     state: "",
     postal: "",
-    country: ""
+    country: "",
   });
 
-  const handleChange = (key: keyof Address, value: string) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
+  const [formErrors, setFormErrors] = useState<Partial<Record<keyof Address, string>>>({});
+
+  const countries = useMemo(() => Country.getAllCountries(), []);
+  const states = useMemo(() => (form.country ? State.getStatesOfCountry(form.country) : []), [form.country]);
+  const cities = useMemo(() => (form.country && form.state ? City.getCitiesOfState(form.country, form.state) : []), [form.country, form.state]);
+
+  // -------------------- Helpers --------------------
+  const updateForm = (patch: Partial<Address>) => {
+    setForm((prev) => ({ ...prev, ...patch }));
+    if (Object.keys(formErrors).length > 0) setFormErrors({});
   };
 
+  // -------------------- Effects --------------------
   useEffect(() => {
     if (resetForm) {
       setForm({
@@ -46,61 +80,84 @@ const AddressForm = ({ onSubmit, isLoading, resetForm }: Props) => {
         city: "",
         state: "",
         postal: "",
-        country: ""
+        country: "",
       });
+      setFormErrors({});
     }
   }, [resetForm]);
 
-  const handleSubmit = (e: FormEvent) => {
+  // -------------------- Submit --------------------
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    onSubmit?.(form);
+    setFormErrors({});
+    await onSubmit?.(form);
   };
 
+  // -------------------- Render --------------------
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
+      {/* Name & Email */}
       <div className="grid gap-4 md:grid-cols-2">
-        <InputField label="Full name" value={form.name} onChange={(v) => handleChange("name", v)} required />
-        <InputField label="Email" type="email" value={form.email} onChange={(v) => handleChange("email", v)} required />
+        <InputField label="Full name" value={form.name} onChange={(v) => updateForm({ name: v })} required error={formErrors.name} />
+        <InputField label="Email" type="email" value={form.email} onChange={(v) => updateForm({ email: v })} required error={formErrors.email} />
       </div>
+
+      {/* Phone & Postal */}
       <div className="grid gap-4 md:grid-cols-2">
-        <InputField label="Phone" value={form.phone} onChange={(v) => handleChange("phone", v)} required />
-        <InputField label="PIN Code" value={form.postal} onChange={(v) => handleChange("postal", v)} required />
+        <PhoneInputField
+          phone={form.phone}
+          country={form.country}
+          onPhoneChange={(phone) => {
+            const detected = detectCountryFromPhone(phone);
+            updateForm({ phone, ...(detected && detected.isoCode !== form.country ? { country: detected.isoCode, state: "", city: "" } : {}) });
+          }}
+          onCountryChange={(iso) => updateForm({ country: iso, state: "", city: "" })}
+          required
+          error={formErrors.phone}
+        />
+        <InputField label="Postal Code" value={form.postal} onChange={(v) => updateForm({ postal: v })} required error={formErrors.postal} />
       </div>
-      <InputField label="Street address" value={form.address} onChange={(v) => handleChange("address", v)} required />
+
+      {/* Address */}
+      <InputField label="Street address" value={form.address} onChange={(v) => updateForm({ address: v })} required error={formErrors.address} />
+
+      {/* Country */}
+      <SelectField
+        label="Country"
+        value={form.country}
+        onChange={(v) => updateForm({ country: v, state: "", city: "" })}
+        options={countries.map((c) => ({ value: c.isoCode, label: c.name }))}
+        required
+        error={formErrors.country}
+      />
+
+      {/* State & City */}
       <div className="grid gap-4 md:grid-cols-2">
-        <InputField label="City" value={form.city} onChange={(v) => handleChange("city", v)} required />
-        <InputField label="State" value={form.state} onChange={(v) => handleChange("state", v)} required />
+        <SelectField
+          label="State"
+          value={form.state}
+          onChange={(v) => updateForm({ state: v, city: "" })}
+          options={states.map((s) => ({ value: s.isoCode, label: s.name }))}
+          disabled={!form.country}
+          required
+          error={formErrors.state}
+        />
+        <SelectField
+          label="City"
+          value={form.city}
+          onChange={(v) => updateForm({ city: v })}
+          options={cities.map((c) => ({ value: c.name, label: c.name }))}
+          disabled={!form.state}
+          required
+          error={formErrors.city}
+        />
       </div>
-      <InputField label="Country" value={form.country} onChange={(v) => handleChange("country", v)} required />
-      <div className="pt-2">
-        <Button type="submit" className="w-full md:w-auto" disabled={isLoading}>
-          {isLoading ? "Processing..." : "Continue to payment"}
-        </Button>
-      </div>
+
+      <Button type="submit" className="w-full md:w-auto" disabled={isLoading}>
+        {isLoading ? "Processing..." : "Order Create"}
+      </Button>
     </form>
   );
 };
 
-type InputProps = {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  type?: string;
-  required?: boolean;
-};
-
-const InputField = ({ label, value, onChange, type = "text", required }: InputProps) => (
-  <label className="block text-sm text-white/70">
-    <span className="mb-2 block text-white">{label}</span>
-    <input
-      type={type}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      required={required}
-      className="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-sand-400/60"
-    />
-  </label>
-);
-
-export type { Address };
 export default AddressForm;

@@ -39,17 +39,18 @@ export default function ContactPainting() {
       
       if (response.success) {
         setResetForm(true);
-        toast.success("order created successfully")
+        toast.success("Order created successfully")
       } else {
-        toast.error("order not created something is wrong")
+        toast.error("Order not created, something is wrong")
       }
-    } catch (error) {
-      if (error instanceof ApiResponseError) {
-        toast.error(error.message);
-      } else {
-        toast.error("An unexpected error occurred");
-      }
+    } catch (error: any) {
       console.error("Order submission error:", error);
+      
+      // Show toast notification
+      const errorMessage = error?.message || 'An error occurred';
+      toast.error(errorMessage);
+      
+      // Don't re-throw - just let the error be handled by the toast
     } finally {
       setIsLoading(false);
     }
