@@ -11,7 +11,7 @@ const navItems = [
   { href: "/gallery", label: "Gallery" },
   { href: "/paintings", label: "Paintings" },
   { href: "/contact", label: "Contact" },
-  { href: "/admin/paintings", label: "Admin" }
+  { href: "/admin/paintings", label: "Login" }
 ];
 
 const Navbar = () => {
@@ -19,9 +19,6 @@ const Navbar = () => {
   // const { totalItems } = useCart();
    const router = useRouter();
   const [open, setOpen] = useState(false);
-
-
-
 
   const linkClass = (href: string) =>
     `relative px-3 py-2 text-sm font-medium transition ${
