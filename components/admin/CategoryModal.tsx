@@ -19,6 +19,7 @@ interface CategoryModalProps {
   mode: "edit" | "delete" | "view";
 }
 
+
 export default function CategoryModal({ 
   category, 
   isOpen, 
