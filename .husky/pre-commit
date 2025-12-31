@@ -1,9 +1,5 @@
-# #!/usr/bin/env sh
-# . "$(dirname "$0")/_/husky.sh"
-
-# echo "Running lint-staged with pnpm..."
-# pnpm exec lint-staged --no-stash
-
 #!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
 echo "🚀 Running lint-staged..."
 npx lint-staged
