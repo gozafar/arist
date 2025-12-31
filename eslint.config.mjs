@@ -1,54 +1,37 @@
-import { FlatCompat } from "@eslint/eslintrc";
+import { defineConfig, globalIgnores } from "eslint/config";
+import nextCore from "eslint-config-next/core-web-vitals";
+import nextTs from "eslint-config-next/typescript";
 import js from "@eslint/js";
 
-const compat = new FlatCompat({
-  baseDirectory: import.meta.url
-});
-
-export default [
+export default defineConfig([
+  // Recommended JS rules
   js.configs.recommended,
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
+
+  // Next.js rules (Core Web Vitals)
+  ...nextCore,
+
+  // TypeScript support
+  ...nextTs,
+
+  // Custom rules
   {
-    ignores: [
-      "postcss.config.mjs",
-      "next.config.{mjs,js,cjs}",
-      "**/.eslintrc.json",
-      "**/tsconfig-paths-register.d.ts",
-      "**/env.d.ts",
-      ".vscode/*",
-      "eslint.config.{cjs,mjs,js,json}",
-      "**/node_modules",
-      "**/package-lock.json",
-      "**/yarn.lock",
-      "**/pnpm-lock.yaml",
-      "**/.next",
-      "**/.husky",
-      "**/logs",
-      "**/loadtest.mjs",
-      "**/build",
-      "**/dist",
-      "**/tsconfig.tsbuildinfo",
-      "**/*.log",
-      "**/npm-debug.log*",
-      "**/yarn-debug.log*",
-      "**/yarn-error.log*",
-      "**/pnpm-debug.log*",
-      "**/lerna-debug.log*",
-      "sw.js",
-      "sw.js.map",
-      "workbox-*.js",
-      "workbox-*.js.map",
-      "**/public/sw.js",
-      "**/public/workbox-*.js",
-      "**/public/worker-*.js",
-      "**/public/sw.js.map",
-      "**/public/workbox-*.js.map",
-      "**/public/worker-*.js.map",
-      "**/test.{js,ts,mjs}",
-      "**/op.{js,ts,mjs}",
-      "node_modules",
-      "dist",
-      "build"
-    ]
-  }
-];
+    rules: {
+      // Example customizations:
+      // "no-console": "warn",
+      // "@next/next/no-img-element": "off",
+    },
+  },
+
+  // Global ignores
+  globalIgnores([
+    ".next/**",
+    "node_modules/**",
+    "dist/**",
+    "build/**",
+    ".husky/**",
+    "*.log",
+    "pnpm-lock.yaml",
+    "yarn.lock",
+    "package-lock.json",
+  ]),
+]);
