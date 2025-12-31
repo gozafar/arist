@@ -6,8 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix"
+    "prepare": "husky install",
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "bcryptjs": "2.4.3",
@@ -34,6 +36,10 @@
     "autoprefixer": "10.4.20",
     "eslint": "8.57.1",
     "eslint-config-next": "16.0.10",
+    "eslint-config-prettier": "^9.1.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.7.4",
     "postcss": "8.4.47",
     "tailwindcss": "3.4.12",
     "typescript": "5.6.3"
@@ -41,9 +47,10 @@
   "packageManager": "pnpm@10.16.1+sha512.0e155aa2629db8672b49e8475da6226aa4bdea85fdcdfdc15350874946d4f3c91faaf64cbdc4a5d1ab8002f473d5c3fcedcd197989cf0390f9badd3c04678706",
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx}": [
-      "eslint --fix"
+      "eslint --fix --max-warnings=0",
+      "prettier --write"
     ],
-    "**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
+    "**/*.{json,css,scss,md}": [
       "prettier --write"
     ]
   }
