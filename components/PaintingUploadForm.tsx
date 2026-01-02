@@ -20,6 +20,10 @@ const initialState: Omit<NewPaintingInput, "price"> & { price: number | "" } = {
   image: "",
   tags: [],
   categoryId: "",
+  height: 0,
+  width: 0,
+  imageWidth: 0,
+  imageHeight: 0,
 };
 
 const PaintingUploadForm = () => {
