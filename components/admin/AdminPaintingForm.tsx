@@ -30,6 +30,8 @@ const emptyState: NewPaintingInput & { categoryId?: string } = {
   size: '',
   height: 0,
   width: 0,
+  imageWidth: 0,
+  imageHeight: 0,
   year: new Date().getFullYear(),
   availability: 'in-stock',
   image: '',
@@ -70,16 +72,40 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Store the actual file for FormData upload
+    // 1️⃣ Store file for upload
     setImageFile(file);
 
-    // Create preview URL
+    // 2️⃣ Read preview (base64)
     const reader = new FileReader();
     reader.onload = ev => {
       const result = ev.target?.result as string;
       setPreview(result);
     };
     reader.readAsDataURL(file);
+
+    // 3️⃣ Get image dimensions
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+
+    img.src = objectUrl;
+
+    img.onload = () => {
+      const width = img.naturalWidth;
+      const height = img.naturalHeight;
+      const sizeBytes = file.size;
+
+      const sizeLabel = `${width} × ${height} px`;
+
+      setForm(prev => ({
+        ...prev,
+        imageWidth: width,
+        imageHeight: height,
+        imageSize: sizeBytes,
+        size: sizeLabel, // 👈 auto-filled
+      }));
+
+      URL.revokeObjectURL(objectUrl);
+    };
   };
 
   const handleChange = (key: keyof (NewPaintingInput & { categoryId?: string }), value: string | number) => {
@@ -221,7 +247,7 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
               type='file'
               accept='image/*'
               onChange={handleImage}
-              className='w-full rounded-2xl border border-dashed border-white/20 bg-white/5 px-4 py-3 text-white/80 file:mr-4 file:rounded-xl file:border file:border-white/20 file:bg-white/10 file:px-3 file:py-1 file:text-white'
+              className='w-full rounded-2xl border border-dashed border-white/20 bg-white/5 px-4 py-3 text-white/80 file:mr-4 file:rounded-xl file:border file:border-white/20 file:bg-white/10 file:px-3 file:py-1 file:text-black'
             />
             {errors.image && <p className='mt-2 text-xs text-red-300'>{errors.image}</p>}
           </label>

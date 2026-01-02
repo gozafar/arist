@@ -1,6 +1,8 @@
 import { UserRole } from '@/models/User';
 
 export type PaintingDTO = {
+  imageWidth: number;
+  imageHeight: number;
   width: number;
   height: number;
   id: string;
