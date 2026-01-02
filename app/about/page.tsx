@@ -79,7 +79,7 @@ const AboutPage = () => {
         </div>
         <div className='relative mx-auto w-full max-w-[450px] aspect-square overflow-hidden rounded-3xl border border-white/15 bg-white shadow-card'>
           <Image
-            src='https://images.unsplash.com/photo-1523419400525-dc6c1e105d58?auto=format&fit=crop&w=1400&q=80'
+            src='https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
             alt='Rakhi Vashisht presenting her paintings'
             fill
             priority
@@ -194,8 +194,8 @@ const AboutPage = () => {
       </div>
 
       <div className='card-glass rounded-[28px] border border-white/10 bg-white/5 p-6 md:p-8 space-y-4'>
-        <h2 className='font-display text-3xl text-sand-200'>Artist Statement</h2>
-        <p className='leading-relaxed text-white/80'>
+        <h1 className='section-heading'>Artist Statement</h1>
+        <p className='leading-relaxed  text-black/80'>
           For Rakhi, art is meditation—a sanctuary where mind and soul find harmony. Each brushstroke is an offering, a
           way to inspire, provoke thought, and build bridges of connection. She believes art is both personal and
           communal, driving her to teach children, guide communities through workshops, and bring creativity into
