@@ -82,27 +82,28 @@ const PaintingDetailPage = async ({ params }: { params: Promise<{ id: string }> 
       <script type='application/ld+json' dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       <script type='application/ld+json' dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <div className='grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start'>
-        <PhotoPreview key={painting.id || painting.id} galleryId={`painting-${painting.id || painting.id}`}>
-          <div className='card-glass relative overflow-hidden rounded-[20px] border border-white/10'>
-            <div className='relative overflow-hidden'>
+        <PhotoPreview galleryId={`painting-${painting.id}`}>
+          <div className='card-glass relative mx-auto w-full max-w-[520px] overflow-hidden rounded-[20px] border border-white/10'>
+            <div className='relative aspect-square overflow-hidden'>
               <a
                 href={painting.image}
                 data-pswp-width={painting.imageWidth ?? 2000}
                 data-pswp-height={painting.imageHeight ?? 2000}
-                className='block cursor-zoom-in'
+                className='block h-full w-full cursor-zoom-in'
               >
                 <Image
                   src={painting.image}
                   alt={`${painting.title} by Rakhi Vashisht – ${painting.medium}`}
-                  width={800}
-                  height={800}
+                  fill
                   className='object-cover'
+                  sizes='(max-width: 640px) 90vw, 320px'
                   loading='lazy'
                 />
               </a>
             </div>
           </div>
         </PhotoPreview>
+
         <div className='space-y-8'>
           {/* HEADER */}
           <div className='space-y-3'>
