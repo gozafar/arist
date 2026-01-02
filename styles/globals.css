@@ -49,7 +49,7 @@ a:hover {
 }
 
 .section-heading {
-  @apply font-display text-3xl md:text-4xl lg:text-5xl tracking-tight;
+  @apply font-display text-3xl md:text-4xl lg:text-[40px] tracking-tight;
   color: var(--ink);
 }
 
