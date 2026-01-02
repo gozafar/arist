@@ -6,6 +6,7 @@ import { createPaintingOrder } from '@/lib/api/public';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface OrderData {
   name: string;
@@ -21,6 +22,7 @@ interface OrderData {
 export default function ContactPainting() {
   const [isLoading, setIsLoading] = useState(false);
   const [formKey, setFormKey] = useState(0);
+  const router = useRouter();
 
   const handleOrderSubmit = async (formData: Omit<OrderData, 'paintingId'>) => {
     setIsLoading(true);
@@ -40,6 +42,7 @@ export default function ContactPainting() {
       if (response.success) {
         setFormKey(prev => prev + 1);
         toast.success('Order created successfully');
+        router.push('/paintings');
       } else {
         toast.error('Order not created, something is wrong');
       }

@@ -11,9 +11,11 @@ import Button from '@/components/Button';
 const STATUS_OPTIONS = [
   { value: 'NEW_LEAD', label: 'New Lead' },
   { value: 'CONTACTED', label: 'Contacted' },
-  { value: 'IN_PROGRESS', label: 'In Progress' },
-  { value: 'COMPLETED', label: 'Completed' },
-  { value: 'CLOSED', label: 'Closed' },
+  { value: 'QUALIFIED', label: 'Qualified' },
+  { value: 'PROPOSAL_SENT', label: 'Proposal Sent' },
+  { value: 'NEGOTIATION', label: 'Negotiation' },
+  { value: 'WON', label: 'Won' },
+  { value: 'LOST', label: 'Lost' },
 ];
 
 export default function ContactManagementPage() {
@@ -59,7 +61,9 @@ export default function ContactManagementPage() {
       setUpdatingId(contactId);
       await updateContact(contactId, { status });
       toast.success('Status updated successfully!');
-      await fetchContacts(page);
+
+      // Update local state instead of refetching
+      setContacts(prev => prev.map(contact => (contact._id === contactId ? { ...contact, status } : contact)));
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to update status';
       toast.error(errorMessage);
@@ -74,17 +78,18 @@ export default function ContactManagementPage() {
     setIsModalOpen(true);
   };
 
-  // const handleViewContact = (contact: ContactResponse) => {
-  //   setSelectedContact(contact);
-  //   setModalMode("view");
-  //   setIsModalOpen(true);
-  // };
-
   const confirmDelete = async (id: string) => {
     try {
       await deleteContact(id);
       toast.success('Contact deleted successfully!');
-      await fetchContacts(page);
+
+      // Update local state instead of refetching
+      setContacts(prev => prev.filter(contact => contact._id !== id));
+
+      // Update pagination if needed
+      if (contacts.length > 1 && pagination.total > 0) {
+        setPagination(prev => ({ ...prev, total: prev.total - 1 }));
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to delete contact';
       toast.error(errorMessage);

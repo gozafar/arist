@@ -130,101 +130,94 @@ export const GET = async (req: NextRequest, context: { params: Promise<{ id: str
   }
 };
 
-export const DELETE = async (req: NextRequest, context: { params: Promise<{ id: string }> }) => {
+// export const DELETE = async (req: NextRequest, context: { params: Promise<{ id: string }> }) => {
+// //   const authError = await requireRole(req, ['ADMIN', 'SUPER_ADMIN']);
+// //   if (authError) return authError;
+// //   const params = await context.params;
+// //   const id = params.id;
+
+// //   try {
+// //     if (!id || typeof id !== 'string') {
+// //       return NextResponse.json({ error: 'Category ID is required' }, { status: 400 });
+// //     }
+
+// //     if (!mongoose.Types.ObjectId.isValid(id)) {
+// //       return NextResponse.json({ error: 'Invalid Category ID format' }, { status: 400 });
+// //     }
+
+// //     await dbConnect();
+
+// //     // Delete category
+// //     // const deleted = await Category.findByIdAndDelete(new mongoose.Types.ObjectId(id)).lean();
+
+// //     // if (!deleted) {
+// //     //     return NextResponse.json(
+// //     //         { error: "Category not found" },
+// //     //         { status: 404 }
+// //     //     );
+// //     // }
+
+// //     return NextResponse.json({ message: 'Category deleted successfully' });
+// //   } catch {
+// //     return NextResponse.json({ error: 'Failed to delete category' }, { status: 500 });
+// //   }
+// // };
+
+export const DELETE = async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
   const authError = await requireRole(req, ['ADMIN', 'SUPER_ADMIN']);
   if (authError) return authError;
-  const params = await context.params;
-  const id = params.id;
+
+  const paramsId = await params;
+  const { id } = paramsId;
+
+  // if (!mongoose.Types.ObjectId.isValid(id)) {
+  //   return NextResponse.json(
+  //     { error: "Invalid Category ID" },
+  //     { status: 400 }
+  //   );
+  // }
+
+  await dbConnect();
+
+  const session = await mongoose.startSession();
+  const cloudinaryPublicIds: string[] = [];
 
   try {
-    if (!id || typeof id !== 'string') {
-      return NextResponse.json({ error: 'Category ID is required' }, { status: 400 });
+    await session.withTransaction(async () => {
+      const paintings = await Painting.find({ categoryId: id }, null, { session });
+
+      for (const painting of paintings) {
+        if (painting.image) {
+          const urlParts = painting.image.split('/');
+          const fileName = urlParts[urlParts.length - 1];
+          cloudinaryPublicIds.push(`paintings/${fileName.split('.')[0]}`);
+        }
+      }
+
+      await Painting.deleteMany({ categoryId: id }, { session });
+
+      const deletedCategory = await Category.findByIdAndDelete(id, { session });
+      if (!deletedCategory) {
+        throw new Error('Category not found');
+      }
+    });
+
+    // 🔥 Delete Cloudinary images AFTER DB success
+    for (const publicId of cloudinaryPublicIds) {
+      try {
+        await deleteFromCloudinary(publicId);
+      } catch (err) {
+        console.error('Cloudinary cleanup failed:', publicId);
+      }
     }
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return NextResponse.json({ error: 'Invalid Category ID format' }, { status: 400 });
-    }
-
-    await dbConnect();
-
-    // Delete category
-    // const deleted = await Category.findByIdAndDelete(new mongoose.Types.ObjectId(id)).lean();
-
-    // if (!deleted) {
-    //     return NextResponse.json(
-    //         { error: "Category not found" },
-    //         { status: 404 }
-    //     );
-    // }
-
-    return NextResponse.json({ message: 'Category deleted successfully' });
-  } catch {
+    return NextResponse.json({
+      message: 'Category and related data deleted successfully',
+    });
+  } catch (error) {
+    console.error('Category delete error:', error);
     return NextResponse.json({ error: 'Failed to delete category' }, { status: 500 });
+  } finally {
+    session.endSession();
   }
 };
-
-// export const DELETE = async (
-//   req: NextRequest,
-//   { params }: { params: { id: string } }
-// ) => {
-//   const authError = await requireRole(req, ["ADMIN", "SUPER_ADMIN"]);
-//   if (authError) return authError;
-
-//   const { id } = params;
-
-//   if (!mongoose.Types.ObjectId.isValid(id)) {
-//     return NextResponse.json(
-//       { error: "Invalid Category ID" },
-//       { status: 400 }
-//     );
-//   }
-
-//   await dbConnect();
-
-//   const session = await mongoose.startSession();
-//   const cloudinaryPublicIds: string[] = [];
-
-//   try {
-//     await session.withTransaction(async () => {
-//       const paintings = await Painting.find({ categoryId: id }, null, { session });
-
-//       for (const painting of paintings) {
-//         if (painting.image) {
-//           const urlParts = painting.image.split("/");
-//           const fileName = urlParts[urlParts.length - 1];
-//           cloudinaryPublicIds.push(`paintings/${fileName.split(".")[0]}`);
-//         }
-
-//       }
-
-//       await Painting.deleteMany({ categoryId: id }, { session });
-
-//       const deletedCategory = await Category.findByIdAndDelete(id, { session });
-//       if (!deletedCategory) {
-//         throw new Error("Category not found");
-//       }
-//     });
-
-//     // 🔥 Delete Cloudinary images AFTER DB success
-//     for (const publicId of cloudinaryPublicIds) {
-//       try {
-//         await deleteFromCloudinary(publicId);
-//       } catch (err) {
-//         console.error("Cloudinary cleanup failed:", publicId);
-//       }
-//     }
-
-//     return NextResponse.json({
-//       message: "Category and related data deleted successfully",
-//     });
-
-//   } catch (error) {
-//     console.error("Category delete error:", error);
-//     return NextResponse.json(
-//       { error: "Failed to delete category" },
-//       { status: 500 }
-//     );
-//   } finally {
-//     session.endSession();
-//   }
-// };

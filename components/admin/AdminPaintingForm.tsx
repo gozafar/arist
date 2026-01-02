@@ -9,6 +9,7 @@ import SubmitButton from '@/components/SubmitButton';
 import ImagePreview from '@/components/ImagePreview';
 import { NewPaintingInput } from '@/context/PaintingContext';
 import { adminGetCategories } from '@/lib/api/admin';
+import { toast } from 'react-toastify';
 
 interface Category {
   id: string;
@@ -113,6 +114,7 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
     setErrors(validation);
     if (Object.keys(validation).length) {
       setStatus({ type: 'error', message: 'Please fix the highlighted fields.' });
+      toast.error('Please fix the highlighted fields.');
       return;
     }
 
@@ -142,10 +144,16 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
         setPreview('');
         setImageFile(null);
       }
-      setStatus({ type: 'success', message: mode === 'create' ? 'Painting added.' : 'Painting updated.' });
+
+      // Success toast notification
+      const successMessage = mode === 'create' ? 'Painting added successfully!' : 'Painting updated successfully!';
+      toast.success(successMessage);
+      setStatus({ type: 'success', message: successMessage });
     } catch (error) {
       console.error('Form submission error:', error);
-      setStatus({ type: 'error', message: 'Failed to save painting. Please try again.' });
+      const errorMessage = 'Failed to save painting. Please try again.';
+      toast.error(errorMessage);
+      setStatus({ type: 'error', message: errorMessage });
     } finally {
       setIsSubmitting(false); // Stop loading
     }
@@ -221,10 +229,10 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
                 onChange={e => handleChange('availability', e.target.value)}
                 className='w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-sand-400/60'
               >
-                <option value='in-stock' className='bg-black text-white'>
+                <option value='in-stock' className='bg-white/5 border-white/15 text-white'>
                   In Stock
                 </option>
-                <option value='sold' className='bg-black text-white'>
+                <option value='sold' className='bg-white/5 border-white/15 text-white'>
                   Sold
                 </option>
               </select>
@@ -238,7 +246,7 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
               type='file'
               accept='image/*'
               onChange={handleImage}
-              className='w-full rounded-2xl border border-dashed border-white/20 bg-white/5 px-4 py-3 text-white/80 file:mr-4 file:rounded-xl file:border file:border-white/20 file:bg-white/10 file:px-3 file:py-1 file:text-white'
+              className='w-full rounded-2xl border border-dashed border-white/20 bg-white/5 px-4 py-3 text-white/80 file:mr-4 file:rounded-xl file:border file:border-white/20 file:bg-white/10 file:px-3 file:py-1 file:text-black/60'
             />
             {errors.image && <p className='mt-2 text-xs text-red-300'>{errors.image}</p>}
           </label>

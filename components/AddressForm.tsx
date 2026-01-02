@@ -4,7 +4,6 @@ import { FormEvent, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { Country, State, City } from 'country-state-city';
-import { toast } from 'react-toastify';
 // import { toast } from "react-toastify";
 
 // Dynamically import components
@@ -48,7 +47,6 @@ const detectCountryFromPhone = (phone: string) => {
 
 // -------------------- Component --------------------
 const AddressForm = ({ onSubmit, isLoading }: Props) => {
-  const router = useRouter();
   const [form, setForm] = useState<Address>({
     name: '',
     email: '',
@@ -85,12 +83,35 @@ const AddressForm = ({ onSubmit, isLoading }: Props) => {
 
     try {
       await onSubmit?.(form);
-      toast.success('Order created successfully');
+      // toast.success('Order created successfully');
       // Redirect to paintings page after successful order creation
-      router.push('/paintings');
     } catch (error) {
-      // If onSubmit throws an error, don't redirect
-      toast.error('Failed to create order');
+      // Handle validation errors from the API
+      if (error instanceof Error) {
+        const errorMessage = error.message;
+
+        // Try to extract field-specific errors
+        if (errorMessage.includes('Phone')) {
+          setFormErrors(prev => ({ ...prev, phone: errorMessage }));
+        } else if (errorMessage.includes('Email')) {
+          setFormErrors(prev => ({ ...prev, email: errorMessage }));
+        } else if (errorMessage.includes('Address')) {
+          setFormErrors(prev => ({ ...prev, address: errorMessage }));
+        } else if (errorMessage.includes('Name')) {
+          setFormErrors(prev => ({ ...prev, name: errorMessage }));
+        } else if (errorMessage.includes('City')) {
+          setFormErrors(prev => ({ ...prev, city: errorMessage }));
+        } else if (errorMessage.includes('State')) {
+          setFormErrors(prev => ({ ...prev, state: errorMessage }));
+        } else if (errorMessage.includes('Postal')) {
+          setFormErrors(prev => ({ ...prev, postal: errorMessage }));
+        } else if (errorMessage.includes('Country')) {
+          setFormErrors(prev => ({ ...prev, country: errorMessage }));
+        } else {
+          // Generic error - could show a toast or set a general form error
+          console.error('Form submission error:', errorMessage);
+        }
+      }
     }
   };
 
