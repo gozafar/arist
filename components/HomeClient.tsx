@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import PaintingCard from "@/components/PaintingCard";
 import { usePaintings } from "@/context/PaintingContext";
+import Marquee from "react-fast-marquee";
 
 const HomeClient = () => {
   const { paintings } = usePaintings();
@@ -26,7 +27,43 @@ const HomeClient = () => {
         "Standing in front of these canvases feels like taking a slow breath—calming, intentional, and beautifully detailed.",
       name: "Priya Nair",
       role: "Art enthusiast, Mumbai"
-    }
+    },
+    {
+      quote:
+        "TestimonialsThe artist has a rare gift—each work feels alive, evoking emotion while maintaining a timeless elegance.",
+      name: "Sophia Lin",
+      role: "Collector, Singapore"
+    },
+    {
+      quote:
+        "TestimonialsThe artist has a rare gift—each work feels alive, evoking emotion while maintaining a timeless elegance.",
+      name: "Sophia Lin",
+      role: "Collector, Singapore"
+    },
+    {
+       quote:
+        "TestimonialsThe artist has a rare gift—each work feels alive, evoking emotion while maintaining a timeless elegance.",
+      name: "Sophia Lin",
+      role: "Collector, Singapore"
+    },
+        {
+       quote:
+        "TestimonialsThe artist has a rare gift—each work feels alive, evoking emotion while maintaining a timeless elegance.",
+      name: "Sophia Lin",
+      role: "Collector, Singapore"
+    },
+        {
+       quote:
+        "TestimonialsThe artist has a rare gift—each work feels alive, evoking emotion while maintaining a timeless elegance.",
+      name: "Sophia Lin",
+      role: "Collector, Singapore"
+    },
+        {
+       quote:
+        "TestimonialsThe artist has a rare gift—each work feels alive, evoking emotion while maintaining a timeless elegance.",
+      name: "Sophia Lin",
+      role: "Collector, Singapore"
+    },
   ];
 
   return (
@@ -43,7 +80,7 @@ const HomeClient = () => {
               Hong Kong with certified originals, museum-grade framing, and worldwide delivery.
             </p>
             <div className="flex flex-wrap gap-3">
-              <Link href="/paintings" className="button-primary shadow-soft">
+              <Link href="/paintings" className="button-primary shadow-soft hover:shadow-lg hover:text-white ">
                 Shop global collection
               </Link>
               <Link href="/contact" className="button-outline">
@@ -121,8 +158,9 @@ const HomeClient = () => {
           <span className="text-sm text-black/60">Collectors on Rakhi’s paintings</span>
         </div>
         <div className="container-grid">
-          {testimonials.map((item) => (
-            <div key={item.name} className="card-glass h-full rounded-2xl p-5">
+          <Marquee>
+          {testimonials.map((item,index) => (
+             <div key={`${item.name}-${index}`} className="card-glass h-full w-[400px] rounded-2xl p-5 m-5">
               <p className="text-black/80 leading-relaxed">“{item.quote}”</p>
               <div className="mt-4 text-sm text-black/60">
                 <p className="font-semibold text-black">{item.name}</p>
@@ -130,6 +168,7 @@ const HomeClient = () => {
               </div>
             </div>
           ))}
+          </Marquee>
         </div>
       </section>
 

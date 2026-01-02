@@ -74,8 +74,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     if (!validationResult.isValid) {
       return NextResponse.json(
         { 
-          error: 'Validation failed', 
-          details: validationResult.errors.map((err) => err.message)
+          // error: 'Validation failed', 
+          error: validationResult.errors.map((err) => err.message)
         },
         { status: 400 }
       );

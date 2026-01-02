@@ -32,7 +32,7 @@ const CheckoutPage = () => {
           <p className="mt-1 text-sm text-white/70">We will confirm shipping timelines after payment.</p>
           <div className="mt-6">
             <AddressForm onSubmit={handleSubmit} />
-          </div>
+          </div>  
         </div>
         <div className="card-glass rounded-3xl p-6">
           <h2 className="font-display text-2xl">Order summary</h2>

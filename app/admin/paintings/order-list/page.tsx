@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getAllOrders } from "@/lib/api/public";
+import { getAllOrders, deleteOrder } from "@/lib/api/public";
 import Pagination from "@/components/Pagination";
 
 interface Painting {
@@ -34,6 +34,7 @@ export default function OrderListPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const PAGE_SIZE = 10;
 
   useEffect(() => {
@@ -64,6 +65,40 @@ export default function OrderListPage() {
 
   const openOrderDetails = (order: Order) => {
     setSelectedOrder(order);
+  };
+
+  const handleDeleteOrder = async (orderId: string) => {
+    if (!confirm('Are you sure you want to delete this order?')) {
+      return;
+    }
+
+    setDeletingId(orderId);
+    try {
+      const response = await deleteOrder(orderId);
+      
+      if (response.success) {
+        // Remove the deleted order from the list
+        setOrders(prevOrders => prevOrders.filter(order => order._id !== orderId));
+        
+        // If the deleted order was the selected one, close the modal
+        if (selectedOrder?._id === orderId) {
+          setSelectedOrder(null);
+        }
+        
+        // Adjust current page if necessary
+        const totalPages = Math.max(1, Math.ceil((orders.length - 1) / PAGE_SIZE));
+        if (currentPage > totalPages) {
+          setCurrentPage(totalPages);
+        }
+      } else {
+        setError('Failed to delete order');
+      }
+    } catch (err) {
+      setError('Error deleting order');
+      console.error('Error:', err);
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   const totalPages = Math.max(1, Math.ceil(orders.length / PAGE_SIZE));
@@ -114,7 +149,7 @@ export default function OrderListPage() {
                         <th className="px-4 py-3">Painting</th>
                         <th className="px-4 py-3">Price</th>
                         <th className="px-4 py-3">Date</th>
-                        <th className="px-4 py-3 text-right">Action</th>
+                        <th className="px-4 py-3 text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/10">
@@ -142,6 +177,7 @@ export default function OrderListPage() {
                               {new Date(order.createdAt).toLocaleDateString()}
                             </td>
                             <td className="px-4 py-3 text-right">
+                            <div className="flex justify-end gap-2">
                               <button
                                 onClick={(event) => {
                                   event.stopPropagation();
@@ -151,7 +187,23 @@ export default function OrderListPage() {
                               >
                                 View
                               </button>
-                            </td>
+                              <button
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  handleDeleteOrder(order._id);
+                                }}
+                                className={`button-outline text-xs flex items-center gap-2 min-w-[60px] justify-center ${
+                                  deletingId === order._id ? 'opacity-70' : ''
+                                }`}
+                                disabled={deletingId === order._id}
+                              >
+                                {deletingId === order._id ? (
+                                  <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                ) : null}
+                                {deletingId === order._id ? "Deleting..." : "Delete"}
+                              </button>
+                            </div>
+                          </td>
                           </tr>
                         );
                       })}
@@ -190,12 +242,26 @@ export default function OrderListPage() {
                     {new Date(selectedOrder.createdAt).toLocaleTimeString()}
                   </p>
                 </div>
+                <div className="flex gap-2">
+                <button
+                  onClick={() => handleDeleteOrder(selectedOrder._id)}
+                  className={`inline-flex items-center justify-center rounded-full border border-red-300 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-red-600 transition hover:border-red-400 hover:text-red-800 ${
+                    deletingId === selectedOrder._id ? 'opacity-70' : ''
+                  }`}
+                  disabled={deletingId === selectedOrder._id}
+                >
+                  {deletingId === selectedOrder._id ? (
+                    <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin mr-1" />
+                  ) : null}
+                  {deletingId === selectedOrder._id ? "Deleting..." : "Delete Order"}
+                </button>
                 <button
                   onClick={() => setSelectedOrder(null)}
                   className="inline-flex items-center justify-center rounded-full border border-slate-300 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600 transition hover:border-slate-400 hover:text-slate-800"
                 >
                   Close
                 </button>
+              </div>
               </div>
 
               <div className="grid gap-6 px-6 py-6 md:grid-cols-2">

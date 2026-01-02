@@ -124,5 +124,11 @@ export const getOrderById = (id: string) =>
     cache: "no-store"
   });
 
+export const deleteOrder = (id: string) =>
+  apiFetch<{ success: boolean; message?: string }>(endpoints.admin.paintingOrder.delete(id), {
+    method: "DELETE",
+    cache: "no-store"
+  });
+
 
 

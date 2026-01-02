@@ -30,10 +30,14 @@ const AdminLoginPage = () => {
     setError(null);
     try {
       await login({ email, password });
-      router.replace("/admin/paintings");
+      
+      // Small delay to ensure cookies are set before redirect
+      setTimeout(() => {
+        setLoading(false);
+        router.replace("/admin/paintings");
+      }, 100);
     } catch (err) {
       setError("Invalid credentials. Try again.");
-    } finally {
       setLoading(false);
     }
   };
@@ -85,7 +89,7 @@ const AdminLoginPage = () => {
         </form>
 
         <div className="mt-6 flex items-center justify-between text-sm text-white/60">
-          <Link href="/" className="hover:text-white">
+          <Link href="/" className="hover:text-gray-500">
             ← Back to site
           </Link>
           

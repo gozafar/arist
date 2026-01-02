@@ -83,7 +83,7 @@ const PaintingUploadForm = () => {
             label="Painting title"
             placeholder="Monsoon Script"
             value={form.title}
-            onChange={(e) => handleChange("title", e.target.value)}
+            onChange={(e) => handleChange("title", e)}
             required
           />
           <TextArea
@@ -99,7 +99,7 @@ const PaintingUploadForm = () => {
               label="Medium"
               placeholder="Acrylic on canvas"
               value={form.medium}
-              onChange={(e) => handleChange("medium", e.target.value)}
+              onChange={(e) => handleChange("medium", e)}
             />
           </div>
           <div className="grid gap-4 md:grid-cols-2">
@@ -107,13 +107,13 @@ const PaintingUploadForm = () => {
               label="Size / Dimensions"
               placeholder="30 x 40 in"
               value={form.size}
-              onChange={(e) => handleChange("size", e.target.value)}
+              onChange={(e) => handleChange("size", e)}
             />
             <InputField
               label="Year"
               type="number"
-              value={form.year}
-              onChange={(e) => handleChange("year", Number(e.target.value))}
+              value={form.year?.toString() || ""}
+              onChange={(e) => handleChange("year", Number(e))}
               min={2015}
               max={new Date().getFullYear() + 1}
             />
