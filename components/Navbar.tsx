@@ -1,27 +1,51 @@
 "use client";
-
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useState,useEffect } from "react";
-import { useCart } from "@/context/CartContext";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { me } from "@/lib/api/auth";
 
-const navItems = [
+const baseNavItems = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/gallery", label: "Gallery" },
   { href: "/paintings", label: "Paintings" },
   { href: "/contact", label: "Contact" },
-  { href: "/admin/paintings", label: "Admin" }
 ];
 
 const Navbar = () => {
   const pathname = usePathname();
   // const { totalItems } = useCart();
-   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [checkedAuth, setCheckedAuth] = useState(false);
 
+  useEffect(() => {
+    let isMounted = true;
+    const checkAuth = async () => {
+      try {
+        const session = await me();
+        if (!isMounted) return;
+        const role = session.user.role;
+        setIsAdmin(role === "ADMIN" || role === "SUPER_ADMIN");
+      } catch {
+        if (!isMounted) return;
+        setIsAdmin(false);
+      } finally {
+        if (!isMounted) return;
+        setCheckedAuth(true);
+      }
+    };
+    void checkAuth();
+    return () => {
+      isMounted = false;
+    };
+  }, [pathname]);
 
-
+  const authNavItem =
+    checkedAuth && isAdmin
+      ? { href: "/admin/paintings", label: "Admin" }
+      : { href: "/admin/login", label: "Login" };
+  const navItems = [...baseNavItems, authNavItem];
 
   const linkClass = (href: string) =>
     `relative px-3 py-2 text-sm font-medium transition ${

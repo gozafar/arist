@@ -18,10 +18,13 @@ export default function proxy(req: NextRequest) {
   if (pathname.startsWith("/_next") || pathname.startsWith("/static")) return NextResponse.next();
 
   const isPublic = PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+  console.log(isPublic,"-----------21")
   const isAdminLogin = pathname === "/admin/login" || pathname.startsWith("/admin/login/");
+  console.log(isAdminLogin,"--------22")
   if (isPublic || isAdminLogin) return NextResponse.next();
 
   const token = req.cookies.get("access_token")?.value;
+  console.log(token, "-----------token");
   // if (!token) {
   const refreshToken = req.cookies.get("refresh_token")?.value;
   
