@@ -160,7 +160,7 @@ export default function GalleryPage() {
           <select
             value={selectedGallery}
             onChange={(e) => setSelectedGallery(e.target.value)}
-            className="rounded-full bg-white/5 px-4 py-2 border border-white/10 focus:border-white/20 outline-none"
+            className="rounded-full bg-white/5 px-4 py-2 border border-white/10 focus:border-white/20 outline-none min-w-[150px] w-full sm:w-auto"
             aria-label="Filter galleries"
             disabled={loading}
           >

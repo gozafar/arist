@@ -89,7 +89,7 @@ const AdminLoginPage = () => {
         </form>
 
         <div className="mt-6 flex items-center justify-between text-sm text-white/60">
-          <Link href="/" className="hover:text-white">
+          <Link href="/" className="hover:text-gray-500">
             ← Back to site
           </Link>
           

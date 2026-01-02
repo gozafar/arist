@@ -12,6 +12,7 @@ type PhoneInputFieldProps = {
   required?: boolean;
   error?: string;
   className?: string;
+  defaultCountry?: string;
 };
 
 const PhoneInputField = React.forwardRef<HTMLDivElement, PhoneInputFieldProps>(({
@@ -25,13 +26,33 @@ const PhoneInputField = React.forwardRef<HTMLDivElement, PhoneInputFieldProps>((
 }, ref) => {
   const countries = useMemo(() => Country.getAllCountries(), []);
 
+  // Get local phone number (without country code) for display
+  const getLocalPhone = (fullPhone: string) => {
+    const selectedCountry = countries.find(c => c.isoCode === country);
+    if (selectedCountry && fullPhone.startsWith(selectedCountry.phonecode)) {
+      return fullPhone.slice(selectedCountry.phonecode.length).trim();
+    }
+    return fullPhone;
+  };
+
   const handleCountryChange = (isoCode: string) => {
     onCountryChange(isoCode);
-    
+
     // Auto-populate phone with country code
     const selectedCountry = countries.find(c => c.isoCode === isoCode);
     if (selectedCountry) {
       onPhoneChange(selectedCountry.phonecode);
+    }
+  };
+
+  const handlePhoneChange = (localPhone: string) => {
+    const selectedCountry = countries.find(c => c.isoCode === country);
+    if (selectedCountry) {
+      // Combine country code with space and local number for backend
+      const fullPhone = selectedCountry.phonecode + ' ' + localPhone.replace(/\s/g, '');
+      onPhoneChange(fullPhone);
+    } else {
+      onPhoneChange(localPhone);
     }
   };
 
@@ -45,9 +66,8 @@ const PhoneInputField = React.forwardRef<HTMLDivElement, PhoneInputFieldProps>((
           <select
             value={country}
             onChange={(e) => handleCountryChange(e.target.value)}
-            className={`h-12 w-full rounded-l-2xl border-r ${
-              error ? "border-red-500" : "border-white/15"
-            } bg-white/5 pl-3 pr-6 text-white text-sm appearance-none focus:outline-none`}
+            className={`h-12 w-full rounded-l-2xl border-r ${error ? "border-red-500" : "border-white/15"
+              } bg-white/5 pl-3 pr-6 text-white text-sm appearance-none focus:outline-none`}
           >
             {countries.map((c) => (
               <option key={c.isoCode} value={c.isoCode} className="bg-white/5">
@@ -63,13 +83,12 @@ const PhoneInputField = React.forwardRef<HTMLDivElement, PhoneInputFieldProps>((
         </div>
         <input
           type="tel"
-          value={phone}
-          onChange={(e) => onPhoneChange(e.target.value.replace(/[^\d\s]/g, ''))}
+          value={getLocalPhone(phone)}
+          onChange={(e) => handlePhoneChange(e.target.value.replace(/[^\d\s]/g, ''))}
           required={required}
           placeholder="415 555 2671"
-          className={`h-12 flex-1 w-full rounded-r-2xl border ${
-            error ? "border-red-500 border-l-0" : "border-white/15 border-l-0"
-          } bg-white/5 px-4 text-white focus:outline-none`}
+          className={`h-12 flex-1 w-full rounded-r-2xl border ${error ? "border-red-500 border-l-0" : "border-white/15 border-l-0"
+            } bg-white/5 px-4 text-white focus:outline-none`}
         />
       </div>
       {error && <p className="mt-1 text-sm text-red-500">{error}</p>}

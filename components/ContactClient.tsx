@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Button from "@/components/Button";
 import { sendContactMessage } from "@/lib/api/public";
+import { toast } from "react-toastify";
 
 const ContactClient = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -60,8 +61,13 @@ const ContactClient = () => {
                     message: String(formData.get("message") || "")
                   });
                   setSubmitted(true);
-                } catch {
-                  setSubmitted(true);
+                  toast.success("Message sent successfully!");
+                } catch (error: any) {
+                    const data = error?.response?.data || error;
+                    console.error("Contact form error:", data);
+                  toast.error(error.message || "Failed to send message. Please try again.", {
+                  });
+                  setSubmitted(false);
                 }
               }}
             >

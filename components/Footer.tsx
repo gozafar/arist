@@ -1,41 +1,177 @@
+"use client";
+
 import Link from "next/link";
+import {
+  FiInstagram,
+  FiFacebook,
+  FiLinkedin,
+  FiMail,
+  FiPhone,
+  FiMapPin,
+} from "react-icons/fi";
+
+const SOCIAL_LINKS = [
+  {
+    name: "Instagram",
+    href: "https://www.instagram.com",
+    icon: FiInstagram,
+    hoverClass: "group-hover:text-pink-600",
+    external: true,
+  },
+  {
+    name: "Facebook",
+    href: "https://www.facebook.com/RakhisArt/",
+    icon: FiFacebook,
+    hoverClass: "group-hover:text-blue-600",
+    external: true,
+  },
+  {
+    name: "LinkedIn",
+    href: "https://www.linkedin.com/in/rakhi-vashisht-b373858/",
+    icon: FiLinkedin,
+    hoverClass: "group-hover:text-blue-700",
+    external: true,
+  },
+  {
+    name: "Email",
+    href: "mailto:rakhistudio1010@gmail.com",
+    icon: FiMail,
+    hoverClass: "group-hover:text-red-500",
+    external: false,
+  },
+];
 
 const Footer = () => {
   return (
-    <footer className="border-t border-white/15 bg-white/70 py-10 backdrop-blur-lg">
-      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 md:flex-row md:items-center md:justify-between lg:px-6">
-        <div>
-          <p className="text-sm uppercase tracking-[0.3em] text-black/60">Artistry – Online Painting Gallery</p>
-          <p className="mt-2 text-black/80">Curated originals with worldwide shipping</p>
-        </div>
-        <div className="flex gap-4 text-sm text-black/70">
-          <Link href="/about" className="hover:text-sand-700">
-            About
-          </Link>
-          <Link href="/paintings" className="hover:text-sand-700">
-            Paintings
-          </Link>
-          <Link href="/contact" className="hover:text-sand-700">
-            Contact
-          </Link>
-        </div>
-        <div className="flex items-center gap-3 text-black/70">
-          <a href="https://www.instagram.com" target="_blank" rel="noreferrer" className="hover:text-sand-700">
-            Instagram
-          </a>
-          <span className="text-black/30">•</span>
-          <a href="https://www.facebook.com/RakhisArt/" target="_blank" rel="noreferrer" className="hover:text-sand-700">
-            Facebook
-          </a>
-          <span className="text-black/30">•</span>
-           <a href="https://www.linkedin.com/in/rakhi-vashisht-b373858/" className="hover:text-sand-700">
-            Linkdin
-          </a>
-          <span className="text-black/30">•</span>
+    <footer className="border-t border-sand-200 bg-white/10">
+      <div className="mx-auto max-w-7xl px-4 py-12">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
 
-          <a href="mailto:rakhistudio1010@gmail.com" className="hover:text-sand-700">
-            Email
-          </a>
+          {/* Brand */}
+          <div>
+            <div className="flex flex-col items-center sm:items-start">
+              <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-sand-400 via-sand-500 to-sand-700 shadow-card">
+                <span className="text-xl font-bold text-white">A</span>
+              </div>
+              <h3 className="text-lg font-display text-gray-900">
+                Artistry Gallery
+              </h3>
+            </div>
+
+            <p className="mt-3 text-center text-sm text-gray-600 sm:text-left">
+              A curated collection of fine art pieces from talented artists
+              around the world.
+            </p>
+          </div>
+
+          {/* Quick Links */}
+          <nav aria-label="Footer navigation">
+            <h4 className="mb-4 text-sm font-medium uppercase tracking-wider text-sand-700 text-center sm:text-left">
+              Quick Links
+            </h4>
+            <ul className="space-y-2 text-center sm:text-left">
+              {[
+                { href: "/", label: "Home" },
+                { href: "/about", label: "About" },
+                { href: "/gallery", label: "Gallery" },
+                { href: "/paintings", label: "Paintings" },
+                { href: "/contact", label: "Contact" },
+              ].map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className="text-sm text-gray-600 transition-colors hover:text-sand-1000"
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          {/* Social */}
+          <div>
+            <h4 className="mb-4 text-sm font-medium uppercase tracking-wider text-sand-700 text-center sm:text-left">
+              Connect
+            </h4>
+
+            <ul className="space-y-3">
+              {SOCIAL_LINKS.map(
+                ({ name, href, icon: Icon, hoverClass, external }) => (
+                  <li key={name}>
+                    <a
+                      href={href}
+                      target={external ? "_blank" : "_self"}
+                      rel={external ? "noopener noreferrer" : undefined}
+                      aria-label={name}
+                      className="group flex items-center justify-center gap-2 text-sm text-gray-600 sm:justify-start"
+                    >
+                      <Icon
+                        className={`h-5 w-5 text-gray-500 transition-colors ${hoverClass}`}
+                      />
+                      <span className="transition-transform group-hover:translate-x-1">
+                        {name}
+                      </span>
+                    </a>
+                  </li>
+                )
+              )}
+            </ul>
+          </div>
+
+          {/* Contact */}
+          <div>
+            <h4 className="mb-4 text-sm font-medium uppercase tracking-wider text-sand-700 text-center sm:text-left">
+              Contact Us
+            </h4>
+
+            <address className="not-italic text-sm text-gray-600 space-y-3">
+              <div className="flex items-start justify-center gap-2 sm:justify-start">
+                <FiMapPin className="mt-0.5 h-4 w-4 text-sand-600" />
+                <div>
+                  <p>123 Art Street</p>
+                  <p>Mumbai, Maharashtra 400001</p>
+                  <p>India</p>
+                </div>
+              </div>
+
+              <a
+                href="mailto:rakhistudio1010@gmail.com"
+                className="flex items-center justify-center gap-2 hover:text-sand-700 sm:justify-start"
+              >
+                <FiMail className="h-4 w-4 text-sand-600" />
+                <span>rakhstudio1010@gmail.com</span>
+              </a>
+
+              <a
+                href="tel:+911234567890"
+                className="flex items-center justify-center gap-2 hover:text-sand-700 sm:justify-start"
+              >
+                <FiPhone className="h-4 w-4 text-sand-600" />
+                <span>+852 97236007 | +91 9899757066</span>
+              </a>
+            </address>
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-sand-200 pt-6 text-xs text-gray-500 md:flex-row">
+          <p>
+            © {new Date().getFullYear()} Artistry Gallery. All rights reserved.
+          </p>
+
+          <div className="flex gap-6">
+            <Link href="/terms" className="hover:text-sand-700">
+              Terms & Conditions
+            </Link>
+            <Link href="/privacy" className="hover:text-sand-700">
+              Privacy Policy
+            </Link>
+          </div>
+
+          <p className="text-gray-400">
+            Developed by Goitel Consultancy Private Limited
+          </p>
         </div>
       </div>
     </footer>

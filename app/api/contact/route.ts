@@ -4,6 +4,7 @@ import Contact from '@/models/Contact';
 import { dbConnect } from '@/lib/db';
 import { sanitizeContactData, validateContactForm } from '../../../lib/validations/contactValidation';
 import { ValidationError } from 'next/dist/compiled/amphtml-validator';
+import { error } from 'console';
 
 // POST /api/contact - Create new contact submission
 export async function POST(request: NextRequest) {
@@ -17,8 +18,8 @@ export async function POST(request: NextRequest) {
     if (!validationResult.isValid) {
       return NextResponse.json(
         { 
-          error: 'Validation failed', 
-          details: validationResult.errors.map((err: ValidationError) => err.message)
+          // error: 'Validation failed', 
+            error: validationResult.errors.map((err: ValidationError) => err.message)
         },
         { status: 400 }
       );
@@ -62,7 +63,6 @@ export async function POST(request: NextRequest) {
     );
 
   } catch (error) {
-    console.error('Error creating contact:', error);
     
     // Handle specific MongoDB errors
     if (error instanceof mongoose.Error.ValidationError) {

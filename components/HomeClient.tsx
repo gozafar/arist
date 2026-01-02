@@ -80,7 +80,7 @@ const HomeClient = () => {
               Hong Kong with certified originals, museum-grade framing, and worldwide delivery.
             </p>
             <div className="flex flex-wrap gap-3">
-              <Link href="/paintings" className="button-primary shadow-soft">
+              <Link href="/paintings" className="button-primary shadow-soft hover:shadow-lg hover:text-white ">
                 Shop global collection
               </Link>
               <Link href="/contact" className="button-outline">

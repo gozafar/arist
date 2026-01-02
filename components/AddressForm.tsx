@@ -54,7 +54,7 @@ const AddressForm = ({ onSubmit, isLoading, resetForm }: Props) => {
     city: "",
     state: "",
     postal: "",
-    country: "",
+    country: "IN", // Default to India
   });
 
   const [formErrors, setFormErrors] = useState<Partial<Record<keyof Address, string>>>({});
