@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { DeleteGallery } from "@/lib/api/admin";
 import { deleteContact } from "@/lib/api/contact";
 
@@ -144,7 +144,7 @@ export default function GalleryModal({
               Confirm Delete
             </h2>
             <p className="text-white/70 mb-6">
-              Are you sure you want to delete the {gallery ? "gallery" : "contact message"} "{gallery?.name || contact?.name}"? 
+              Are you sure you want to delete the {gallery ? "gallery" : "contact message"} &quot;{gallery?.name || contact?.name}&quot;? 
               {gallery && ` This action cannot be undone and will also delete all ${gallery.imageIds?.length || 0} images in this gallery.`}
               {contact && " This action cannot be undone."}
             </p>

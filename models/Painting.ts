@@ -13,6 +13,7 @@ export interface PaintingDoc {
   categoryId: Types.ObjectId; 
   createdAt: Date;
   updatedAt: Date;
+  blog: string;
 }
 
 const PaintingSchema = new Schema<PaintingDoc>(
@@ -24,6 +25,10 @@ const PaintingSchema = new Schema<PaintingDoc>(
     year: { type: Number, required: true },
     description: { type: String, required: true },
     image: { type: String, required: true },
+    blog: {
+      type: String,
+      required: true, // Markdown content
+    },
     tags: [{ type: String }],
     categoryId: { 
       type:  Schema.Types.ObjectId, 
@@ -34,15 +39,6 @@ const PaintingSchema = new Schema<PaintingDoc>(
   },
   {
     timestamps: true,
-    toJSON: {
-      virtuals: true,
-      versionKey: false,
-      transform: (_doc, ret) => {
-        ret.id = ret._id.toString();
-        delete ret._id;
-        return ret;
-      }
-    }
   }
 );
 

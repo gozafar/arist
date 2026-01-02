@@ -6,21 +6,21 @@ import AdminPagination from "@/components/admin/AdminPagination";
 import AddCategoryModal from "@/components/admin/AddCategoryModal";
 import { adminGetCategories, adminDeleteCategory, adminUpdateCategory } from "@/lib/api/admin";
 
-interface PaintingItem {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  medium: string;
-  size: string;
-  year: number;
-  availability: "in-stock" | "sold";
-  image: string;
-  tags: string[];
-  categoryId: string;
-  createdAt: string;
-  updatedAt: string;
-}
+// interface PaintingItem {
+//   id: string;
+//   title: string;
+//   description: string;
+//   price: number;
+//   medium: string;
+//   size: string;
+//   year: number;
+//   availability: "in-stock" | "sold";
+//   image: string;
+//   tags: string[];
+//   categoryId: string;
+//   createdAt: string;
+//   updatedAt: string;
+// }
 
 interface CategoryItem {
   id: string;

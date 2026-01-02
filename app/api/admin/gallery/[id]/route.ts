@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Types } from "mongoose";
 import Gallery from "@/models/gallery";
 import Image from "@/models/Image";
 import { dbConnect } from "@/lib/db";
@@ -13,16 +14,6 @@ interface ImageMeta {
   isDeleted: boolean;
 }
 
-interface GalleryImage {
-  _id: string;
-  url: string;
-  name: string;
-}
-
-interface GalleryData {
-  _id: string;
-  imageIds: GalleryImage[];
-}
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
@@ -123,7 +114,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         }
 
         // Prepare all operations in parallel
-        const operations: Promise<any>[] = [];
+        const operations: Promise<unknown>[] = [];
 
         // Handle image deletions and name updates
         for (const meta of imagesMeta) {
@@ -135,7 +126,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
                         await deleteImageFromCloudinary(image.url);
                         await Image.findByIdAndDelete(meta._id);
                         // Remove from gallery imageIds
-                        gallery.imageIds = gallery.imageIds.filter((id: any) => id.toString() !== meta._id);
+                        gallery.imageIds = gallery.imageIds.filter((id: string | Types.ObjectId) => id.toString() !== meta._id);
                     }
                 })());
             } else if (meta.name) {
@@ -248,6 +239,12 @@ async function uploadImageToCloudinary(file: File) {
     try {
         const buffer = Buffer.from(await file.arrayBuffer());
         fs.writeFileSync(tempFilePath, buffer);
+        console.log(`Uploaded file to temp path: ${tempFilePath}`);
+        console.log(`File size: ${buffer.length} bytes`);
+        console.log(`File type: ${file.type}`);
+        console.log(`File name: ${file.name}`);
+        console.log(`File lastModified: ${file.lastModified}`);
+        console.log(`File size (via file): ${file.size}`);
         return await uploadOnCloudinary(tempFilePath, "rakhi-studio/gallery");
     } finally {
         if (fs.existsSync(tempFilePath)) {
@@ -256,23 +253,23 @@ async function uploadImageToCloudinary(file: File) {
     }
 }
 
-async function deleteImageById(imageId: string) {
-    const image = await Image.findById(imageId);
-    if (image) {
-        await deleteImageFromCloudinary(image.url);
-        await Image.findByIdAndDelete(imageId);
-    }
-}
+// async function deleteImageById(imageId: string) {
+//     const image = await Image.findById(imageId);
+//     if (image) {
+//         await deleteImageFromCloudinary(image.url);
+//         await Image.findByIdAndDelete(imageId);
+//     }
+// }
 
 async function deleteImageFromCloudinary(url: string) {
-    try {
+    // try {
         const urlParts = url.split('/');
         const fileName = urlParts[urlParts.length - 1]?.split('.')[0];
         if (fileName) {
             const publicId = `rakhi-studio/gallery/${fileName}`;
             await deleteFromCloudinary(publicId);
         }
-    } catch (error) {
-        // Silent error handling
-    }
+    // } catch (error) {
+    //     // Silent error handling
+    // }
 }

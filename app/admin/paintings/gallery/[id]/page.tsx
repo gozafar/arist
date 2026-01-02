@@ -40,7 +40,7 @@ export default function EditGalleryPage({
   const [submitting, setSubmitting] = useState(false);
   const [galleryName, setGalleryName] = useState("");
   const [images, setImages] = useState<EditableImage[]>([]);
-  const [initialGalleryName, setInitialGalleryName] = useState("");
+  // const [initialGalleryName, setInitialGalleryName] = useState("");
   const [initialImages, setInitialImages] = useState<EditableImage[]>([]);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [imageToDelete, setImageToDelete] = useState<string | null>(null);
@@ -66,7 +66,7 @@ export default function EditGalleryPage({
       if (galleryParam) {
         const galleryData: GalleryData = JSON.parse(decodeURIComponent(galleryParam));
         setGalleryName(galleryData.name);
-        setInitialGalleryName(galleryData.name);
+        // setInitialGalleryName(galleryData.name);
         setImages(
           galleryData.imageIds.map((img: GalleryImage) => ({
             _id: img._id,

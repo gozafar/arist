@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import Link from "next/link";
 import AddressForm, { Address } from "@/components/AddressForm";
 import Button from "@/components/Button";
@@ -7,11 +8,13 @@ import { checkout } from "@/lib/api/public";
 
 const CheckoutPage = () => {
   const { items, subtotal } = useCart();
+  const [formKey, setFormKey] = useState(0);
 
   const handleSubmit = async (address: Address) => {
     try {
       const order = await checkout({ shipping: address });
       sessionStorage.setItem("pending-order-id", order.orderId);
+      setFormKey(prev => prev + 1); // Reset form if user comes back
     } catch {
       // noop; proceed to payment screen for demo parity
     }
@@ -31,7 +34,10 @@ const CheckoutPage = () => {
           <h2 className="font-display text-2xl">Shipping details</h2>
           <p className="mt-1 text-sm text-white/70">We will confirm shipping timelines after payment.</p>
           <div className="mt-6">
-            <AddressForm onSubmit={handleSubmit} />
+            <AddressForm 
+              key={`checkout-form-${formKey}`}
+              onSubmit={handleSubmit} 
+            />
           </div>  
         </div>
         <div className="card-glass rounded-3xl p-6">

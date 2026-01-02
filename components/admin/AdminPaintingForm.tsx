@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState, useRef } from "react";
 import clsx from "clsx";
 import InputField from "@/components/InputField";
 import TextArea from "@/components/TextArea";
@@ -57,12 +57,36 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = "create" }: AdminPainting
     loadCategories();
   }, []);
 
+  const isInitialMount = useRef(true);
+
   useEffect(() => {
-    if (initial) {
-      setForm(initial);
-      setPreview(initial.image || "");
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      // Only set initial values on first render if they exist
+      if (initial) {
+        setForm(prev => ({
+          ...prev,
+          ...initial,
+          price: initial.price || 0, // Ensure price is always a number
+        }));
+        if (initial.image) {
+          setPreview(initial.image);
+        }
+      }
+    } else if (initial) {
+      // Only update if the initial prop changes and the values are actually different
+      if (initial.title !== form.title || initial.image !== preview) {
+        setForm(prev => ({
+          ...prev,
+          ...initial,
+          price: initial.price || 0,
+        }));
+        if (initial.image !== preview) {
+          setPreview(initial.image || "");
+        }
+      }
     }
-  }, [initial]);
+  }, [initial]); // Only depend on initial prop
 
   const handleImage = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

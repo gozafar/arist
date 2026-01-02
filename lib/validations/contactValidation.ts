@@ -38,7 +38,7 @@ export const contactSchema = Joi.object<ContactFormData>({
   
   phone: Joi.string()
     .trim()
-    .pattern(/^[+]?[\d\s\-\(\)]+$/)
+    .pattern(/^[+]?[\d\s-()]+$/)
     .max(20)
     .optional()
     .allow('')
@@ -120,7 +120,7 @@ export const sanitizeContactData = (data: Partial<ContactFormData>): ContactForm
 };
 
 // Client-side field validation using Joi
-export const validateField = (field: keyof ContactFormData, value: any): string | null => {
+export const validateField = (field: keyof ContactFormData, value: string | undefined): string | null => {
   const fieldSchema = contactSchema.extract(field);
   const { error } = fieldSchema.validate(value);
   
@@ -158,7 +158,7 @@ export const updateContactSchema = Joi.object<ContactFormData>({
   
   phone: Joi.string()
     .trim()
-    .pattern(/^[+]?[\d\s\-\(\)]+$/)
+    .pattern(/^[+]?[\d\s-()]+$/)
     .max(20)
     .optional()
     .allow('')
@@ -224,7 +224,7 @@ export const validateContactUpdate = (data: Partial<ContactFormData>) => {
 };
 
 // Validate update field using Joi
-export const validateUpdateField = (field: keyof ContactFormData, value: any): string | null => {
+export const validateUpdateField = (field: keyof ContactFormData, value: string | undefined): string | null => {
   const fieldSchema = updateContactSchema.extract(field);
   const { error } = fieldSchema.validate(value);
   

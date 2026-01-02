@@ -21,15 +21,18 @@ interface GalleryItem {
   updatedAt: string;
 }
 
-interface ImageRow {
-  galleryId: string;
-  imageId: string;
-  imageUrl: string;
-  imageName: string;
-  galleryName?: string;
-  categoryName: string;
+interface GalleryApiResponse {
+  _id: string;
+  name?: string;
+  imageIds?: Array<{
+    _id: string;
+    url: string;
+    name: string;
+  }>;
   createdAt: string;
+  updatedAt: string;
 }
+
 
 export default function GalleryListPage() {
   const router = useRouter();
@@ -56,10 +59,14 @@ export default function GalleryListPage() {
       setError(null);
       const response = await GetGallery();
       // Transform API response to match GalleryItem interface
-      const transformedGalleries = response?.galleries?.map((gallery: any) => ({
+      const transformedGalleries = (response?.galleries as GalleryApiResponse[])?.map((gallery) => ({
         _id: gallery._id,
         name: gallery.name || "Untitled Gallery",
-        imageIds: gallery.imageIds || [],
+        imageIds: gallery.imageIds?.map(img => ({
+          _id: img._id,
+          url: img.url,
+          name: img.name
+        })) || [],
         createdAt: gallery.createdAt,
         updatedAt: gallery.updatedAt,
       })) || [];
@@ -88,11 +95,11 @@ export default function GalleryListPage() {
     setIsModalOpen(true);
   };
 
-  const handleViewGallery = (gallery: GalleryItem) => {
-    setSelectedGallery(gallery);
-    setModalMode("view");
-    setIsModalOpen(true);
-  };
+  // const handleViewGallery = (gallery: GalleryItem) => {
+  //   setSelectedGallery(gallery);
+  //   setModalMode("view");
+  //   setIsModalOpen(true);
+  // };
 
   const handleConfirmDelete = async (id: string) => {
     try {
@@ -100,8 +107,8 @@ export default function GalleryListPage() {
       setSuccess("Gallery deleted successfully");
       fetchGalleries();
       setTimeout(() => setSuccess(null), 3000);
-    } catch (error) {
-      setError("Failed to delete gallery");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete gallery");
       setTimeout(() => setError(null), 3000);
     }
   };

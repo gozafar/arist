@@ -5,6 +5,16 @@ import Button from "@/components/Button";
 import { sendContactMessage } from "@/lib/api/public";
 import { toast } from "react-toastify";
 
+
+interface ApiError extends Error {
+  response?: {
+    data?: {
+      message?: string;
+      error?: string;
+    };
+  };
+}
+
 const ContactClient = () => {
   const [submitted, setSubmitted] = useState(false);
   const [phoneError, setPhoneError] = useState("");
@@ -62,11 +72,16 @@ const ContactClient = () => {
                   });
                   setSubmitted(true);
                   toast.success("Message sent successfully!");
-                } catch (error: any) {
-                    const data = error?.response?.data || error;
-                    console.error("Contact form error:", data);
-                  toast.error(error.message || "Failed to send message. Please try again.", {
-                  });
+                } catch (error: unknown) {
+                      const apiError = error as ApiError;
+                  const errorMessage = 
+                    apiError.response?.data?.message || 
+                    apiError.response?.data?.error || 
+                    apiError.message || 
+                    "Failed to send message. Please try again.";
+                  
+                  console.error("Contact form error:", apiError);
+                  toast.error(errorMessage);
                   setSubmitted(false);
                 }
               }}

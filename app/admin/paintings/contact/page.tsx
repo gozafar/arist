@@ -74,11 +74,11 @@ export default function ContactManagementPage() {
     setIsModalOpen(true);
   };
 
-  const handleViewContact = (contact: ContactResponse) => {
-    setSelectedContact(contact);
-    setModalMode("view");
-    setIsModalOpen(true);
-  };
+  // const handleViewContact = (contact: ContactResponse) => {
+  //   setSelectedContact(contact);
+  //   setModalMode("view");
+  //   setIsModalOpen(true);
+  // };
 
   const confirmDelete = async (id: string) => {
     try {

@@ -54,19 +54,22 @@ const waitForRefresh = (): Promise<void> => {
   });
 };
 
-export const apiFetch = async <T>(path: string, options: FetchOptions = {}): Promise<T> => {
+export const apiFetch = async <T>(
+  path: string,
+  options: FetchOptions = {}
+): Promise<T> => {
   const { method = "GET", body, headers = {}, cache, next, authToken } = options;
+
   const base = getBaseUrl();
   const url = `${base}${path}`;
-  
-  // Handle FormData differently
+
   const isFormData = body instanceof FormData;
-  const mergedHeaders: Record<string, string> = { 
-    ...defaultHeaders, 
-    ...headers 
+
+  const mergedHeaders: Record<string, string> = {
+    ...defaultHeaders,
+    ...headers,
   };
 
-  // Remove Content-Type for FormData (browser sets it automatically)
   if (isFormData) {
     delete mergedHeaders["Content-Type"];
   }
@@ -79,66 +82,63 @@ export const apiFetch = async <T>(path: string, options: FetchOptions = {}): Pro
     return fetch(url, {
       method,
       headers: mergedHeaders,
-      body: isFormData ? body : (body ? JSON.stringify(body) : undefined),
+      body: isFormData ? body : body ? JSON.stringify(body) : undefined,
       cache,
       next,
       credentials: "include",
     });
   };
 
-  return new Promise(async (resolve, reject) => {
-    let response = await makeRequest();
+  let response = await makeRequest();
 
-    // Handle 401 - try to refresh token (ONLY for auth errors)
-    if (response.status === 401 && !isRefreshing) {
+  /* ================= 401 HANDLING ================= */
+  if (response.status === 401) {
+    if (!isRefreshing) {
       isRefreshing = true;
-      
+
       try {
         await refreshToken();
-        isRefreshing = false;
-        
-        // Resolve all queued requests
-        refreshQueue.forEach(resolve => resolve());
-        refreshQueue = [];
-        
-        // Retry original request
-        response = await makeRequest();
-      } catch (refreshError) {
+      } finally {
         isRefreshing = false;
         refreshQueue.forEach(resolve => resolve());
         refreshQueue = [];
-        reject(refreshError);
-        return;
       }
-    } else if (response.status === 401 && isRefreshing) {
-      // Wait for refresh to complete
+
+      response = await makeRequest();
+    } else {
       await waitForRefresh();
       response = await makeRequest();
     }
+  }
 
-    const text = await response.text();
-    const contentType = response.headers.get("content-type") || "";
-    const isJson = contentType.includes("application/json");
-    const payload = text && isJson ? (JSON.parse(text) as unknown) : (text as unknown);
+  /* ================= RESPONSE PARSING ================= */
+  const text = await response.text();
+  const contentType = response.headers.get("content-type") || "";
+  const isJson = contentType.includes("application/json");
 
-    // For non-401 errors, throw immediately (including 404)
-    if (!response.ok) {
-      const error = new ApiResponseError({
-        status: response.status,
-        message: (() => {
-          const record = isJson && payload && typeof payload === "object" 
-            ? payload as Record<string, unknown> 
+  const payload = text && isJson
+    ? (JSON.parse(text) as unknown)
+    : (text as unknown);
+
+  /* ================= ERROR HANDLING ================= */
+  if (!response.ok) {
+    throw new ApiResponseError({
+      status: response.status,
+      message: (() => {
+        const record =
+          isJson && payload && typeof payload === "object"
+            ? (payload as Record<string, unknown>)
             : null;
-          return record?.message as string || record?.error as string || response.statusText;
-        })(),
-        details: payload
-      });
-      
-      // Properly reject the promise
-      reject(error);
-      return;
-    }
 
-    resolve(payload as T);
-  });
+        return (
+          (record?.message as string) ||
+          (record?.error as string) ||
+          response.statusText
+        );
+      })(),
+      details: payload,
+    });
+  }
+
+  return payload as T;
 };

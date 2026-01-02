@@ -2,7 +2,7 @@ import { Schema, Types, model, models } from "mongoose";
 
 export interface GalleryDoc {
   imageIds: Types.ObjectId[];  // Array of image document IDs
-  name: String;  // This will act as the category/section - UNIQUE
+  name: string;  // This will act as the category/section - UNIQUE
   createdAt: Date;
   updatedAt: Date;
 }

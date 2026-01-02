@@ -14,7 +14,7 @@ export const GET = async (request: Request) => {
 
   await dbConnect();
 
-  let query: any = {};
+  const query: Record<string, unknown> = {};
   
   // Handle availability filter
   if (availability) query.availability = availability;

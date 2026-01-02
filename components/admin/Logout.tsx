@@ -40,7 +40,7 @@ export default function LogoutModal({ isOpen, onClose }: LogoutModalProps) {
         </h2>
         
         <p className="text-white/70 mb-6">
-          Are you sure you want to log out? You'll need to sign in again to access the admin panel.
+          Are you sure you want to log out? You&apos;ll need to sign in again to access the admin panel.
         </p>
 
         {error && (

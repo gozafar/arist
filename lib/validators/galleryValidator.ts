@@ -1,10 +1,10 @@
 import Joi from 'joi';
 
-const objectIdSchema = Joi.string()
-  .pattern(/^[0-9a-fA-F]{24}$/)
-  .messages({
-    'string.pattern.base': 'Invalid ObjectId format'
-  });
+// const objectIdSchema = Joi.string()
+//   .pattern(/^[0-9a-fA-F]{24}$/)
+//   .messages({
+//     'string.pattern.base': 'Invalid ObjectId format'
+//   });
 
 // Gallery validation schemas
 export const gallerySchemas = {
@@ -132,7 +132,7 @@ export const validateFiles = (files: File[]) => {
 };
 
 // Validation helper function
-export const validateRequest = <T>(schema: Joi.ObjectSchema<T>, data: any) => {
+export const validateRequest = <T>(schema: Joi.ObjectSchema<T>, data: T): { isValid: boolean; errors: { [key: string]: string } | null; value: T | null } => {
   const { error, value } = schema.validate(data, {
     abortEarly: false, // Return all errors
     stripUnknown: false // Keep File objects intact

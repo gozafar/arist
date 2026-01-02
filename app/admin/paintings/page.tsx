@@ -21,20 +21,46 @@ const AdminPaintingsPage = () => {
 
   const handleEditSubmit = (payload: FormData) => {
     if (editing) {
-      // Extract painting data from FormData
-      const paintingData: Partial<NewPaintingInput> = {
-        title: payload.get('title') as string,
-        description: payload.get('description') as string,
-        price: Number(payload.get('price')),
-        medium: payload.get('medium') as string,
-        size: payload.get('size') as string,
-        year: Number(payload.get('year')),
-        availability: payload.get('availability') as "in-stock" | "sold",
-        categoryId: payload.get('categoryId') as string,
-        tags: JSON.parse(payload.get('tags') as string || '[]')
-      };
+      // Check if there's an image file in the FormData
+      const imageFile = payload.get('image') as File;
       
-      updatePainting(editing.id, paintingData);
+      console.log("=== FRONTEND DEBUG ===");
+      console.log("Image file in frontend:", imageFile ? {
+        name: imageFile.name,
+        size: imageFile.size,
+        type: imageFile.type
+      } : "No image file");
+      
+      if (imageFile && imageFile.size > 0) {
+        console.log("Sending FormData with image");
+        console.log("FormData entries:");
+        payload.forEach((value, key) => {
+          if (value instanceof File) {
+            console.log(`${key}: File(${value.name}, ${value.size} bytes)`);
+          } else {
+            console.log(`${key}: ${value}`);
+          }
+        });
+        // Send FormData directly when there's an image
+        updatePainting(editing.id, payload);
+      } else {
+        console.log("Sending JSON without image");
+        // Extract painting data from FormData when no image
+        const paintingData: Partial<NewPaintingInput> = {
+          title: payload.get('title') as string,
+          description: payload.get('description') as string,
+          price: Number(payload.get('price')),
+          medium: payload.get('medium') as string,
+          size: payload.get('size') as string,
+          year: Number(payload.get('year')),
+          availability: payload.get('availability') as "in-stock" | "sold",
+          categoryId: payload.get('categoryId') as string,
+          tags: JSON.parse(payload.get('tags') as string || '[]')
+        };
+        
+        updatePainting(editing.id, paintingData);
+      }
+      
       setEditing(null);
     }
   };

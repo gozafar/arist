@@ -17,16 +17,17 @@ export const uploadOnCloudinary = async (localFilePath: string, folder?: string)
     });
 
     return response;
-  } catch (error: any) {
+  } catch (error: unknown) {
     // remove temp file even if upload fails
     if (fs.existsSync(localFilePath)) {
       fs.unlinkSync(localFilePath);
     }
 
-    const message =
-      (error && error.message) ||
-      (error && error.error && error.error.message) ||
-      "Unknown Cloudinary upload error";
+    const message = error instanceof Error 
+      ? error.message 
+      : typeof error === 'object' && error !== null && 'error' in error && error.error instanceof Error
+        ? error.error.message
+        : 'Unknown Cloudinary upload error';
 
     console.error("Cloudinary Error:", error);
     throw new Error(message);

@@ -47,7 +47,7 @@ export const POST = async (req: NextRequest) => {
     const created = await Category.create({ categoryName: name });
     return NextResponse.json(created, { status: 201 });
 
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to create category" },
       { status: 500 }
@@ -76,7 +76,7 @@ export const GET = async (req: NextRequest) => {
     }));
 
     return NextResponse.json(transformedCategories);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to fetch categories" },
       { status: 500 }

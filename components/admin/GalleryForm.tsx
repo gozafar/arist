@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import Button from "@/components/Button";
+import Image from "next/image";
 
 interface GalleryFormProps {
   onSubmit: (data: {
@@ -143,7 +144,7 @@ const GalleryForm = ({ onSubmit, isLoading = false }: GalleryFormProps) => {
           className="relative h-48 overflow-hidden rounded-2xl border border-gray-200 cursor-pointer"
         >
           {pendingPreview ? (
-            <img src={pendingPreview} alt="" className="w-full h-full object-cover" />
+            <Image src={pendingPreview} alt="" width={100} height={100} className="w-full h-full object-cover" />
           ) : (
             <div className="flex h-full items-center justify-center text-sm text-gray-500">
               Drag and drop file here or browse
@@ -194,7 +195,7 @@ const GalleryForm = ({ onSubmit, isLoading = false }: GalleryFormProps) => {
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         {imagePreviews.map((src, index) => (
           <div key={index} className="relative overflow-hidden rounded-lg border border-gray-200">
-            <img src={src} alt="" className="h-32 w-full object-cover" />
+            <Image src={src} alt="" width={100} height={100} className="h-32 w-full object-cover" />
             <button
               type="button"
               onClick={() => removeImage(index)}

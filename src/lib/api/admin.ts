@@ -31,7 +31,7 @@ export const adminCreatePainting = (payload: FormData | PaintingInput) =>
     cache: "no-store"
   });
 
-export const adminUpdatePainting = (id: string, payload: Partial<PaintingInput>) =>
+export const adminUpdatePainting = (id: string, payload: Partial<PaintingInput> | FormData) =>
   apiFetch<PaintingDTO>(endpoints.admin.paintings.detail(id), {
     method: "PUT",
     body: payload,

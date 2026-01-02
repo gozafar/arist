@@ -3,7 +3,7 @@ import Image from "@/models/Image";
 import Gallery from "@/models/gallery";
 import { dbConnect } from "@/lib/db";
 import { deleteFromCloudinary } from "../../../../cloudinary";
-import { requireRole } from "@/lib/rbac";
+// import { requireRole } from "@/lib/rbac";
 
 export async function DELETE(
   request: NextRequest,

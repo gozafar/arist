@@ -108,7 +108,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<GalleryRes
         pages: Math.ceil(total / limit),
       },
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to fetch galleries" },
       { status: 500 }

@@ -78,13 +78,13 @@ export const PUT = async (req: NextRequest, context: { params: Promise<{ id: str
       newImageUrl = cloudinaryRes.secure_url;
 
       // Delete temp file
-      try {
+      // try {
         if (fs.existsSync(tempPath)) {
           fs.unlinkSync(tempPath);
         }
-      } catch (error) {
-        // Continue even if temp file deletion fails
-      }
+      // } catch (error) {
+      //   // Continue even if temp file deletion fails
+      // }
     }
 
     // Extract other form fields
@@ -147,7 +147,7 @@ export const DELETE = async (req: NextRequest, context: { params: Promise<{ id: 
 
     // Delete image from Cloudinary if it exists
     if (removed.image) {
-      try {
+      // try {
         // Extract public ID from Cloudinary URL
         const urlParts = removed.image.split('/');
         
@@ -161,10 +161,10 @@ export const DELETE = async (req: NextRequest, context: { params: Promise<{ id: 
         } else {
           console.log('Failed to delete from Cloudinary:', publicId);
         }
-      } catch (cloudinaryError) {
-        // console.error('Error deleting from Cloudinary:', cloudinaryError);
-        // Continue with database deletion even if Cloudinary fails
-      }
+      // } catch (cloudinaryError) {
+      //   // console.error('Error deleting from Cloudinary:', cloudinaryError);
+      //   // Continue with database deletion even if Cloudinary fails
+      // }
     } else {
       // console.log('No image URL found for painting');
     }
@@ -172,13 +172,13 @@ export const DELETE = async (req: NextRequest, context: { params: Promise<{ id: 
     const token = req.cookies.get("access_token")?.value;
     const user = token ? verifyAccessToken(token) : null;
     if (user) {
-      try {
+      // try {
         await AdminLog.create({ adminId: user.userId, action: "DELETE_PAINTING", targetId: id });
         // console.log('Admin log created');
-      } catch (logError) {
-        // console.error('Failed to create AdminLog:', logError);
-        // Continue even if logging fails
-      }
+      // } catch (logError) {
+      //   // console.error('Failed to create AdminLog:', logError);
+      //   // Continue even if logging fails
+      // }
     }
     
     revalidateTag("paintings", "default");

@@ -1,5 +1,11 @@
 #!/bin/sh
 set -e
 
-echo "🚀 Running lint-staged..."
+echo "🚀 Running lint-staged (staged files)..."
 pnpm exec lint-staged
+
+echo "🚀 Running ESLint (full project)..."
+pnpm lint
+
+echo "🚀 Running Prettier (full project check)..."
+pnpm exec prettier --check .

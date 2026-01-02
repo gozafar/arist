@@ -17,20 +17,13 @@ type NewPaintingInput = Omit<PaintingDTO, "id" | "createdAt" | "updatedAt" | "ye
 type PaintingContextValue = {
   paintings: Painting[];
   addPainting: (painting: NewPaintingInput | FormData) => void;
-  updatePainting: (id: string, painting: Partial<NewPaintingInput>) => void;
+  updatePainting: (id: string, painting: Partial<NewPaintingInput> | FormData) => void;
   deletePainting: (id: string) => void;
   toggleAvailability: (id: string) => void;
   loaded: boolean;
 };
 
 const PaintingContext = createContext<PaintingContextValue | undefined>(undefined);
-
-const generateId = () => {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return crypto.randomUUID();
-  }
-  return `painting-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-};
 
 export const PaintingProvider = ({ children }: { children: ReactNode }) => {
   const [paintings, setPaintings] = useState<Painting[]>([]);
@@ -56,33 +49,24 @@ export const PaintingProvider = ({ children }: { children: ReactNode }) => {
   const addPainting = (painting: NewPaintingInput | FormData) => {
     const create = async () => {
       try {
-        const saved = await adminCreatePainting(painting as any);
+        const saved = await adminCreatePainting(painting as FormData);
         setPaintings((prev) => [saved, ...prev]);
-      } catch {
+      } catch (error) {
         // For FormData, we can't create a local fallback
-        console.error('Failed to create painting');
+        console.error('Failed to create painting:', error);
       }
     };
     void create();
   };
 
-  const updatePainting = (id: string, painting: Partial<NewPaintingInput>) => {
+  const updatePainting = (id: string, painting: Partial<NewPaintingInput> | FormData) => {
     const apply = async () => {
       try {
         const updated = await adminUpdatePainting(id, painting);
         setPaintings((prev) => prev.map((p) => (p.id === id ? updated : p)));
       } catch {
         setPaintings((prev) =>
-          prev.map((p) =>
-            p.id === id
-              ? {
-                  ...p,
-                  ...painting,
-                  year: painting.year ?? p.year,
-                  availability: painting.availability ?? p.availability
-                }
-              : p
-          )
+          prev.map((p) => (p.id === id ? { ...p, updatedAt: new Date().toISOString() } : p))
         );
       }
     };
@@ -121,7 +105,7 @@ export const PaintingProvider = ({ children }: { children: ReactNode }) => {
 
   const value = useMemo(
     () => ({ paintings, addPainting, updatePainting, deletePainting, toggleAvailability, loaded }),
-    [paintings, loaded]
+    [paintings, loaded, addPainting, updatePainting, deletePainting, toggleAvailability]
   );
 
   return <PaintingContext.Provider value={value}>{children}</PaintingContext.Provider>;

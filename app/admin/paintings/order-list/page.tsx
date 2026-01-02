@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { getAllOrders, deleteOrder } from "@/lib/api/public";
 import Pagination from "@/components/Pagination";
+import Image from "next/image";
 
 interface Painting {
   _id: string;
@@ -305,10 +306,12 @@ export default function OrderListPage() {
                     {typeof selectedOrder.paintingId === "object" ? (
                       <>
                         <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-3">
-                          <img
+                          <Image
                             src={selectedOrder?.paintingId?.image}
                             alt={selectedOrder?.paintingId?.title}
                             className="h-20 w-20 rounded-xl object-cover"
+                            width={80}
+                            height={80}
                           />
                           <div>
                             <p className="text-xs uppercase text-slate-400">Painting</p>

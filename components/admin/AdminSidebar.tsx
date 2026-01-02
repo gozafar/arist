@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import LogoutModal from "./Logout";
 import { useState } from "react";
@@ -22,11 +22,11 @@ const AdminSidebar = () => {
   const pathname = usePathname();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  const handleLogout = async () => {
-    // await fetch("/api/auth/logout", { method: "POST" });
-    // Trigger storage event to notify other components
-    // router.push("/admin/login");
-  };
+  // const handleLogout = async () => {
+  //   // await fetch("/api/auth/logout", { method: "POST" });
+  //   // Trigger storage event to notify other components
+  //   // router.push("/admin/login");
+  // };
 
   return (
     <>

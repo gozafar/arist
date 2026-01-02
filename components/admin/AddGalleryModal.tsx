@@ -39,7 +39,7 @@ export default function AddGalleryModal({ isOpen, onClose, onGalleryAdded }: Add
       } else {
         setError('Failed to create gallery');
       }
-    } catch (err) {
+    } catch {
       setError('Error creating gallery');
     } finally {
       setSubmitting(false);

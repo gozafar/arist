@@ -1,7 +1,7 @@
 "use client"
 import AddressForm from "@/components/AddressForm";
-import Button from "@/components/Button";
-import { ApiResponseError } from "@/lib/api/client";
+// import Button from "@/components/Button";
+// import { ApiResponseError } from "@/lib/api/client";
 import { createPaintingOrder } from "@/lib/api/public";
 import Link from "next/link";
 import { toast } from "react-toastify";
@@ -20,7 +20,7 @@ interface OrderData {
 
 export default function ContactPainting() {
   const [isLoading, setIsLoading] = useState(false);
-  const [resetForm, setResetForm] = useState(false);
+  const [formKey, setFormKey] = useState(0);
 
   const handleOrderSubmit = async (formData: Omit<OrderData, 'paintingId'>) => {
     setIsLoading(true);
@@ -38,16 +38,16 @@ export default function ContactPainting() {
       const response = await createPaintingOrder(orderData);
       
       if (response.success) {
-        setResetForm(true);
+        setFormKey(prev => prev + 1);
         toast.success("Order created successfully")
       } else {
         toast.error("Order not created, something is wrong")
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Order submission error:", error);
       
       // Show toast notification
-      const errorMessage = error?.message || 'An error occurred';
+      const errorMessage = (error as Error)?.message || 'An error occurred';
       toast.error(errorMessage);
       
       // Don't re-throw - just let the error be handled by the toast
@@ -69,7 +69,11 @@ return (
           <h2 className="font-display text-2xl">Shipping details</h2>
           <p className="mt-1 text-sm text-white/70">We will confirm shipping timelines after payment.</p>
           <div className="mt-6">
-            <AddressForm onSubmit={handleOrderSubmit} isLoading={isLoading} resetForm={resetForm} />
+            <AddressForm 
+              key={`address-form-${formKey}`}
+              onSubmit={handleOrderSubmit} 
+              isLoading={isLoading} 
+            />
           </div>
         </div>
       </div>

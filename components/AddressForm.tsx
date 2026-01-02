@@ -1,9 +1,9 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { Country, State, City } from "country-state-city";
-import { toast } from "react-toastify";
+// import { toast } from "react-toastify";
 
 // Dynamically import components
 const Button = dynamic(() => import("./Button"), { ssr: false });
@@ -26,14 +26,14 @@ export type Address = {
 type Props = {
   onSubmit?: (address: Address) => Promise<void>;
   isLoading?: boolean;
-  resetForm?: boolean;
+  key?: string; // Used for resetting the form when key changes
 };
 
-type BackendError =
-  | { errors?: Record<string, string> }
-  | { errors?: { field: keyof Address; message: string }[] }
-  | { message?: string }
-  | string;
+// type BackendError =
+//   | { errors?: Record<string, string> }
+//   | { errors?: { field: keyof Address; message: string }[] }
+//   | { message?: string }
+//   | string;
 
 // -------------------- Helper --------------------
 const detectCountryFromPhone = (phone: string) => {
@@ -45,7 +45,7 @@ const detectCountryFromPhone = (phone: string) => {
 };
 
 // -------------------- Component --------------------
-const AddressForm = ({ onSubmit, isLoading, resetForm }: Props) => {
+const AddressForm = ({ onSubmit, isLoading }: Props) => {
   const [form, setForm] = useState<Address>({
     name: "",
     email: "",
@@ -69,22 +69,9 @@ const AddressForm = ({ onSubmit, isLoading, resetForm }: Props) => {
     if (Object.keys(formErrors).length > 0) setFormErrors({});
   };
 
-  // -------------------- Effects --------------------
-  useEffect(() => {
-    if (resetForm) {
-      setForm({
-        name: "",
-        email: "",
-        phone: "",
-        address: "",
-        city: "",
-        state: "",
-        postal: "",
-        country: "",
-      });
-      setFormErrors({});
-    }
-  }, [resetForm]);
+
+    // The form will be reset automatically when the key prop changes
+  // No need for a separate resetForm prop or effect
 
   // -------------------- Submit --------------------
   const handleSubmit = async (e: FormEvent) => {

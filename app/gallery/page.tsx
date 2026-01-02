@@ -5,12 +5,14 @@ import { GetGallery } from "@/lib/api/admin";
 import Image from "next/image";
 import Pagination from "@/components/Pagination";
 
-const GALLERY_NAMES = [
+type GalleryName = "Contemporary / Modern Art" | "Portrait Paintings" | "Landscape Paintings" | "Abstract Art";
+
+const GALLERY_NAMES: GalleryName[] = [
   "Contemporary / Modern Art",
   "Portrait Paintings", 
   "Landscape Paintings",
   "Abstract Art"
-] as const;
+];
 
 interface GalleryImage {
   _id: string;
@@ -19,7 +21,7 @@ interface GalleryImage {
   name: string;
   galleryName?: string;
   createdAt?: string;
-  [key: string]: any;
+  [key: string]: string | undefined; 
 }
 
 interface Gallery {
@@ -62,7 +64,7 @@ export default function GalleryPage() {
       setCurrentPage(1); // Reset to page 1 when gallery changes
     } else {
       const hardcodedFiltered = galleries.filter(gallery => 
-        GALLERY_NAMES.includes(gallery.name as any)
+        GALLERY_NAMES.includes(gallery.name as GalleryName)
       );
       setFilteredGalleries(hardcodedFiltered);
       
@@ -70,7 +72,7 @@ export default function GalleryPage() {
         gallery.imageIds.map(img => ({
           ...img,
           galleryName: gallery.name,
-          createdAt: (img as any).createdAt || gallery.createdAt
+          createdAt: (img as { createdAt?: string }).createdAt || gallery.createdAt
         }))
       );
       setImageList(allImages);
@@ -93,13 +95,13 @@ export default function GalleryPage() {
           images = filtered[0]?.imageIds || [];
         } else {
           const hardcodedFiltered = res.galleries.filter(gallery => 
-            GALLERY_NAMES.includes(gallery.name as any)
+            GALLERY_NAMES.includes(gallery.name as GalleryName)
           );
           images = hardcodedFiltered.flatMap(gallery => 
             gallery.imageIds.map(img => ({
               ...img,
               galleryName: gallery.name,
-              createdAt: (img as any).createdAt || gallery.createdAt
+              createdAt: (img as GalleryImage).createdAt || gallery.createdAt
             }))
           );
         }

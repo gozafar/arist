@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useState,useEffect } from "react";
-import { useCart } from "@/context/CartContext";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
+// import { useCart } from "@/context/CartContext";
 
 const navItems = [
   { href: "/", label: "Home" },
@@ -17,7 +17,7 @@ const navItems = [
 const Navbar = () => {
   const pathname = usePathname();
   // const { totalItems } = useCart();
-   const router = useRouter();
+  //  const router = useRouter();
   const [open, setOpen] = useState(false);
 
   const linkClass = (href: string) =>

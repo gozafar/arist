@@ -1,7 +1,7 @@
 import { dbConnect } from "@/lib/db";
 import { requireRole } from "@/lib/rbac";
 import Category from "@/models/Category";
-import { promises } from "dns";
+// import { promises } from "dns";
 import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -181,7 +181,7 @@ export const DELETE = async (
         await dbConnect();
 
         // Delete category
-        const deleted = await Category.findByIdAndDelete(new mongoose.Types.ObjectId(id)).lean();
+        // const deleted = await Category.findByIdAndDelete(new mongoose.Types.ObjectId(id)).lean();
 
         // if (!deleted) {
         //     return NextResponse.json(
@@ -192,7 +192,7 @@ export const DELETE = async (
 
         return NextResponse.json({ message: "Category deleted successfully" });
 
-    } catch (err) {
+    } catch {
         return NextResponse.json(
             { error: "Failed to delete category" },
             { status: 500 }

@@ -22,7 +22,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
             { status: 200 }
         );
 
-    } catch (error) {
+    } catch {
         return NextResponse.json(
             { success: false, error: "Failed to fetch orders" },
             { status: 500 }

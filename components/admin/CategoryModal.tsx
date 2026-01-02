@@ -156,7 +156,7 @@ export default function CategoryModal({
               Confirm Delete
             </h2>
             <p className="text-white/70 mb-6">
-              Are you sure you want to delete the category "{category.categoryName}"? This action cannot be undone.
+              Are you sure you want to delete the category &quot;{category.categoryName}&quot;? This action cannot be undone.
             </p>
 
             {error && (

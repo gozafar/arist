@@ -36,7 +36,7 @@ const AdminLoginPage = () => {
         setLoading(false);
         router.replace("/admin/paintings");
       }, 100);
-    } catch (err) {
+    } catch  {
       setError("Invalid credentials. Try again.");
       setLoading(false);
     }

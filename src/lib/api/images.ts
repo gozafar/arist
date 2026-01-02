@@ -1,5 +1,5 @@
 export const deleteImage = async (imageId: string) => {
-  try {
+  // try {
     const response = await fetch(`/api/admin/gallery/images/${imageId}`, {
       method: 'DELETE',
     });
@@ -10,7 +10,7 @@ export const deleteImage = async (imageId: string) => {
     }
 
     return await response.json();
-  } catch (error) {
-    throw error;
-  }
+  // } catch (error) {
+  //   throw error;
+  // }
 };
