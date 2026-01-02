@@ -1,6 +1,8 @@
-import { UserRole } from "@/models/User";
+import { UserRole } from '@/models/User';
 
 export type PaintingDTO = {
+  width: number;
+  height: number;
   id: string;
   title: string;
   price: number;
@@ -10,7 +12,7 @@ export type PaintingDTO = {
   description: string;
   image: string;
   tags: string[];
-  availability: "in-stock" | "sold";
+  availability: 'in-stock' | 'sold';
   categoryId: string;
   createdAt: string;
   updatedAt: string;

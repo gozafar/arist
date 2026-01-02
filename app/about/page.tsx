@@ -37,7 +37,7 @@ const AboutPage = () => {
 
         <div className='space-y-5'>
           <p className='text-sm uppercase tracking-[0.3em] text-white/60'>About the artist</p>
-          <h1 className='section-heading'>Meet Rakhi Vashisht</h1>
+          <h1 className='text-3xl md:text-4xl font-semibold text-white my font-display'>Meet Rakhi Vashisht</h1>
           <p className='max-w-2xl text-base leading-relaxed text-black/70 md:text-[16px]'>
             Born amidst the vibrant landscapes of Madhya Pradesh, India, Rakhi discovered her calling in colors and
             forms early on—earning Elementary and Intermediate certifications from JJ School of Arts by age ten. Though
@@ -59,7 +59,7 @@ const AboutPage = () => {
 
       <div className='grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start'>
         <div className='space-y-4'>
-          <h1 className='section-heading'>Artist Profile & Style</h1>
+          <h1 className='text-3xl md:text-4xl font-semibold text-white my font-display'>Artist Profile & Style</h1>
 
           <p className='max-w-2xl text-base leading-relaxed text-black/70 md:text-[16px]'>
             Rakhi&apos;s art is a dance of vibrancy and detail. Bold hues and intricate strokes converge to create
@@ -90,7 +90,7 @@ const AboutPage = () => {
       </div>
 
       <div className='card-glass rounded-[28px] border border-white/10 bg-white/5 p-6 md:p-8 text-black'>
-        <h2 className='section-heading mb-6'>Exhibitions Timeline</h2>
+        <h1 className='text-3xl md:text-4xl font-semibold text-white my font-display mb-4'>Exhibitions Timeline</h1>
 
         <div className='space-y-8 text-white/85'>
           {/* EARLY */}
@@ -194,8 +194,8 @@ const AboutPage = () => {
       </div>
 
       <div className='card-glass rounded-[28px] border border-white/10 bg-white/5 p-6 md:p-8 space-y-4'>
-        <h1 className='section-heading'>Artist Statement</h1>
-        <p className='leading-relaxed  text-black/80'>
+        <h1 className='text-3xl md:text-4xl font-semibold text-white my font-display mb-4'>Artist Statement</h1>
+        <p className=' text-base leading-relaxed text-black/70 md:text-[16px]'>
           For Rakhi, art is meditation—a sanctuary where mind and soul find harmony. Each brushstroke is an offering, a
           way to inspire, provoke thought, and build bridges of connection. She believes art is both personal and
           communal, driving her to teach children, guide communities through workshops, and bring creativity into

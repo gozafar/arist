@@ -72,12 +72,12 @@ const HomeClient = () => {
         <div className='mx-auto grid max-w-7xl gap-12 lg:grid-cols-2 lg:items-center'>
           {/* LEFT CONTENT */}
           <div className='flex flex-col justify-center space-y-6'>
-            <p className='text-xs font-medium uppercase tracking-[0.3em] text-black/60 '>Curated originals</p>
-            <h1 className='section-heading'>
+            <p className='text-sm uppercase tracking-[0.3em] text-white/60'>Curated originals</p>
+            <h1 className='text-3xl md:text-4xl font-semibold text-white my font-display'>
               Buy Original Paintings Online – Trusted Art Gallery for UAE, India, USA &amp; Hong Kong
             </h1>
 
-            <p className='max-w-2xl text-base leading-relaxed text-black/70 md:text-[18px]'>
+            <p className='max-w-2xl text-base leading-relaxed text-black/70 md:text-[16px]'>
               Artistry is an international painting marketplace connecting collectors in Dubai, Mumbai, New York, and
               Hong Kong with certified originals, museum-grade framing, and worldwide delivery.
             </p>
@@ -96,13 +96,13 @@ const HomeClient = () => {
             </div>
 
             {/* STATS */}
-            <div className='flex flex-wrap gap-4 pt-4'>
-              <div className='min-w-[160px] rounded-2xl bg-white/80 px-5 py-4 text-center shadow-card'>
+            <div className='grid w-full grid-cols-1 gap-4 pt-4 sm:grid-cols-2'>
+              <div className='rounded-2xl bg-white/80 px-5 py-4 text-center shadow-card'>
                 <p className='text-2xl font-semibold text-sand-700'>30+ works</p>
                 <p className='text-sm text-black/70'>One-of-a-kind originals</p>
               </div>
 
-              <div className='min-w-[160px] rounded-2xl bg-white/80 px-5 py-4 text-center shadow-card'>
+              <div className='rounded-2xl bg-white/80 px-5 py-4 text-center shadow-card'>
                 <p className='text-2xl font-semibold text-sand-700'>Worldwide</p>
                 <p className='text-sm text-black/70'>Insured global shipping</p>
               </div>
@@ -124,22 +124,24 @@ const HomeClient = () => {
       </section>
 
       <section className='mt-16 space-y-6'>
-        <h2 className='section-heading'>Trusted international art marketplace</h2>
+        <h1 className='text-3xl md:text-4xl font-semibold text-white my font-display'>
+          Trusted international art marketplace
+        </h1>
         <div className='grid gap-6 md:grid-cols-3'>
           <div className='card-glass rounded-2xl p-5'>
-            <h3 className='font-display text-2xl'>Authenticity guaranteed</h3>
+            <h3 className='text-lg md:text-xl font-semibold text-white my font-display'>Authenticity guaranteed</h3>
             <p className='mt-2 text-black/70 text-sm'>
               Every painting ships with a signed certificate of authenticity and provenance details for collectors.
             </p>
           </div>
           <div className='card-glass rounded-2xl p-5'>
-            <h3 className='font-display text-2xl'>Worldwide shipping</h3>
+            <h3 className='text-lg md:text-xl font-semibold text-white my font-display'>Worldwide shipping</h3>
             <p className='mt-2 text-black/70 text-sm'>
               Gallery-grade packaging, customs guidance, and tracking for UAE, India, USA, and Hong Kong deliveries.
             </p>
           </div>
           <div className='card-glass rounded-2xl p-5'>
-            <h3 className='font-display text-2xl'>Secure payments</h3>
+            <h3 className='text-lg md:text-xl font-semibold text-white my font-display'>Secure payments</h3>
             <p className='mt-2 text-black/70 text-sm'>
               Trusted checkout and white-glove support for collectors, designers, and hospitality teams.
             </p>
@@ -147,9 +149,9 @@ const HomeClient = () => {
         </div>
       </section>
 
-      <section className='mt-16'>
+      <section className='mt-16 space-y-6'>
         <div className='flex items-center justify-between'>
-          <h2 className='section-heading'>Featured works</h2>
+          <h1 className='text-3xl md:text-4xl font-semibold text-white my font-display'>Featured works</h1>
           <Link href='/paintings' className='button-outline text-xs'>
             Browse all
           </Link>
@@ -160,8 +162,8 @@ const HomeClient = () => {
           ))}
         </div>
         <div className='mt-5 rounded-[28px] border border-white/15 bg-white/80 px-10 py-10 md:px-10 shadow-card'>
-          <div className='flex items-center justify-between'>
-            <h2 className='section-heading'>Testimonials</h2>
+          <div className='flex items-center justify-between flex-wrap'>
+            <h1 className='text-3xl md:text-4xl font-semibold text-white my font-display'>Testimonials</h1>
             <span className='text-sm text-black/60'>Collectors on Rakhi’s paintings</span>
           </div>
           <div className='container-grid'>
@@ -182,19 +184,19 @@ const HomeClient = () => {
 
       <section className='mt-16 grid gap-10 rounded-[28px] border border-white/15 bg-white/80 px-6 py-10 md:grid-cols-3 md:px-10 shadow-card'>
         <div className='space-y-3'>
-          <h3 className='font-display text-2xl'>Studio visits</h3>
+          <h3 className='text-xl md:text-2xl font-semibold text-white my font-display'>Studio visits</h3>
           <p className='text-black/70 text-sm leading-relaxed'>
             View works by appointment. Private walkthroughs with curated lighting and framing guidance.
           </p>
         </div>
         <div className='space-y-3'>
-          <h3 className='font-display text-2xl'>Commissions</h3>
+          <h3 className='text-xl md:text-2xl font-semibold text-white my font-display'>Commissions</h3>
           <p className='text-black/70 text-sm leading-relaxed'>
             Bespoke pieces tailored to your space, palette, and size requirements with design consultations.
           </p>
         </div>
         <div className='space-y-3'>
-          <h3 className='font-display text-2xl'>Shipping</h3>
+          <h3 className='text-xl md:text-2xl font-semibold text-white my font-display'>Shipping</h3>
           <p className='text-black/70 text-sm leading-relaxed'>
             Worldwide shipping in museum-grade crates. Works ship 7–10 days after purchase.
           </p>

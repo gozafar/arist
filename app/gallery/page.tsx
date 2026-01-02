@@ -145,9 +145,9 @@ export default function GalleryPage() {
     <div className='mx-auto max-w-6xl px-4 py-14'>
       {/* HEADER */}
       <div className='mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-6'>
-        <div>
+        <div className='space-y-2'>
           <p className='text-sm uppercase tracking-[0.3em] text-white/60'>Collections</p>
-          <h1 className='text-3xl md:text-4xl font-semibold text-white mt-2'>Art Gallery</h1>
+          <h1 className='text-3xl md:text-4xl font-semibold text-white my font-display'>Art Gallery</h1>
           <p className='max-w-2xl text-base leading-relaxed text-black/70 md:text-[16px]'>
             Browse through our gallery collections. Page through to explore all available galleries.
           </p>
