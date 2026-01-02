@@ -1,5 +1,5 @@
-import { v2 as cloudinary } from "cloudinary";
-import fs from "fs";
+import { v2 as cloudinary } from 'cloudinary';
+import fs from 'fs';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
@@ -12,8 +12,8 @@ export const uploadOnCloudinary = async (localFilePath: string, folder?: string)
     if (!localFilePath) return null;
 
     const response = await cloudinary.uploader.upload(localFilePath, {
-      folder: folder || "rakhi-studio",
-      resource_type: "auto",
+      folder: folder || 'rakhi-studio',
+      resource_type: 'auto',
     });
 
     return response;
@@ -23,13 +23,14 @@ export const uploadOnCloudinary = async (localFilePath: string, folder?: string)
       fs.unlinkSync(localFilePath);
     }
 
-    const message = error instanceof Error 
-      ? error.message 
-      : typeof error === 'object' && error !== null && 'error' in error && error.error instanceof Error
-        ? error.error.message
-        : 'Unknown Cloudinary upload error';
+    const message =
+      error instanceof Error
+        ? error.message
+        : typeof error === 'object' && error !== null && 'error' in error && error.error instanceof Error
+          ? error.error.message
+          : 'Unknown Cloudinary upload error';
 
-    console.error("Cloudinary Error:", error);
+    console.error('Cloudinary Error:', error);
     throw new Error(message);
   }
 };
@@ -40,10 +41,10 @@ export const deleteFromCloudinary = async (publicId: string) => {
 
     const response = await cloudinary.uploader.destroy(publicId);
     console.log('Cloudinary delete response:', response);
-    
+
     return response.result === 'ok' || response.result === 'not found';
   } catch (error) {
-    console.error("Cloudinary Delete Error:", error);
+    console.error('Cloudinary Delete Error:', error);
     return false;
   }
 };
@@ -58,8 +59,8 @@ export const updateOnCloudinary = async (localFilePath: string, existingPublicId
     }
 
     const response = await cloudinary.uploader.upload(localFilePath, {
-      folder: folder || "paintings",
-      resource_type: "auto",
+      folder: folder || 'paintings',
+      resource_type: 'auto',
     });
 
     console.log('Cloudinary update successful:', response.public_id);
@@ -70,7 +71,7 @@ export const updateOnCloudinary = async (localFilePath: string, existingPublicId
       fs.unlinkSync(localFilePath);
     }
 
-    console.error("Cloudinary Update Error:", error);
+    console.error('Cloudinary Update Error:', error);
     return null;
   }
 };

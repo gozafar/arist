@@ -1,7 +1,6 @@
 // import { uploadOnCloudinary } from "../api/cloudinary";
 
-import { uploadOnCloudinary } from "../cloudinary";
-
+import { uploadOnCloudinary } from '../cloudinary';
 
 interface ExtendedRequest {
   file: {
@@ -23,18 +22,14 @@ interface NextFunction {
   (error?: Error | string | undefined): void;
 }
 
-export const uploadToCloudinary = async (
-  req: ExtendedRequest,
-  res: Response,
-  next: NextFunction
-) => {
+export const uploadToCloudinary = async (req: ExtendedRequest, res: Response, next: NextFunction) => {
   try {
     if (!req.file) return next();
 
     const result = await uploadOnCloudinary(req.file.path);
 
     if (!result) {
-      return res.status(500).json({ message: "Upload failed" });
+      return res.status(500).json({ message: 'Upload failed' });
     }
 
     req.cloudinary = {

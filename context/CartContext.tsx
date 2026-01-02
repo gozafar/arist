@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { createContext, ReactNode, useContext, useEffect, useMemo, useRef, useState } from "react";
-import type { PaintingDTO } from "@/lib/dto";
-import { addCartItem, clearCart as clearCartApi, fetchCart, removeCartItem, updateCartItem } from "@/lib/api/public";
+import { createContext, ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import type { PaintingDTO } from '@/lib/dto';
+import { addCartItem, clearCart as clearCartApi, fetchCart, removeCartItem, updateCartItem } from '@/lib/api/public';
 
 export type CartItem = {
   painting: PaintingDTO;
@@ -36,7 +36,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     const load = async () => {
       try {
         const data = await fetchCart();
-        setItems(data.items.map((item) => ({ painting: item.painting, quantity: item.quantity })));
+        setItems(data.items.map(item => ({ painting: item.painting, quantity: item.quantity })));
       } catch {
         setItems([]);
       }
@@ -45,7 +45,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const addToCart = (painting: PaintingDTO, quantity = 1) => {
-    if (painting.availability === "sold") return;
+    if (painting.availability === 'sold') return;
     const key = painting.id;
     const nextMutation = (lastMutationByItem.current[key] ?? 0) + 1;
     lastMutationByItem.current[key] = nextMutation;
@@ -53,14 +53,12 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     // Optimistic update: update local quantity immediately
     let newQuantity = quantity;
     let existed = false;
-    setItems((prev) => {
-      const existing = prev.find((item) => item.painting.id === key);
+    setItems(prev => {
+      const existing = prev.find(item => item.painting.id === key);
       if (existing) {
         newQuantity = existing.quantity + quantity;
         existed = true;
-        return prev.map((item) =>
-          item.painting.id === key ? { ...item, quantity: newQuantity } : item
-        );
+        return prev.map(item => (item.painting.id === key ? { ...item, quantity: newQuantity } : item));
       }
       return [...prev, { painting, quantity }];
     });
@@ -72,7 +70,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           : await addCartItem({ paintingId: key, quantity: newQuantity });
 
         if (lastMutationByItem.current[key] === nextMutation) {
-          setItems(data.items.map((item) => ({ painting: item.painting, quantity: item.quantity })));
+          setItems(data.items.map(item => ({ painting: item.painting, quantity: item.quantity })));
         }
       } catch {
         // keep optimistic state on failure
@@ -87,9 +85,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       setDeleting(true);
       try {
         const data = await removeCartItem(id);
-        setItems(data.items.map((item) => ({ painting: item.painting, quantity: item.quantity })));
+        setItems(data.items.map(item => ({ painting: item.painting, quantity: item.quantity })));
       } catch {
-        setItems((prev) => prev.filter((item) => item.painting.id !== id));
+        setItems(prev => prev.filter(item => item.painting.id !== id));
       } finally {
         setDeleting(false);
         setUpdatingId(undefined);
@@ -103,14 +101,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       setUpdatingId(id);
       try {
         const data = await updateCartItem(id, quantity);
-        setItems(data.items.map((item) => ({ painting: item.painting, quantity: item.quantity })));
+        setItems(data.items.map(item => ({ painting: item.painting, quantity: item.quantity })));
       } catch {
-        setItems((prev) =>
-          prev.map((item) =>
-            item.painting.id === id
-              ? { ...item, quantity: Math.max(1, quantity) }
-              : item
-          )
+        setItems(prev =>
+          prev.map(item => (item.painting.id === id ? { ...item, quantity: Math.max(1, quantity) } : item))
         );
       } finally {
         setUpdatingId(undefined);
@@ -125,7 +119,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       setDeleting(true);
       try {
         const data = await clearCartApi();
-        setItems(data.items.map((item) => ({ painting: item.painting, quantity: item.quantity })));
+        setItems(data.items.map(item => ({ painting: item.painting, quantity: item.quantity })));
       } catch {
         setItems([]);
       } finally {
@@ -136,19 +130,23 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     void run();
   };
 
-  const subtotal = useMemo(
-    () => items.reduce((sum, item) => sum + item.painting.price * item.quantity, 0),
-    [items]
-  );
+  const subtotal = useMemo(() => items.reduce((sum, item) => sum + item.painting.price * item.quantity, 0), [items]);
 
-  const totalItems = useMemo(
-    () => items.reduce((sum, item) => sum + item.quantity, 0),
-    [items]
-  );
+  const totalItems = useMemo(() => items.reduce((sum, item) => sum + item.quantity, 0), [items]);
 
   return (
     <CartContext.Provider
-      value={{ items, addToCart, removeFromCart, updateQuantity, clearCart, subtotal, totalItems, deleting, updatingId }}
+      value={{
+        items,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart,
+        subtotal,
+        totalItems,
+        deleting,
+        updatingId,
+      }}
     >
       {children}
     </CartContext.Provider>
@@ -157,6 +155,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
 export const useCart = () => {
   const context = useContext(CartContext);
-  if (!context) throw new Error("useCart must be used within a CartProvider");
+  if (!context) throw new Error('useCart must be used within a CartProvider');
   return context;
 };

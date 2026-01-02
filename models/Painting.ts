@@ -1,4 +1,4 @@
-import { Schema, Types, model, models } from "mongoose";
+import { Schema, Types, model, models } from 'mongoose';
 
 export interface PaintingDoc {
   title: string;
@@ -9,8 +9,8 @@ export interface PaintingDoc {
   description: string;
   image: string;
   tags: string[];
-  availability: "in-stock" | "sold";
-  categoryId: Types.ObjectId; 
+  availability: 'in-stock' | 'sold';
+  categoryId: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
   blog: string;
@@ -30,16 +30,16 @@ const PaintingSchema = new Schema<PaintingDoc>(
       required: true, // Markdown content
     },
     tags: [{ type: String }],
-    categoryId: { 
-      type:  Schema.Types.ObjectId, 
+    categoryId: {
+      type: Schema.Types.ObjectId,
       required: true,
-      ref: 'Category' 
+      ref: 'Category',
     },
-    availability: { type: String, enum: ["in-stock", "sold"], default: "in-stock", index: true },
+    availability: { type: String, enum: ['in-stock', 'sold'], default: 'in-stock', index: true },
   },
   {
     timestamps: true,
   }
 );
 
-export default models.Painting || model<PaintingDoc>("Painting", PaintingSchema);
+export default models.Painting || model<PaintingDoc>('Painting', PaintingSchema);

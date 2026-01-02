@@ -1,36 +1,32 @@
-"use client";
+'use client';
 
-import { useRef, useState } from "react";
-import { toast } from "react-toastify";
-import Button from "@/components/Button";
-import Image from "next/image";
+import { useRef, useState } from 'react';
+import { toast } from 'react-toastify';
+import Button from '@/components/Button';
+import Image from 'next/image';
 
 interface GalleryFormProps {
-  onSubmit: (data: {
-    name: string;
-    images: File[];
-    imageNames: string[];
-  }) => void;
+  onSubmit: (data: { name: string; images: File[]; imageNames: string[] }) => void;
   isLoading?: boolean;
 }
 
 const GALLERY_NAMES = [
-  "Contemporary / Modern Art",
-  "Portrait Paintings", 
-  "Landscape Paintings",
-  "Abstract Art"
+  'Contemporary / Modern Art',
+  'Portrait Paintings',
+  'Landscape Paintings',
+  'Abstract Art',
 ] as const;
 
 const GalleryForm = ({ onSubmit, isLoading = false }: GalleryFormProps) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const [galleryName, setGalleryName] = useState("");
+  const [galleryName, setGalleryName] = useState('');
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [imageNames, setImageNames] = useState<string[]>([]);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
-  const [pendingPreview, setPendingPreview] = useState<string>("");
-  const [pendingName, setPendingName] = useState("");
+  const [pendingPreview, setPendingPreview] = useState<string>('');
+  const [pendingName, setPendingName] = useState('');
   const triggerFileSelect = () => fileInputRef.current?.click();
   const handleFiles = (files: FileList | null) => {
     if (!files) return;
@@ -47,28 +43,24 @@ const GalleryForm = ({ onSubmit, isLoading = false }: GalleryFormProps) => {
 
   const addPendingImage = () => {
     if (!pendingFile) {
-      toast.error("Please select an image");
+      toast.error('Please select an image');
       return;
     }
     if (!pendingName.trim()) {
-      toast.error("Please enter an image name");
+      toast.error('Please enter an image name');
       return;
     }
     const trimmedName = pendingName.trim();
 
-    const isDuplicateFile = imageFiles.some(
-      (file) => file.name === pendingFile.name && file.size === pendingFile.size
-    );
+    const isDuplicateFile = imageFiles.some(file => file.name === pendingFile.name && file.size === pendingFile.size);
     if (isDuplicateFile) {
-      toast.error("This image is already added");
+      toast.error('This image is already added');
       return;
     }
 
-    const isDuplicateName = imageNames.some(
-      (name) => name.toLowerCase() === trimmedName.toLowerCase()
-    );
+    const isDuplicateName = imageNames.some(name => name.toLowerCase() === trimmedName.toLowerCase());
     if (isDuplicateName) {
-      toast.error("Image name must be unique");
+      toast.error('Image name must be unique');
       return;
     }
 
@@ -76,10 +68,10 @@ const GalleryForm = ({ onSubmit, isLoading = false }: GalleryFormProps) => {
     setImagePreviews([...imagePreviews, pendingPreview]);
     setImageNames([...imageNames, trimmedName]);
     setPendingFile(null);
-    setPendingPreview("");
-    setPendingName("");
+    setPendingPreview('');
+    setPendingName('');
     if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      fileInputRef.current.value = '';
     }
   };
 
@@ -93,11 +85,11 @@ const GalleryForm = ({ onSubmit, isLoading = false }: GalleryFormProps) => {
     e.preventDefault();
 
     if (!galleryName) {
-      toast.error("Please select a gallery name");
+      toast.error('Please select a gallery name');
       return;
     }
     if (imageFiles.length === 0) {
-      toast.error("Please upload at least one image");
+      toast.error('Please upload at least one image');
       return;
     }
 
@@ -109,18 +101,16 @@ const GalleryForm = ({ onSubmit, isLoading = false }: GalleryFormProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className='space-y-6'>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Gallery Name
-        </label>
+        <label className='block text-sm font-medium text-gray-700 mb-2'>Gallery Name</label>
         <select
           value={galleryName}
-          onChange={(e) => setGalleryName(e.target.value)}
-          className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none"
+          onChange={e => setGalleryName(e.target.value)}
+          className='w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none'
         >
-          <option value="">Select a gallery name</option>
-          {GALLERY_NAMES.map((name) => (
+          <option value=''>Select a gallery name</option>
+          {GALLERY_NAMES.map(name => (
             <option key={name} value={name}>
               {name}
             </option>
@@ -129,49 +119,49 @@ const GalleryForm = ({ onSubmit, isLoading = false }: GalleryFormProps) => {
       </div>
 
       <input
-        type="text"
-        placeholder="Image Name"
+        type='text'
+        placeholder='Image Name'
         value={pendingName}
-        onChange={(e) => setPendingName(e.target.value)}
-        className="w-full rounded-xl border border-gray-300 px-4 py-3"
+        onChange={e => setPendingName(e.target.value)}
+        className='w-full rounded-xl border border-gray-300 px-4 py-3'
       />
 
-      <div className="space-y-3">
+      <div className='space-y-3'>
         <div
           onDrop={handleDrop}
-          onDragOver={(e) => e.preventDefault()}
+          onDragOver={e => e.preventDefault()}
           onClick={triggerFileSelect}
-          className="relative h-48 overflow-hidden rounded-2xl border border-gray-200 cursor-pointer"
+          className='relative h-48 overflow-hidden rounded-2xl border border-gray-200 cursor-pointer'
         >
           {pendingPreview ? (
-            <Image src={pendingPreview} alt="" width={100} height={100} className="w-full h-full object-cover" />
+            <Image src={pendingPreview} alt='' width={100} height={100} className='w-full h-full object-cover' />
           ) : (
-            <div className="flex h-full items-center justify-center text-sm text-gray-500">
+            <div className='flex h-full items-center justify-center text-sm text-gray-500'>
               Drag and drop file here or browse
             </div>
           )}
           {pendingPreview && (
             <button
-              type="button"
+              type='button'
               onClick={() => {
                 setPendingFile(null);
-                setPendingPreview("");
-                setPendingName("");
+                setPendingPreview('');
+                setPendingName('');
                 if (fileInputRef.current) {
-                  fileInputRef.current.value = "";
+                  fileInputRef.current.value = '';
                 }
               }}
-              className="absolute right-3 top-3 rounded-full bg-black/40 px-2 py-1 text-xs text-white"
+              className='absolute right-3 top-3 rounded-full bg-black/40 px-2 py-1 text-xs text-white'
             >
               ✕
             </button>
           )}
         </div>
         <button
-          type="button"
+          type='button'
           onClick={addPendingImage}
           disabled={!pendingPreview}
-          className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm disabled:opacity-50"
+          className='w-full rounded-xl border border-gray-300 px-4 py-3 text-sm disabled:opacity-50'
         >
           Add
         </button>
@@ -182,38 +172,32 @@ const GalleryForm = ({ onSubmit, isLoading = false }: GalleryFormProps) => {
         >
           Browse file
         </button> */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          hidden
-          onChange={(e) => handleFiles(e.target.files)}
-        />
+        <input ref={fileInputRef} type='file' accept='image/*' hidden onChange={e => handleFiles(e.target.files)} />
       </div>
 
       {/* Preview Thumbnails */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      <div className='grid grid-cols-2 sm:grid-cols-3 gap-4'>
         {imagePreviews.map((src, index) => (
-          <div key={index} className="relative overflow-hidden rounded-lg border border-gray-200">
-            <Image src={src} alt="" width={100} height={100} className="h-32 w-full object-cover" />
+          <div key={index} className='relative overflow-hidden rounded-lg border border-gray-200'>
+            <Image src={src} alt='' width={100} height={100} className='h-32 w-full object-cover' />
             <button
-              type="button"
+              type='button'
               onClick={() => removeImage(index)}
-              className="absolute right-2 top-2 rounded bg-white/80 p-1 text-xs text-red-600"
+              className='absolute right-2 top-2 rounded bg-white/80 p-1 text-xs text-red-600'
             >
               🗑
             </button>
-            <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-2 py-1 text-xs !text-white">
-              {imageNames[index] || "Untitled"}
+            <div className='absolute bottom-0 left-0 right-0 bg-black/60 px-2 py-1 text-xs !text-white'>
+              {imageNames[index] || 'Untitled'}
             </div>
           </div>
         ))}
       </div>
 
       {/* Submit */}
-      <div className="flex justify-end">
-        <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Uploading..." : "Submit"}
+      <div className='flex justify-end'>
+        <Button type='submit' disabled={isLoading}>
+          {isLoading ? 'Uploading...' : 'Submit'}
         </Button>
       </div>
     </form>

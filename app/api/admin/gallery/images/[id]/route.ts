@@ -1,14 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
-import Image from "@/models/Image";
-import Gallery from "@/models/gallery";
-import { dbConnect } from "@/lib/db";
-import { deleteFromCloudinary } from "../../../../cloudinary";
+import { NextRequest, NextResponse } from 'next/server';
+import Image from '@/models/Image';
+import Gallery from '@/models/gallery';
+import { dbConnect } from '@/lib/db';
+import { deleteFromCloudinary } from '../../../../cloudinary';
 // import { requireRole } from "@/lib/rbac";
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     // const authError = await requireRole(request, ["ADMIN", "SUPER_ADMIN"]);
     // if (authError) return authError;
@@ -19,7 +16,7 @@ export async function DELETE(
     // Find the image
     const image = await Image.findById(imageId);
     if (!image) {
-      return NextResponse.json({ error: "Image not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Image not found' }, { status: 404 });
     }
 
     // Delete from Cloudinary
@@ -31,26 +28,19 @@ export async function DELETE(
         await deleteFromCloudinary(publicId);
       }
     } catch (cloudinaryError) {
-      console.error("Cloudinary deletion error:", cloudinaryError);
+      console.error('Cloudinary deletion error:', cloudinaryError);
       // Continue with database deletion even if Cloudinary fails
     }
 
     // Remove image reference from gallery
-    await Gallery.updateMany(
-      { imageIds: imageId },
-      { $pull: { imageIds: imageId } }
-    );
+    await Gallery.updateMany({ imageIds: imageId }, { $pull: { imageIds: imageId } });
 
     // Delete image from database
     await Image.findByIdAndDelete(imageId);
 
-    return NextResponse.json({ message: "Image deleted successfully" });
-
+    return NextResponse.json({ message: 'Image deleted successfully' });
   } catch (error) {
-    console.error("Delete image error:", error);
-    return NextResponse.json(
-      { error: "Failed to delete image" },
-      { status: 500 }
-    );
+    console.error('Delete image error:', error);
+    return NextResponse.json({ error: 'Failed to delete image' }, { status: 500 });
   }
 }

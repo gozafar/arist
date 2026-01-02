@@ -1,9 +1,9 @@
-import { Schema, Types, model, models } from "mongoose";
+import { Schema, Types, model, models } from 'mongoose';
 
 export interface ImageDoc {
-  url: string;         // Cloudinary secure_url
-  name: string;        // Image name
-  galleryId: Types.ObjectId;  // Reference to parent gallery
+  url: string; // Cloudinary secure_url
+  name: string; // Image name
+  galleryId: Types.ObjectId; // Reference to parent gallery
   createdAt: Date;
   updatedAt: Date;
 }
@@ -23,7 +23,7 @@ const ImageSchema = new Schema<ImageDoc>(
     },
     galleryId: {
       type: Schema.Types.ObjectId,
-      ref: "Gallery",
+      ref: 'Gallery',
       required: true,
       index: true,
     },
@@ -33,4 +33,4 @@ const ImageSchema = new Schema<ImageDoc>(
 
 ImageSchema.index({ galleryId: 1, createdAt: -1 });
 
-export default models.Image || model<ImageDoc>("Image", ImageSchema);
+export default models.Image || model<ImageDoc>('Image', ImageSchema);

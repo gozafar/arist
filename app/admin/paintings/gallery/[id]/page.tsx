@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useEffect, useState, use, useMemo } from "react";
-import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
-import { UpdateGallery } from "@/lib/api/admin";
-import GalleryModal from "@/components/admin/GalleryModal";
-import Image from "next/image";
+import { useEffect, useState, use, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
+import { UpdateGallery } from '@/lib/api/admin';
+import GalleryModal from '@/components/admin/GalleryModal';
+import Image from 'next/image';
 
 interface GalleryImage {
   _id: string;
@@ -27,18 +27,14 @@ interface EditableImage {
   isDeleted?: boolean;
 }
 
-export default function EditGalleryPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default function EditGalleryPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const resolvedParams = use(params);
   const galleryId = resolvedParams.id;
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [galleryName, setGalleryName] = useState("");
+  const [galleryName, setGalleryName] = useState('');
   const [images, setImages] = useState<EditableImage[]>([]);
   // const [initialGalleryName, setInitialGalleryName] = useState("");
   const [initialImages, setInitialImages] = useState<EditableImage[]>([]);
@@ -46,13 +42,16 @@ export default function EditGalleryPage({
   const [imageToDelete, setImageToDelete] = useState<string | null>(null);
 
   // Create a dummy gallery object for GalleryModal with image deletion context
-  const dummyGallery = useMemo(() => ({
-    _id: imageToDelete || '',
-    name: 'Image',
-    imageIds: [{ _id: imageToDelete || '', url: '', name: 'Image' }], // Show 1 image
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }), [imageToDelete]);
+  const dummyGallery = useMemo(
+    () => ({
+      _id: imageToDelete || '',
+      name: 'Image',
+      imageIds: [{ _id: imageToDelete || '', url: '', name: 'Image' }], // Show 1 image
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }),
+    [imageToDelete]
+  );
 
   useEffect(() => {
     loadData();
@@ -83,35 +82,25 @@ export default function EditGalleryPage({
         );
       } else {
         // No gallery data in URL params - show error or redirect
-        toast.error("Gallery data not found");
-        router.push("/admin/paintings/gallery");
+        toast.error('Gallery data not found');
+        router.push('/admin/paintings/gallery');
         return;
       }
     } catch (err) {
-      console.error("Load error:", err);
-      toast.error("Failed to load gallery");
-      router.push("/admin/paintings/gallery");
+      console.error('Load error:', err);
+      toast.error('Failed to load gallery');
+      router.push('/admin/paintings/gallery');
     }
     setLoading(false);
   };
 
   const updateImageName = (id: string, value: string) => {
-    setImages((prev) =>
-      prev.map((img) =>
-        img._id === id ? { ...img, name: value } : img
-      )
-    );
+    setImages(prev => prev.map(img => (img._id === id ? { ...img, name: value } : img)));
   };
 
   const replaceImage = (id: string, file: File) => {
     const previewUrl = URL.createObjectURL(file);
-    setImages((prev) =>
-      prev.map((img) =>
-        img._id === id
-          ? { ...img, file, url: previewUrl }
-          : img
-      )
-    );
+    setImages(prev => prev.map(img => (img._id === id ? { ...img, file, url: previewUrl } : img)));
   };
 
   const deleteImage = (id: string) => {
@@ -123,13 +112,7 @@ export default function EditGalleryPage({
     if (!imageToDelete) return;
 
     // Mark image as deleted locally - no API call
-    setImages((prev) =>
-      prev.map((img) =>
-        img._id === imageToDelete
-          ? { ...img, isDeleted: true }
-          : img
-      )
-    );
+    setImages(prev => prev.map(img => (img._id === imageToDelete ? { ...img, isDeleted: true } : img)));
 
     toast.success('Image marked for deletion');
     setDeleteModalOpen(false);
@@ -146,31 +129,31 @@ export default function EditGalleryPage({
     setSubmitting(true);
 
     try {
-      const activeImages = images.filter((img) => !img.isDeleted);
+      const activeImages = images.filter(img => !img.isDeleted);
 
       if (activeImages.length === 0) {
-        toast.error("At least one image is required");
+        toast.error('At least one image is required');
         setSubmitting(false);
         return;
       }
 
-      const hasNameErrors = activeImages.some((img) => !img.name.trim());
+      const hasNameErrors = activeImages.some(img => !img.name.trim());
       if (hasNameErrors) {
-        toast.error("All images must have a name");
+        toast.error('All images must have a name');
         setSubmitting(false);
         return;
       }
 
-      const uniqueNames = new Set(activeImages.map((img) => img.name.trim().toLowerCase()));
+      const uniqueNames = new Set(activeImages.map(img => img.name.trim().toLowerCase()));
       if (uniqueNames.size !== activeImages.length) {
-        toast.error("Image names must be unique");
+        toast.error('Image names must be unique');
         setSubmitting(false);
         return;
       }
 
       const imageDiffs = images
-        .map((img) => {
-          const initial = initialImages.find((orig) => orig._id === img._id);
+        .map(img => {
+          const initial = initialImages.find(orig => orig._id === img._id);
           const nameChanged = initial?.name !== img.name;
           const replaced = Boolean(img.file);
           const deleted = Boolean(img.isDeleted);
@@ -188,146 +171,141 @@ export default function EditGalleryPage({
       const hasImageChange = imageDiffs.length > 0;
 
       if (!hasImageChange) {
-        toast.info("No changes to save");
+        toast.info('No changes to save');
         setSubmitting(false);
         return;
       }
 
       const formData = new FormData();
-      formData.append("name", galleryName); // Keep current gallery name
+      formData.append('name', galleryName); // Keep current gallery name
 
       if (hasImageChange) {
-        formData.append(
-          "imagesMeta",
-          JSON.stringify(
-            imageDiffs
-          )
-        );
+        formData.append('imagesMeta', JSON.stringify(imageDiffs));
 
-        images.forEach((img) => {
+        images.forEach(img => {
           if (img.file) {
-            formData.append("replacedImages", img.file);
-            formData.append("replacedImageIds", img._id);
+            formData.append('replacedImages', img.file);
+            formData.append('replacedImageIds', img._id);
           }
         });
       }
 
       await UpdateGallery(galleryId, formData);
-      toast.success("Gallery updated");
-      router.push("/admin/paintings/gallery?updated=true");
+      toast.success('Gallery updated');
+      router.push('/admin/paintings/gallery?updated=true');
     } catch (err) {
-      console.error("Update error:", err);
-      toast.error("Failed to update gallery");
+      console.error('Update error:', err);
+      toast.error('Failed to update gallery');
     } finally {
       setSubmitting(false);
     }
   };
 
   if (loading) {
-    return <p className="text-center py-20">Loading...</p>;
+    return <p className='text-center py-20'>Loading...</p>;
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10 space-y-8">
-      <div className="flex flex-col gap-2">
-        <p className="text-xs uppercase tracking-[0.3em] text-white/50">Admin · Gallery</p>
-        <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className='mx-auto max-w-6xl px-4 py-10 space-y-8'>
+      <div className='flex flex-col gap-2'>
+        <p className='text-xs uppercase tracking-[0.3em] text-white/50'>Admin · Gallery</p>
+        <div className='flex flex-wrap items-center justify-between gap-3'>
           <div>
-            <h1 className="text-3xl font-semibold text-white">Edit Gallery</h1>
-            <p className="text-white/70 mt-1">
+            <h1 className='text-3xl font-semibold text-white'>Edit Gallery</h1>
+            <p className='text-white/70 mt-1'>
               Update the category and images. Changes save when you click “Update Gallery”.
             </p>
           </div>
-          <span className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs text-white/70">
-            {images.filter((img) => !img.isDeleted).length} image(s)
+          <span className='rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs text-white/70'>
+            {images.filter(img => !img.isDeleted).length} image(s)
           </span>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="card-glass rounded-2xl border border-white/10 bg-white/5 p-6 space-y-4">
-          <div className="flex items-center justify-between">
+      <form onSubmit={handleSubmit} className='space-y-6'>
+        <div className='card-glass rounded-2xl border border-white/10 bg-white/5 p-6 space-y-4'>
+          <div className='flex items-center justify-between'>
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-white/50">Details</p>
-              <h2 className="text-lg font-semibold text-white">Gallery Info</h2>
+              <p className='text-xs uppercase tracking-[0.2em] text-white/50'>Details</p>
+              <h2 className='text-lg font-semibold text-white'>Gallery Info</h2>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-4">
+          <div className='grid grid-cols-1 gap-4'>
             <div>
-              <label className="block text-sm text-white/70 mb-2">Gallery Name</label>
-              <div className="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-white/70">
-                {galleryName || "Loading..."}
+              <label className='block text-sm text-white/70 mb-2'>Gallery Name</label>
+              <div className='w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-white/70'>
+                {galleryName || 'Loading...'}
               </div>
-              <p className="text-xs text-white/50 mt-1">Gallery name cannot be changed</p>
+              <p className='text-xs text-white/50 mt-1'>Gallery name cannot be changed</p>
             </div>
           </div>
         </div>
 
-        <div className="card-glass rounded-2xl border border-white/10 bg-white/5 p-6 space-y-5">
-          <div className="flex items-center justify-between">
+        <div className='card-glass rounded-2xl border border-white/10 bg-white/5 p-6 space-y-5'>
+          <div className='flex items-center justify-between'>
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-white/50">Images</p>
-              <h2 className="text-lg font-semibold text-white">Manage Images</h2>
-              <p className="text-xs text-white/60 mt-1">Rename, replace, or remove existing images.</p>
+              <p className='text-xs uppercase tracking-[0.2em] text-white/50'>Images</p>
+              <h2 className='text-lg font-semibold text-white'>Manage Images</h2>
+              <p className='text-xs text-white/60 mt-1'>Rename, replace, or remove existing images.</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
             {images
-              .filter((img) => !img.isDeleted)
-              .map((img) => {
+              .filter(img => !img.isDeleted)
+              .map(img => {
                 const fileInputId = `replace-${img._id}`;
                 return (
                   <div
                     key={img._id}
-                    className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/5 shadow-sm transition hover:border-white/20"
+                    className='group relative overflow-hidden rounded-xl border border-white/10 bg-white/5 shadow-sm transition hover:border-white/20'
                   >
-                    <div className="relative h-40 w-full">
+                    <div className='relative h-40 w-full'>
                       <Image
                         src={img.url}
                         alt={img.name}
                         fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                        loading="lazy"
+                        className='object-cover'
+                        sizes='(max-width: 768px) 100vw, 33vw'
+                        loading='lazy'
                         quality={75}
-                        placeholder="blur"
-                        blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiB2aWV3Qm94PSIwIDAgNDAwIDQwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YxZjFmMSIvPjwvc3ZnPg=="
+                        placeholder='blur'
+                        blurDataURL='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiB2aWV3Qm94PSIwIDAgNDAwIDQwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YxZjFmMSIvPjwvc3ZnPg=='
                       />
-                      <span className="absolute left-3 top-3 rounded-full bg-black/60 px-2 py-1 text-[10px] uppercase tracking-[0.15em] !text-white">
+                      <span className='absolute left-3 top-3 rounded-full bg-black/60 px-2 py-1 text-[10px] uppercase tracking-[0.15em] !text-white'>
                         Existing
                       </span>
                     </div>
-                    <div className="space-y-3 p-4">
+                    <div className='space-y-3 p-4'>
                       <div>
-                        <label className="block text-xs text-white/60 mb-1">Image Name</label>
+                        <label className='block text-xs text-white/60 mb-1'>Image Name</label>
                         <input
                           value={img.name}
-                          onChange={(e) => updateImageName(img._id, e.target.value)}
-                          className="w-full rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white outline-none transition focus:border-white/30"
-                          placeholder="Image name"
+                          onChange={e => updateImageName(img._id, e.target.value)}
+                          className='w-full rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white outline-none transition focus:border-white/30'
+                          placeholder='Image name'
                         />
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      <div className='flex items-center gap-2'>
                         <label
                           htmlFor={fileInputId}
-                          className="flex-1 cursor-pointer rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-xs text-white/80 text-center transition hover:border-white/30"
+                          className='flex-1 cursor-pointer rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-xs text-white/80 text-center transition hover:border-white/30'
                         >
                           Replace Image
                         </label>
                         <input
                           id={fileInputId}
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={(e) => e.target.files && replaceImage(img._id, e.target.files[0])}
+                          type='file'
+                          accept='image/*'
+                          className='hidden'
+                          onChange={e => e.target.files && replaceImage(img._id, e.target.files[0])}
                         />
                         <button
-                          type="button"
+                          type='button'
                           onClick={() => deleteImage(img._id)}
-                          className="rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-300 transition hover:bg-red-500/20"
+                          className='rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-300 transition hover:bg-red-500/20'
                         >
                           Delete
                         </button>
@@ -339,21 +317,12 @@ export default function EditGalleryPage({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-end gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            disabled={submitting}
-            className="button-outline text-sm"
-          >
+        <div className='flex flex-wrap items-center justify-end gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-4'>
+          <button type='button' onClick={() => router.back()} disabled={submitting} className='button-outline text-sm'>
             Cancel
           </button>
-          <button
-            type="submit"
-            disabled={submitting}
-            className="button-primary px-6 py-2 text-sm"
-          >
-            {submitting ? "Updating..." : "Update Gallery"}
+          <button type='submit' disabled={submitting} className='button-primary px-6 py-2 text-sm'>
+            {submitting ? 'Updating...' : 'Update Gallery'}
           </button>
         </div>
       </form>
@@ -364,7 +333,7 @@ export default function EditGalleryPage({
         isOpen={deleteModalOpen}
         onClose={cancelDelete}
         onDelete={confirmDeleteImage}
-        mode="delete"
+        mode='delete'
       />
     </div>
   );

@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { createContext, ReactNode, useContext, useEffect, useMemo, useRef, useState } from "react";
-import type { PaintingDTO } from "@/lib/dto";
-import { getPaintings } from "@/lib/api/public";
+import { createContext, ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import type { PaintingDTO } from '@/lib/dto';
+import { getPaintings } from '@/lib/api/public';
 import {
   adminCreatePainting,
   adminDeletePainting,
   adminToggleAvailability,
-  adminUpdatePainting
-} from "@/lib/api/admin";
+  adminUpdatePainting,
+} from '@/lib/api/admin';
 
 type Painting = PaintingDTO;
 
-type NewPaintingInput = Omit<PaintingDTO, "id" | "createdAt" | "updatedAt" | "year"> & { year?: number };
+type NewPaintingInput = Omit<PaintingDTO, 'id' | 'createdAt' | 'updatedAt' | 'year'> & { year?: number };
 
 type PaintingContextValue = {
   paintings: Painting[];
@@ -50,7 +50,7 @@ export const PaintingProvider = ({ children }: { children: ReactNode }) => {
     const create = async () => {
       try {
         const saved = await adminCreatePainting(painting as FormData);
-        setPaintings((prev) => [saved, ...prev]);
+        setPaintings(prev => [saved, ...prev]);
       } catch (error) {
         // For FormData, we can't create a local fallback
         console.error('Failed to create painting:', error);
@@ -63,11 +63,9 @@ export const PaintingProvider = ({ children }: { children: ReactNode }) => {
     const apply = async () => {
       try {
         const updated = await adminUpdatePainting(id, painting);
-        setPaintings((prev) => prev.map((p) => (p.id === id ? updated : p)));
+        setPaintings(prev => prev.map(p => (p.id === id ? updated : p)));
       } catch {
-        setPaintings((prev) =>
-          prev.map((p) => (p.id === id ? { ...p, updatedAt: new Date().toISOString() } : p))
-        );
+        setPaintings(prev => prev.map(p => (p.id === id ? { ...p, updatedAt: new Date().toISOString() } : p)));
       }
     };
     void apply();
@@ -80,24 +78,20 @@ export const PaintingProvider = ({ children }: { children: ReactNode }) => {
       } catch {
         // ignore delete failure for now
       }
-      setPaintings((prev) => prev.filter((p) => p.id !== id));
+      setPaintings(prev => prev.filter(p => p.id !== id));
     };
     void run();
   };
 
   const toggleAvailability = (id: string) => {
     const run = async () => {
-      const current = paintings.find((p) => p.id === id);
-      const nextAvailability = current?.availability === "sold" ? "in-stock" : "sold";
+      const current = paintings.find(p => p.id === id);
+      const nextAvailability = current?.availability === 'sold' ? 'in-stock' : 'sold';
       try {
-        const updated = await adminToggleAvailability(id, nextAvailability ?? "in-stock");
-        setPaintings((prev) => prev.map((p) => (p.id === id ? updated : p)));
+        const updated = await adminToggleAvailability(id, nextAvailability ?? 'in-stock');
+        setPaintings(prev => prev.map(p => (p.id === id ? updated : p)));
       } catch {
-        setPaintings((prev) =>
-          prev.map((p) =>
-            p.id === id ? { ...p, availability: nextAvailability ?? "in-stock" } : p
-          )
-        );
+        setPaintings(prev => prev.map(p => (p.id === id ? { ...p, availability: nextAvailability ?? 'in-stock' } : p)));
       }
     };
     void run();
@@ -113,7 +107,7 @@ export const PaintingProvider = ({ children }: { children: ReactNode }) => {
 
 export const usePaintings = () => {
   const ctx = useContext(PaintingContext);
-  if (!ctx) throw new Error("usePaintings must be used within PaintingProvider");
+  if (!ctx) throw new Error('usePaintings must be used within PaintingProvider');
   return ctx;
 };
 

@@ -1,5 +1,5 @@
 type FetchOptions = {
-  method?: "GET" | "POST" | "PATCH" | "DELETE" | "PUT";
+  method?: 'GET' | 'POST' | 'PATCH' | 'DELETE' | 'PUT';
   body?: unknown;
   headers?: Record<string, string>;
   cache?: RequestCache;
@@ -22,43 +22,40 @@ export class ApiResponseError extends Error {
 
   constructor(error: ApiError) {
     super(error.message);
-    this.name = "ApiResponseError";
+    this.name = 'ApiResponseError';
     this.status = error.status;
     this.details = error.details;
   }
 }
 
 const defaultHeaders = {
-  "Content-Type": "application/json"
+  'Content-Type': 'application/json',
 };
 
-const getBaseUrl = () => process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") || "";
+const getBaseUrl = () => process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, '') || '';
 
 let isRefreshing = false;
 let refreshQueue: Array<() => void> = [];
 
 const refreshToken = async (): Promise<void> => {
   const response = await fetch(`${getBaseUrl()}/api/auth/refresh`, {
-    method: "POST",
-    credentials: "include",
+    method: 'POST',
+    credentials: 'include',
   });
 
   if (!response.ok) {
-    throw new Error("Token refresh failed");
+    throw new Error('Token refresh failed');
   }
 };
 
 const waitForRefresh = (): Promise<void> => {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     refreshQueue.push(resolve);
   });
 };
 
-export const apiFetch = async <T>(
-  path: string,
-  options: FetchOptions = {}
-): Promise<T> => {
-  const { method = "GET", body, headers = {}, cache, next, authToken } = options;
+export const apiFetch = async <T>(path: string, options: FetchOptions = {}): Promise<T> => {
+  const { method = 'GET', body, headers = {}, cache, next, authToken } = options;
 
   const base = getBaseUrl();
   const url = `${base}${path}`;
@@ -71,7 +68,7 @@ export const apiFetch = async <T>(
   };
 
   if (isFormData) {
-    delete mergedHeaders["Content-Type"];
+    delete mergedHeaders['Content-Type'];
   }
 
   if (authToken) {
@@ -85,7 +82,7 @@ export const apiFetch = async <T>(
       body: isFormData ? body : body ? JSON.stringify(body) : undefined,
       cache,
       next,
-      credentials: "include",
+      credentials: 'include',
     });
   };
 
@@ -113,28 +110,19 @@ export const apiFetch = async <T>(
 
   /* ================= RESPONSE PARSING ================= */
   const text = await response.text();
-  const contentType = response.headers.get("content-type") || "";
-  const isJson = contentType.includes("application/json");
+  const contentType = response.headers.get('content-type') || '';
+  const isJson = contentType.includes('application/json');
 
-  const payload = text && isJson
-    ? (JSON.parse(text) as unknown)
-    : (text as unknown);
+  const payload = text && isJson ? (JSON.parse(text) as unknown) : (text as unknown);
 
   /* ================= ERROR HANDLING ================= */
   if (!response.ok) {
     throw new ApiResponseError({
       status: response.status,
       message: (() => {
-        const record =
-          isJson && payload && typeof payload === "object"
-            ? (payload as Record<string, unknown>)
-            : null;
+        const record = isJson && payload && typeof payload === 'object' ? (payload as Record<string, unknown>) : null;
 
-        return (
-          (record?.message as string) ||
-          (record?.error as string) ||
-          response.statusText
-        );
+        return (record?.message as string) || (record?.error as string) || response.statusText;
       })(),
       details: payload,
     });
