@@ -13,28 +13,18 @@ const AdminPaintingsPage = () => {
   const editRef = useRef<HTMLDivElement | null>(null);
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 8;
+  const [loading, setLoading] = useState(false);
 
   const totalPages = Math.max(1, Math.ceil(paintings.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
   const start = (currentPage - 1) * PAGE_SIZE;
   const paginated = paintings.slice(start, start + PAGE_SIZE);
 
-  const handleEditSubmit = (payload: FormData) => {
+  const handleEditSubmit = async (payload: FormData) => {
     if (editing) {
-      // Check if there's an image file in the FormData
+      setLoading(true);
+      // Check if there's an image file in FormData
       const imageFile = payload.get('image') as File;
-
-      console.log('=== FRONTEND DEBUG ===');
-      console.log(
-        'Image file in frontend:',
-        imageFile
-          ? {
-              name: imageFile.name,
-              size: imageFile.size,
-              type: imageFile.type,
-            }
-          : 'No image file'
-      );
 
       if (imageFile && imageFile.size > 0) {
         console.log('Sending FormData with image');
@@ -47,7 +37,7 @@ const AdminPaintingsPage = () => {
           }
         });
         // Send FormData directly when there's an image
-        updatePainting(editing.id, payload);
+        await updatePainting(editing.id, payload);
       } else {
         console.log('Sending JSON without image');
         // Extract painting data from FormData when no image
@@ -63,9 +53,10 @@ const AdminPaintingsPage = () => {
           tags: JSON.parse((payload.get('tags') as string) || '[]'),
         };
 
-        updatePainting(editing.id, paintingData);
+        await updatePainting(editing.id, paintingData);
       }
 
+      setLoading(false);
       setEditing(null);
     }
   };
@@ -89,9 +80,7 @@ const AdminPaintingsPage = () => {
       <AdminPaintingTable
         paintings={paginated}
         onEdit={p => setEditing(p)}
-        onDelete={id => {
-          if (confirm('Delete this painting?')) deletePainting(id);
-        }}
+        onDelete={deletePainting}
         onToggle={toggleAvailability}
       />
       <AdminPagination total={paintings.length} perPage={PAGE_SIZE} currentPage={currentPage} onPageChange={setPage} />

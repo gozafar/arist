@@ -2,7 +2,9 @@
 
 import { FormEvent, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
 import { Country, State, City } from 'country-state-city';
+import { toast } from 'react-toastify';
 // import { toast } from "react-toastify";
 
 // Dynamically import components
@@ -46,6 +48,7 @@ const detectCountryFromPhone = (phone: string) => {
 
 // -------------------- Component --------------------
 const AddressForm = ({ onSubmit, isLoading }: Props) => {
+  const router = useRouter();
   const [form, setForm] = useState<Address>({
     name: '',
     email: '',
@@ -79,7 +82,16 @@ const AddressForm = ({ onSubmit, isLoading }: Props) => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setFormErrors({});
-    await onSubmit?.(form);
+
+    try {
+      await onSubmit?.(form);
+      toast.success('Order created successfully');
+      // Redirect to paintings page after successful order creation
+      router.push('/paintings');
+    } catch (error) {
+      // If onSubmit throws an error, don't redirect
+      toast.error('Failed to create order');
+    }
   };
 
   // -------------------- Render --------------------

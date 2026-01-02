@@ -12,7 +12,8 @@ import path from 'path';
 export const dynamic = 'force-dynamic';
 
 export const PUT = async (req: NextRequest, context: { params: Promise<{ id: string }> }) => {
-  const { id } = await context.params;
+  const paramsId = await context.params;
+  const id = await paramsId.id;
   const authError = await requireRole(req, ['ADMIN', 'SUPER_ADMIN']);
   if (authError) return authError;
 
@@ -109,9 +110,7 @@ export const PUT = async (req: NextRequest, context: { params: Promise<{ id: str
     // Handle regular JSON payload (no image update)
     updateData = (await req.json()) as Record<string, unknown>;
   }
-  console.log(updateData, '=============>119');
   const updated = await Painting.findByIdAndUpdate(id, updateData, { new: true }).lean();
-  console.log(updated, '============>121');
   if (!updated || Array.isArray(updated)) {
     return NextResponse.json({ message: 'Not found' }, { status: 404 });
   }
@@ -120,7 +119,6 @@ export const PUT = async (req: NextRequest, context: { params: Promise<{ id: str
   if (user) await AdminLog.create({ adminId: user.userId, action: 'UPDATE_PAINTING' });
   revalidateTag('paintings', 'default');
   const { _id, ...rest } = updated;
-  console.log('Updated painting data:', rest);
   return NextResponse.json({ ...rest, id: _id?.toString?.() || id });
 };
 
@@ -140,49 +138,30 @@ export const DELETE = async (req: NextRequest, context: { params: Promise<{ id: 
 
     // Delete image from Cloudinary if it exists
     if (removed.image) {
-      // try {
-      // Extract public ID from Cloudinary URL
-      const urlParts = removed.image.split('/');
-
-      const publicIdWithExtension = urlParts[urlParts.length - 1];
-
-      const publicId = `paintings/${publicIdWithExtension.split('.')[0]}`;
-      const cloudinaryDeleted = await deleteFromCloudinary(publicId);
-
-      if (cloudinaryDeleted) {
-        console.log('Successfully deleted from Cloudinary:', publicId);
-      } else {
-        console.log('Failed to delete from Cloudinary:', publicId);
+      try {
+        // Extract public ID from Cloudinary URL
+        const urlParts = removed.image.split('/');
+        const publicIdWithExtension = urlParts[urlParts.length - 1];
+        const publicId = `paintings/${publicIdWithExtension.split('.')[0]}`;
+        const cloudinaryDeleted = await deleteFromCloudinary(publicId);
+        if (!cloudinaryDeleted) {
+          return NextResponse.json({ message: 'Failed to delete image from Cloudinary' }, { status: 500 });
+        }
+      } catch {
+        return NextResponse.json({ message: 'Failed to delete image from Cloudinary' }, { status: 500 });
       }
-      // } catch (cloudinaryError) {
-      //   // console.error('Error deleting from Cloudinary:', cloudinaryError);
-      //   // Continue with database deletion even if Cloudinary fails
-      // }
-    } else {
-      // console.log('No image URL found for painting');
     }
 
     const token = req.cookies.get('access_token')?.value;
     const user = token ? verifyAccessToken(token) : null;
     if (user) {
-      // try {
       await AdminLog.create({ adminId: user.userId, action: 'DELETE_PAINTING', targetId: id });
-      // console.log('Admin log created');
-      // } catch (logError) {
-      //   // console.error('Failed to create AdminLog:', logError);
-      //   // Continue even if logging fails
-      // }
     }
 
     revalidateTag('paintings', 'default');
-    // console.log('Cache revalidated, returning success');
 
     return NextResponse.json({ status: 'ok' });
-  } catch (error) {
-    // console.error('DELETE route error:', error);
-    return NextResponse.json(
-      { message: 'Internal server error', error: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
+  } catch {
+    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
   }
 };

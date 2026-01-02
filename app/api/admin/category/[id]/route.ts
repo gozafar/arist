@@ -1,9 +1,11 @@
 import { dbConnect } from '@/lib/db';
 import { requireRole } from '@/lib/rbac';
 import Category from '@/models/Category';
+import Painting from '@/models/Painting';
 // import { promises } from "dns";
 import mongoose from 'mongoose';
 import { NextRequest, NextResponse } from 'next/server';
+import { deleteFromCloudinary } from '../../../cloudinary';
 
 // export const PUT = async (
 //     req: NextRequest,
@@ -92,7 +94,6 @@ export const PUT = async (req: NextRequest, context: { params: Promise<{ id: str
 
     return NextResponse.json(updated);
   } catch (err) {
-    console.error('PUT /categories/[id] error:', err);
     return NextResponse.json({ error: 'Failed to update category' }, { status: 500 });
   }
 };
@@ -125,7 +126,6 @@ export const GET = async (req: NextRequest, context: { params: Promise<{ id: str
 
     return NextResponse.json(category);
   } catch (err) {
-    console.error('GET /categories/[id] error:', err);
     return NextResponse.json({ error: 'Failed to fetch category' }, { status: 500 });
   }
 };
@@ -162,3 +162,69 @@ export const DELETE = async (req: NextRequest, context: { params: Promise<{ id: 
     return NextResponse.json({ error: 'Failed to delete category' }, { status: 500 });
   }
 };
+
+// export const DELETE = async (
+//   req: NextRequest,
+//   { params }: { params: { id: string } }
+// ) => {
+//   const authError = await requireRole(req, ["ADMIN", "SUPER_ADMIN"]);
+//   if (authError) return authError;
+
+//   const { id } = params;
+
+//   if (!mongoose.Types.ObjectId.isValid(id)) {
+//     return NextResponse.json(
+//       { error: "Invalid Category ID" },
+//       { status: 400 }
+//     );
+//   }
+
+//   await dbConnect();
+
+//   const session = await mongoose.startSession();
+//   const cloudinaryPublicIds: string[] = [];
+
+//   try {
+//     await session.withTransaction(async () => {
+//       const paintings = await Painting.find({ categoryId: id }, null, { session });
+
+//       for (const painting of paintings) {
+//         if (painting.image) {
+//           const urlParts = painting.image.split("/");
+//           const fileName = urlParts[urlParts.length - 1];
+//           cloudinaryPublicIds.push(`paintings/${fileName.split(".")[0]}`);
+//         }
+
+//       }
+
+//       await Painting.deleteMany({ categoryId: id }, { session });
+
+//       const deletedCategory = await Category.findByIdAndDelete(id, { session });
+//       if (!deletedCategory) {
+//         throw new Error("Category not found");
+//       }
+//     });
+
+//     // 🔥 Delete Cloudinary images AFTER DB success
+//     for (const publicId of cloudinaryPublicIds) {
+//       try {
+//         await deleteFromCloudinary(publicId);
+//       } catch (err) {
+//         console.error("Cloudinary cleanup failed:", publicId);
+//       }
+//     }
+
+//     return NextResponse.json({
+//       message: "Category and related data deleted successfully",
+//     });
+
+//   } catch (error) {
+//     console.error("Category delete error:", error);
+//     return NextResponse.json(
+//       { error: "Failed to delete category" },
+//       { status: 500 }
+//     );
+//   } finally {
+//     session.endSession();
+//   }
+// };

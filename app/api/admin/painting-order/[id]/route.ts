@@ -120,8 +120,6 @@ export async function DELETE(
       { status: 200 }
     );
   } catch (error) {
-    console.error('Error deleting admin order:', error);
-
     return NextResponse.json(
       {
         success: false,

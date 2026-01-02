@@ -56,8 +56,7 @@ export const isAuthenticated = async (): Promise<boolean> => {
     // Update last accessed time
     session.lastAccessed = Date.now();
     return true;
-  } catch (error) {
-    console.error('Authentication check failed:', error);
+  } catch {
     return false;
   }
 };
@@ -72,8 +71,7 @@ export const getCurrentAdmin = async (): Promise<JwtPayload | null> => {
     }
 
     return verifyAccessToken(accessToken);
-  } catch (error) {
-    console.error('Failed to get current admin:', error);
+  } catch {
     return null;
   }
 };
@@ -294,9 +292,8 @@ export const refreshAdminSession = async (): Promise<NextResponse | null> => {
     });
 
     return response;
-  } catch (error) {
-    console.error('Token refresh failed:', error);
-    return null;
+  } catch {
+    return NextResponse.json({ error: 'Failed to refresh session' }, { status: 500 });
   }
 };
 
@@ -325,8 +322,7 @@ export const logoutAdmin = async (): Promise<NextResponse> => {
     });
 
     return response;
-  } catch (error) {
-    console.error('Logout failed:', error);
+  } catch {
     return NextResponse.json({ error: 'Logout failed' }, { status: 500 });
   }
 };

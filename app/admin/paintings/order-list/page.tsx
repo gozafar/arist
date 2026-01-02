@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { getAllOrders, deleteOrder } from '@/lib/api/public';
 import Pagination from '@/components/Pagination';
 import Image from 'next/image';
+import DeleteModal from '@/components/admin/DeleteModal';
 
 interface Painting {
   _id: string;
@@ -36,6 +37,8 @@ export default function OrderListPage() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedOrderForDelete, setSelectedOrderForDelete] = useState<Order | null>(null);
   const PAGE_SIZE = 10;
 
   useEffect(() => {
@@ -58,7 +61,6 @@ export default function OrderListPage() {
       }
     } catch (err) {
       setError('Error fetching orders');
-      console.error('Error:', err);
     } finally {
       setLoading(false);
     }
@@ -68,21 +70,24 @@ export default function OrderListPage() {
     setSelectedOrder(order);
   };
 
-  const handleDeleteOrder = async (orderId: string) => {
-    if (!confirm('Are you sure you want to delete this order?')) {
-      return;
-    }
+  const handleDeleteClick = (order: Order) => {
+    setSelectedOrderForDelete(order);
+    setIsDeleteModalOpen(true);
+  };
 
-    setDeletingId(orderId);
+  const handleDeleteOrder = async () => {
+    if (!selectedOrderForDelete) return;
+
+    setDeletingId(selectedOrderForDelete._id);
     try {
-      const response = await deleteOrder(orderId);
+      const response = await deleteOrder(selectedOrderForDelete._id);
 
       if (response.success) {
         // Remove the deleted order from the list
-        setOrders(prevOrders => prevOrders.filter(order => order._id !== orderId));
+        setOrders(prevOrders => prevOrders.filter(order => order._id !== selectedOrderForDelete._id));
 
         // If the deleted order was the selected one, close the modal
-        if (selectedOrder?._id === orderId) {
+        if (selectedOrder?._id === selectedOrderForDelete._id) {
           setSelectedOrder(null);
         }
 
@@ -91,15 +96,23 @@ export default function OrderListPage() {
         if (currentPage > totalPages) {
           setCurrentPage(totalPages);
         }
+
+        // Close the delete modal
+        setIsDeleteModalOpen(false);
+        setSelectedOrderForDelete(null);
       } else {
         setError('Failed to delete order');
       }
     } catch (err) {
       setError('Error deleting order');
-      console.error('Error:', err);
     } finally {
       setDeletingId(null);
     }
+  };
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setSelectedOrderForDelete(null);
   };
 
   const totalPages = Math.max(1, Math.ceil(orders.length / PAGE_SIZE));
@@ -183,7 +196,7 @@ export default function OrderListPage() {
                               <button
                                 onClick={event => {
                                   event.stopPropagation();
-                                  handleDeleteOrder(order._id);
+                                  handleDeleteClick(order);
                                 }}
                                 className={`button-outline text-xs flex items-center gap-2 min-w-[60px] justify-center ${
                                   deletingId === order._id ? 'opacity-70' : ''
@@ -235,7 +248,7 @@ export default function OrderListPage() {
               </div>
               <div className='flex gap-2'>
                 <button
-                  onClick={() => handleDeleteOrder(selectedOrder._id)}
+                  onClick={() => handleDeleteClick(selectedOrder)}
                   className={`inline-flex items-center justify-center rounded-full border border-red-300 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-red-600 transition hover:border-red-400 hover:text-red-800 ${
                     deletingId === selectedOrder._id ? 'opacity-70' : ''
                   }`}
@@ -332,6 +345,16 @@ export default function OrderListPage() {
           </div>
         </div>
       )}
+
+      <DeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        onDelete={handleDeleteOrder}
+        itemName={`Order #${selectedOrderForDelete?._id?.slice(-8) || ''}`}
+        itemType='order'
+        additionalInfo='This action cannot be undone and will permanently remove the order from the system.'
+        loading={!!deletingId}
+      />
     </div>
   );
 }

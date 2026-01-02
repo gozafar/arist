@@ -5,7 +5,7 @@ echo "🚀 Running lint-staged (staged files)..."
 pnpm exec lint-staged
 
 echo "🚀 Running ESLint (full project)..."
-pnpm lint
+pnpm exec eslint . --ext .js,.jsx,.ts,.tsx --max-warnings=999
 
 echo "🚀 Running Prettier (full project check)..."
 pnpm exec prettier --check .

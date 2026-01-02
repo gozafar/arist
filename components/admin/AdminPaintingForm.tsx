@@ -48,6 +48,7 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
   const [categories, setCategories] = useState<Category[]>([]);
   const [status, setStatus] = useState<{ type: 'success' | 'error' | null; message: string } | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Fetch categories on component mount
   useEffect(() => {
@@ -106,7 +107,7 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
     return newErrors;
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const validation = validate();
     setErrors(validation);
@@ -114,6 +115,8 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
       setStatus({ type: 'error', message: 'Please fix the highlighted fields.' });
       return;
     }
+
+    setIsSubmitting(true); // Start loading
 
     // Create FormData for API call
     const formData = new FormData();
@@ -130,15 +133,22 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
     formData.append('categoryId', form.categoryId || '');
     formData.append('tags', JSON.stringify(form.tags));
 
-    // Call onSubmit with FormData
-    onSubmit(formData);
+    try {
+      // Call onSubmit with FormData
+      await onSubmit(formData);
 
-    if (mode === 'create') {
-      setForm(emptyState);
-      setPreview('');
-      setImageFile(null);
+      if (mode === 'create') {
+        setForm(emptyState);
+        setPreview('');
+        setImageFile(null);
+      }
+      setStatus({ type: 'success', message: mode === 'create' ? 'Painting added.' : 'Painting updated.' });
+    } catch (error) {
+      console.error('Form submission error:', error);
+      setStatus({ type: 'error', message: 'Failed to save painting. Please try again.' });
+    } finally {
+      setIsSubmitting(false); // Stop loading
     }
-    setStatus({ type: 'success', message: mode === 'create' ? 'Painting added.' : 'Painting updated.' });
   };
 
   return (
@@ -197,7 +207,7 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
                   Select a category
                 </option>
                 {categories.map(category => (
-                  <option key={category.id} value={category.id} className='bg-gray-800 text-white'>
+                  <option key={category.id} value={category.id} className='bg-white/5 border-white/15 text-white'>
                     {category.categoryName}
                   </option>
                 ))}

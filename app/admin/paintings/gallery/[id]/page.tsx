@@ -87,7 +87,6 @@ export default function EditGalleryPage({ params }: { params: Promise<{ id: stri
         return;
       }
     } catch (err) {
-      console.error('Load error:', err);
       toast.error('Failed to load gallery');
       router.push('/admin/paintings/gallery');
     }
@@ -194,7 +193,6 @@ export default function EditGalleryPage({ params }: { params: Promise<{ id: stri
       toast.success('Gallery updated');
       router.push('/admin/paintings/gallery?updated=true');
     } catch (err) {
-      console.error('Update error:', err);
       toast.error('Failed to update gallery');
     } finally {
       setSubmitting(false);

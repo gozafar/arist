@@ -13,7 +13,6 @@ export interface PaintingDoc {
   categoryId: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
-  blog: string;
 }
 
 const PaintingSchema = new Schema<PaintingDoc>(
@@ -25,10 +24,6 @@ const PaintingSchema = new Schema<PaintingDoc>(
     year: { type: Number, required: true },
     description: { type: String, required: true },
     image: { type: String, required: true },
-    blog: {
-      type: String,
-      required: true, // Markdown content
-    },
     tags: [{ type: String }],
     categoryId: {
       type: Schema.Types.ObjectId,

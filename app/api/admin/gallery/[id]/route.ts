@@ -250,12 +250,6 @@ async function uploadImageToCloudinary(file: File) {
   try {
     const buffer = Buffer.from(await file.arrayBuffer());
     fs.writeFileSync(tempFilePath, buffer);
-    console.log(`Uploaded file to temp path: ${tempFilePath}`);
-    console.log(`File size: ${buffer.length} bytes`);
-    console.log(`File type: ${file.type}`);
-    console.log(`File name: ${file.name}`);
-    console.log(`File lastModified: ${file.lastModified}`);
-    console.log(`File size (via file): ${file.size}`);
     return await uploadOnCloudinary(tempFilePath, 'rakhi-studio/gallery');
   } finally {
     if (fs.existsSync(tempFilePath)) {

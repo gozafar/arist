@@ -120,7 +120,7 @@ export default function CategoryModal({ category, isOpen, onClose, onSave, onDel
                 <button
                   type='submit'
                   disabled={loading}
-                  className='flex-1 bg-sand-500 hover:bg-sand-600 text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50'
+                  className='flex-1 button-primary px-4 py-2 rounded-lg disabled:opacity-50'
                 >
                   {loading ? 'Saving...' : 'Save Changes'}
                 </button>

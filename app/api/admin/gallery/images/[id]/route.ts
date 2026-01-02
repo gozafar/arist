@@ -28,7 +28,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
         await deleteFromCloudinary(publicId);
       }
     } catch (cloudinaryError) {
-      console.error('Cloudinary deletion error:', cloudinaryError);
+      return NextResponse.json({ error: 'Failed to delete image from Cloudinary' }, { status: 500 });
       // Continue with database deletion even if Cloudinary fails
     }
 
@@ -40,7 +40,6 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
 
     return NextResponse.json({ message: 'Image deleted successfully' });
   } catch (error) {
-    console.error('Delete image error:', error);
     return NextResponse.json({ error: 'Failed to delete image' }, { status: 500 });
   }
 }

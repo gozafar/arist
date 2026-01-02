@@ -18,7 +18,7 @@ type PaintingContextValue = {
   paintings: Painting[];
   addPainting: (painting: NewPaintingInput | FormData) => void;
   updatePainting: (id: string, painting: Partial<NewPaintingInput> | FormData) => void;
-  deletePainting: (id: string) => void;
+  deletePainting: (id: string) => Promise<void>;
   toggleAvailability: (id: string) => void;
   loaded: boolean;
 };
@@ -71,16 +71,13 @@ export const PaintingProvider = ({ children }: { children: ReactNode }) => {
     void apply();
   };
 
-  const deletePainting = (id: string) => {
-    const run = async () => {
-      try {
-        await adminDeletePainting(id);
-      } catch {
-        // ignore delete failure for now
-      }
-      setPaintings(prev => prev.filter(p => p.id !== id));
-    };
-    void run();
+  const deletePainting = async (id: string) => {
+    try {
+      await adminDeletePainting(id);
+    } catch {
+      // ignore delete failure for now
+    }
+    setPaintings(prev => prev.filter(p => p.id !== id));
   };
 
   const toggleAvailability = (id: string) => {
