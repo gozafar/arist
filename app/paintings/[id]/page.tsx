@@ -123,7 +123,7 @@ const PaintingDetailPage = async ({ params }: { params: Promise<{ id: string }> 
 
           {/* PRICE & ACTIONS */}
           <div className='flex flex-wrap items-center gap-4'>
-            <p className='text-3xl font-semibold text-sand-200'>${painting.price.toLocaleString()}</p>
+            <p className='text-3xl font-semibold text-sand-700'>${painting.price.toLocaleString()}</p>
 
             <AddToCartButton painting={painting} disabled={isSold} />
 

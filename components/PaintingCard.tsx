@@ -42,7 +42,7 @@ const PaintingCard = ({ painting }: { painting: PaintingDTO }) => {
         </div>
 
         {/* DESCRIPTION */}
-        <p className='text-sm leading-relaxed text-white/70 line-clamp-3'>{painting.description}</p>
+        <p className='text-sm leading-relaxed text-black/70 line-clamp-3'>{painting.description}</p>
 
         {/* FOOTER */}
         <div className='mt-auto flex items-center justify-between pt-3'>
