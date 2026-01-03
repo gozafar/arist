@@ -8,6 +8,7 @@ import { requireRole } from '@/lib/rbac';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
 
 interface ImageMeta {
   _id: string;

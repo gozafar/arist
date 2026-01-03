@@ -12,6 +12,7 @@ import '@/models/Image';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
   try {
@@ -64,6 +65,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No images provided for upload' }, { status: 400 });
     }
 
+    let lastUploadError: string | null = null;
+
     // Process images in parallel for better performance
     const imageUploadPromises = imageFiles.map(async (file, index) => {
       const imageName = imageNames[index] || file.name;
@@ -78,6 +81,8 @@ export async function POST(request: NextRequest) {
           name: imageName,
         };
       } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown upload error';
+        lastUploadError = message;
         console.error(`Failed to upload image ${imageName}:`, error);
         return null;
       }
@@ -92,7 +97,8 @@ export async function POST(request: NextRequest) {
     );
 
     if (processedImages.length === 0) {
-      throw new Error('Failed to upload any images to Cloudinary');
+      const reason = lastUploadError || 'Failed to upload any images to Cloudinary';
+      throw new Error(reason);
     }
 
     // Prepare image documents with gallery reference
