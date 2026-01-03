@@ -54,7 +54,7 @@ const Navbar = () => {
 
   const linkClass = (href: string) =>
     `relative px-3 py-2 text-sm font-medium transition ${
-      pathname === href ? 'text-sand-700' : 'text-black/70 hover:text-sand-700'
+      pathname === href ? 'text-[#0ac9bc] font-semibold' : 'text-black/80 '
     }`;
 
   return (
@@ -64,7 +64,7 @@ const Navbar = () => {
           <div className='h-10 w-10 rounded-full bg-gradient-to-br from-sand-400 via-sand-500 to-sand-700 shadow-card' />
           <div>
             <p className='text-xs uppercase tracking-[0.35em] text-black/60'>Artistry</p>
-            <p className='font-display text-xl text-black'>Online Gallery</p>
+            <p className='font-display text-xl text-black font-semibold'>Online Gallery</p>
           </div>
         </Link>
 

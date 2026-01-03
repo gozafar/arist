@@ -156,7 +156,7 @@ const HomeClient = () => {
             Browse all
           </Link>
         </div>
-        <div className='container-grid'>
+        <div className='container-grid gap-6'>
           {featured.map(painting => (
             <PaintingCard key={painting.id} painting={painting} />
           ))}
