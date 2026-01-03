@@ -13,7 +13,7 @@ type PaintingResponse = PaintingDTO;
 
 async function fetchPainting(id: string): Promise<PaintingResponse | null> {
   try {
-    const base = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+    const base = process.env.NEXT_PUBLIC_CLIENT_BASE_URL || '';
     const endpoint =
       typeof endpoints.paintings.detail === 'function'
         ? endpoints.paintings.detail(id)

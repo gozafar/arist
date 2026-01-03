@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidateTag } from 'next/cache';
 import { dbConnect } from '@/lib/db';
-import Painting from '@/models/Painting';
+import Painting, { PaintingDoc } from '@/models/Painting';
 import AdminLog from '@/models/AdminLog';
 import { requireRole } from '@/lib/rbac';
 import { verifyAccessToken } from '@/lib/jwt';
@@ -9,31 +9,17 @@ import fs from 'fs';
 import path from 'path';
 import { uploadOnCloudinary } from '../../cloudinary';
 
-// interface CloudinaryResponse {
-//   secure_url: string;
-//   public_id: string;
-//   url?: string;
-//   asset_id?: string;
-//   signature?: string;
-//   version?: number;
-//   format?: string;
-//   resource_type?: string;
-//   created_at?: string;
-//   tags?: string[];
-//   bytes?: number;
-//   width?: number;
-//   height?: number;
-//   etag?: string;
-//   placeholder?: boolean;
-// }
-
+export const runtime = 'nodejs'; // 🔴 REQUIRED
 export const dynamic = 'force-dynamic';
+
+/* ================= GET ================= */
 
 export const GET = async (req: NextRequest) => {
   const authError = await requireRole(req, ['ADMIN', 'SUPER_ADMIN']);
   if (authError) return authError;
 
   await dbConnect();
+
   const { searchParams } = req.nextUrl;
   const page = Number(searchParams.get('page') || '1');
   const limit = Number(searchParams.get('limit') || '50');
@@ -41,18 +27,28 @@ export const GET = async (req: NextRequest) => {
 
   const query = availability ? { availability } : {};
   const skip = (page - 1) * limit;
+
   const [items, total] = await Promise.all([
-    Painting.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+    Painting.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit).lean<PaintingDoc[]>(),
     Painting.countDocuments(query),
   ]);
 
   return NextResponse.json({
-    items: items.map(({ _id, ...rest }) => ({ ...rest, id: _id?.toString() })),
+    items: items.map(item => {
+      const { _id, ...rest } = item;
+      if (!_id) {
+        console.error('Painting missing _id:', item);
+        return { ...rest, id: 'invalid' };
+      }
+      return { ...rest, id: _id.toString() };
+    }),
     total,
     page,
     pageSize: limit,
   });
 };
+
+/* ================= POST ================= */
 
 export const POST = async (req: NextRequest) => {
   const authError = await requireRole(req, ['ADMIN', 'SUPER_ADMIN']);
@@ -61,12 +57,12 @@ export const POST = async (req: NextRequest) => {
   await dbConnect();
 
   const contentType = req.headers.get('content-type');
-  if (!contentType || !contentType.includes('multipart/form-data')) {
+  if (!contentType?.includes('multipart/form-data')) {
     return NextResponse.json({ message: 'Content-Type must be multipart/form-data' }, { status: 400 });
   }
 
   const formData = await req.formData();
-  const imageFile = formData.get('image') as File;
+  const imageFile = formData.get('image') as File | null;
 
   if (!imageFile) {
     return NextResponse.json({ message: 'Image is required' }, { status: 400 });
@@ -77,33 +73,31 @@ export const POST = async (req: NextRequest) => {
     return NextResponse.json({ message: 'Only image files are allowed' }, { status: 400 });
   }
 
-  console.log('Image validation passed:', imageFile.name, imageFile.type);
+  /* ===== TEMP FILE SAVE ===== */
 
   const tempDir = path.join(process.cwd(), 'public/temp');
-  if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
+  if (!fs.existsSync(tempDir)) {
+    fs.mkdirSync(tempDir, { recursive: true });
+  }
 
   const tempPath = path.join(tempDir, `${Date.now()}-${imageFile.name}`);
   const buffer = Buffer.from(await imageFile.arrayBuffer());
   fs.writeFileSync(tempPath, buffer);
 
-  const cloudinaryRes = await uploadOnCloudinary(tempPath, 'rakhi-studio/paintings');
+  /* ===== CLOUDINARY UPLOAD ===== */
 
-  if (!cloudinaryRes) {
-    fs.unlinkSync(tempPath);
+  let cloudinaryRes;
+  try {
+    cloudinaryRes = await uploadOnCloudinary(tempPath, 'rakhi-studio/paintings');
+  } catch (err) {
     return NextResponse.json({ message: 'Image upload failed' }, { status: 500 });
   }
 
-  console.log('Image uploaded to Cloudinary successfully:', cloudinaryRes.secure_url);
-
-  // Delete temp file
-  try {
-    if (fs.existsSync(tempPath)) {
-      fs.unlinkSync(tempPath);
-      console.log('Temp file deleted:', tempPath);
-    }
-  } catch {
-    console.log('Temp file already deleted or not found:', tempPath);
+  if (!cloudinaryRes) {
+    return NextResponse.json({ message: 'Image upload failed' }, { status: 500 });
   }
+
+  /* ===== SAVE DATA ===== */
 
   const paintingData = {
     title: formData.get('title') as string,
@@ -115,6 +109,7 @@ export const POST = async (req: NextRequest) => {
     availability: formData.get('availability') as 'in-stock' | 'sold',
     tags: JSON.parse((formData.get('tags') as string) || '[]'),
     image: cloudinaryRes.secure_url,
+    imagePublicId: cloudinaryRes.public_id, // ✅ IMPORTANT
     categoryId: formData.get('categoryId') as string,
   };
 
@@ -131,7 +126,7 @@ export const POST = async (req: NextRequest) => {
     });
   }
 
-  revalidateTag('paintings', 'default');
+  revalidateTag('paintings', 'default'); // ✅ correct usage
 
   return NextResponse.json(created, { status: 201 });
 };

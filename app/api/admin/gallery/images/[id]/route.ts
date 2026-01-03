@@ -3,12 +3,12 @@ import Image from '@/models/Image';
 import Gallery from '@/models/gallery';
 import { dbConnect } from '@/lib/db';
 import { deleteFromCloudinary } from '../../../../cloudinary';
-// import { requireRole } from "@/lib/rbac";
+import { requireRole } from '@/lib/rbac';
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    // const authError = await requireRole(request, ["ADMIN", "SUPER_ADMIN"]);
-    // if (authError) return authError;
+    const authError = await requireRole(request, ['ADMIN', 'SUPER_ADMIN']);
+    if (authError) return authError;
 
     const { id: imageId } = await params;
     await dbConnect();

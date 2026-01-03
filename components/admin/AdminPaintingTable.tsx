@@ -23,8 +23,10 @@ const AdminPaintingTable = ({ paintings, onEdit, onDelete, onToggle }: AdminPain
   };
 
   const handleDeleteConfirm = async () => {
-    if (selectedPainting) {
+    if (selectedPainting && selectedPainting.id && selectedPainting.id !== 'invalid') {
       await onDelete(selectedPainting.id);
+    } else {
+      console.error('Cannot delete painting: invalid or missing ID', selectedPainting);
     }
   };
 
@@ -81,17 +83,30 @@ const AdminPaintingTable = ({ paintings, onEdit, onDelete, onToggle }: AdminPain
                 </td>
                 <td className='px-4 py-3 text-right'>
                   <div className='flex justify-end gap-2 text-xs'>
-                    <Button type='button' variant='outline' className='px-3 py-1' onClick={() => onEdit(painting)}>
+                    <Button
+                      type='button'
+                      variant='outline'
+                      className='px-3 py-1 disabled:opacity-50 disabled:cursor-not-allowed'
+                      onClick={() => onEdit(painting)}
+                      disabled={!painting.id || painting.id === 'invalid'}
+                    >
                       Edit
                     </Button>
-                    <Button type='button' variant='outline' className='px-3 py-1' onClick={() => onToggle(painting.id)}>
+                    <Button
+                      type='button'
+                      variant='outline'
+                      className='px-3 py-1 disabled:opacity-50 disabled:cursor-not-allowed'
+                      onClick={() => onToggle(painting.id)}
+                      disabled={!painting.id || painting.id === 'invalid'}
+                    >
                       {painting.availability === 'sold' ? 'Mark In Stock' : 'Mark Sold'}
                     </Button>
                     <Button
                       type='button'
                       variant='outline'
-                      className='px-3 py-1 text-red-200 hover:text-red-100'
+                      className='px-3 py-1 text-red-200 hover:text-red-100 disabled:opacity-50 disabled:cursor-not-allowed'
                       onClick={() => handleDeleteClick(painting)}
+                      disabled={!painting.id || painting.id === 'invalid'}
                     >
                       Delete
                     </Button>

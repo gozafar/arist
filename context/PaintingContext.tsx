@@ -74,10 +74,14 @@ export const PaintingProvider = ({ children }: { children: ReactNode }) => {
   const deletePainting = async (id: string) => {
     try {
       await adminDeletePainting(id);
-    } catch {
-      // ignore delete failure for now
+      setPaintings(prev => prev.filter(p => p.id !== id));
+    } catch (error) {
+      console.error('Failed to delete painting:', error);
+      // Still remove from local state even if API fails
+      setPaintings(prev => prev.filter(p => p.id !== id));
+      // Re-throw the error so the UI can handle it
+      throw error;
     }
-    setPaintings(prev => prev.filter(p => p.id !== id));
   };
 
   const toggleAvailability = (id: string) => {

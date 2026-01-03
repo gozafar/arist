@@ -16,6 +16,7 @@ export const uploadOnCloudinary = async (localFilePath: string, folder?: string)
       resource_type: 'auto',
     });
 
+    console.log('Cloudinary upload successful:', response.public_id);
     return response;
   } catch (error: unknown) {
     // remove temp file even if upload fails
@@ -37,11 +38,16 @@ export const uploadOnCloudinary = async (localFilePath: string, folder?: string)
 
 export const deleteFromCloudinary = async (publicId: string) => {
   try {
-    if (!publicId) return false;
+    if (!publicId) {
+      console.log('No public ID provided for deletion');
+      return false;
+    }
 
+    console.log('Attempting to delete Cloudinary image:', publicId);
     const response = await cloudinary.uploader.destroy(publicId);
     console.log('Cloudinary delete response:', response);
 
+    // Consider both 'ok' and 'not found' as success
     return response.result === 'ok' || response.result === 'not found';
   } catch (error) {
     console.error('Cloudinary Delete Error:', error);
@@ -55,11 +61,12 @@ export const updateOnCloudinary = async (localFilePath: string, existingPublicId
 
     // If there's an existing image, delete it first
     if (existingPublicId) {
+      console.log('Deleting existing image:', existingPublicId);
       await deleteFromCloudinary(existingPublicId);
     }
 
     const response = await cloudinary.uploader.upload(localFilePath, {
-      folder: folder || 'paintings',
+      folder: folder || 'rakhi-studio/paintings', // FIXED: Use consistent folder structure
       resource_type: 'auto',
     });
 
@@ -72,6 +79,31 @@ export const updateOnCloudinary = async (localFilePath: string, existingPublicId
     }
 
     console.error('Cloudinary Update Error:', error);
+    return null;
+  }
+};
+
+// NEW: Helper function to extract public ID from Cloudinary URL
+export const extractPublicIdFromUrl = (url: string): string | null => {
+  try {
+    const urlParts = url.split('/');
+    const uploadIndex = urlParts.indexOf('upload');
+
+    if (uploadIndex !== -1 && uploadIndex + 2 < urlParts.length) {
+      const publicIdParts = urlParts.slice(uploadIndex + 2);
+
+      // Remove version number if it exists (starts with 'v' followed by digits)
+      if (publicIdParts[0] && /^v\d+/.test(publicIdParts[0])) {
+        publicIdParts.shift(); // Remove the version part
+      }
+
+      const publicId = publicIdParts.join('/').split('.')[0]; // Remove file extension
+      return publicId;
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Error extracting public ID from URL:', error);
     return null;
   }
 };
