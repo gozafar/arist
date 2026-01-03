@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from 'cloudinary';
 import fs from 'fs';
+import { Readable } from 'stream';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
@@ -20,9 +21,6 @@ export const uploadOnCloudinary = async (localFilePath: string, folder?: string)
     return response;
   } catch (error: unknown) {
     // remove temp file even if upload fails
-    if (fs.existsSync(localFilePath)) {
-      fs.unlinkSync(localFilePath);
-    }
 
     const message =
       error instanceof Error
@@ -32,6 +30,47 @@ export const uploadOnCloudinary = async (localFilePath: string, folder?: string)
           : 'Unknown Cloudinary upload error';
 
     console.error('Cloudinary Error:', error);
+    throw new Error(message);
+  }
+};
+
+export const uploadBufferOnCloudinary = async (buffer: Buffer, folder?: string, mimeType?: string) => {
+  try {
+    if (!buffer || buffer.length === 0) {
+      throw new Error('Empty buffer provided for Cloudinary upload');
+    }
+
+    const response = await new Promise<Awaited<ReturnType<typeof cloudinary.uploader.upload>> | undefined>(
+      (resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            folder: folder || 'rakhi-studio',
+            resource_type: 'auto',
+          },
+          (error, result) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(result ?? undefined);
+            }
+          }
+        );
+
+        Readable.from(buffer).on('error', reject).pipe(uploadStream);
+      }
+    );
+
+    console.log('Cloudinary buffer upload successful:', response?.public_id);
+    return response;
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : typeof error === 'object' && error !== null && 'error' in error && error.error instanceof Error
+          ? error.error.message
+          : 'Unknown Cloudinary upload error';
+
+    console.error('Cloudinary Buffer Upload Error:', error);
     throw new Error(message);
   }
 };

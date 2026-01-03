@@ -5,9 +5,7 @@ import Painting from '@/models/Painting';
 import AdminLog from '@/models/AdminLog';
 import { requireRole } from '@/lib/rbac';
 import { verifyAccessToken } from '@/lib/jwt';
-import { deleteFromCloudinary, updateOnCloudinary, extractPublicIdFromUrl } from '../../../cloudinary';
-import fs from 'fs';
-import path from 'path';
+import { deleteFromCloudinary, extractPublicIdFromUrl, uploadBufferOnCloudinary } from '../../../cloudinary';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,13 +41,8 @@ export const PUT = async (req: NextRequest, context: { params: Promise<{ id: str
         return NextResponse.json({ message: 'Only image files are allowed' }, { status: 400 });
       }
 
-      // Create temp file
-      const tempDir = path.join(process.cwd(), 'public/temp');
-      if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
-
-      const tempPath = path.join(tempDir, `${Date.now()}-${imageFile.name}`);
+      // Convert uploaded file to buffer for Cloudinary
       const buffer = Buffer.from(await imageFile.arrayBuffer());
-      fs.writeFileSync(tempPath, buffer);
 
       // Extract existing public ID from current image URL
       let existingPublicId: string | undefined;
@@ -59,27 +52,28 @@ export const PUT = async (req: NextRequest, context: { params: Promise<{ id: str
         console.log('Extracted existing public ID:', existingPublicId);
       }
 
-      // Upload new image to Cloudinary (will delete old one if existingPublicId provided)
-      const cloudinaryRes = await updateOnCloudinary(tempPath, existingPublicId);
+      // Upload new image to Cloudinary and clean up old asset after success
+      let cloudinaryRes: Awaited<ReturnType<typeof uploadBufferOnCloudinary>>;
+      try {
+        cloudinaryRes = await uploadBufferOnCloudinary(buffer, 'rakhi-studio/paintings', imageFile.type);
+      } catch (error) {
+        console.error('Image upload failed:', error);
+        return NextResponse.json({ message: 'Image upload failed' }, { status: 500 });
+      }
 
       if (!cloudinaryRes) {
-        // Clean up temp file on failure
-        if (fs.existsSync(tempPath)) {
-          fs.unlinkSync(tempPath);
-        }
         return NextResponse.json({ message: 'Image upload failed' }, { status: 500 });
       }
 
       newImageUrl = cloudinaryRes.secure_url;
 
-      // Delete temp file
-      // try {
-      if (fs.existsSync(tempPath)) {
-        fs.unlinkSync(tempPath);
+      if (existingPublicId) {
+        try {
+          await deleteFromCloudinary(existingPublicId);
+        } catch (error) {
+          console.error('Failed to delete old Cloudinary asset:', error);
+        }
       }
-      // } catch (error) {
-      //   // Continue even if temp file deletion fails
-      // }
     }
 
     // Extract other form fields

@@ -4,20 +4,28 @@ import Image from '@/models/Image';
 // import Category from "@/models/Category"; // Ensure Category model is loaded
 import { dbConnect } from '@/lib/db';
 // import { requireRole } from "@/lib/rbac";
-import { uploadOnCloudinary } from '../../cloudinary';
-import fs from 'fs';
-import path from 'path';
+import { uploadBufferOnCloudinary } from '../../cloudinary';
 
 // Ensure Category model is registered
 import '@/models/Category';
 import '@/models/Image';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
+
 export async function POST(request: NextRequest) {
   try {
+    const contentType = request.headers.get('content-type');
+    if (!contentType?.includes('multipart/form-data')) {
+      return NextResponse.json({ error: 'Content-Type must be multipart/form-data' }, { status: 400 });
+    }
+
     const formData = await request.formData();
 
     // Extract fields from FormData
-    const imageFiles = formData.getAll('images') as File[];
+    const imageEntries = formData.getAll('images');
+    const imageFiles = imageEntries.filter((entry): entry is File => entry instanceof File);
     const imageNames = formData.getAll('imageNames') as string[];
     const name = formData.get('name') as string;
 
@@ -53,36 +61,30 @@ export async function POST(request: NextRequest) {
       await gallery.save();
     }
 
+    if (imageFiles.length === 0) {
+      return NextResponse.json({ error: 'No images provided for upload' }, { status: 400 });
+    }
+
+    let lastUploadError: string | null = null;
+
     // Process images in parallel for better performance
     const imageUploadPromises = imageFiles.map(async (file, index) => {
       const imageName = imageNames[index] || file.name;
 
-      // Create temporary file
-      const tempDir = path.join(process.cwd(), 'temp');
-      if (!fs.existsSync(tempDir)) {
-        fs.mkdirSync(tempDir, { recursive: true });
-      }
-
-      const tempFileName = `gallery-${Date.now()}-${Math.random().toString(36).substring(7)}-${file.name}`;
-      const tempFilePath = path.join(tempDir, tempFileName);
-
       try {
-        // Convert File to buffer and write to temp file
-        const buffer = Buffer.from(await file.arrayBuffer());
-        fs.writeFileSync(tempFilePath, buffer);
-
-        // Upload to Cloudinary
-        const uploadResult = await uploadOnCloudinary(tempFilePath, 'rakhi-studio/gallery');
+        // Convert File to buffer and upload directly to Cloudinary
+        const buffer = await fileToBuffer(file);
+        const uploadResult = await uploadBufferOnCloudinary(buffer, 'rakhi-studio/gallery', file.type);
 
         return {
           url: uploadResult?.secure_url,
           name: imageName,
         };
-      } finally {
-        // Clean up temp file
-        if (fs.existsSync(tempFilePath)) {
-          fs.unlinkSync(tempFilePath);
-        }
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown upload error';
+        lastUploadError = message;
+        console.error(`Failed to upload image ${imageName}:`, error);
+        return null;
       }
     });
 
@@ -90,10 +92,13 @@ export async function POST(request: NextRequest) {
     const uploadResults = await Promise.all(imageUploadPromises);
 
     // Filter out failed uploads
-    const processedImages = uploadResults.filter(result => result.url);
+    const processedImages = uploadResults.filter(
+      (result): result is { url: string; name: string } => result !== null && result.url !== undefined
+    );
 
     if (processedImages.length === 0) {
-      throw new Error('Failed to upload any images to Cloudinary');
+      const reason = lastUploadError || 'Failed to upload any images to Cloudinary';
+      throw new Error(reason);
     }
 
     // Prepare image documents with gallery reference
@@ -125,3 +130,16 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+const fileToBuffer = async (file: File): Promise<Buffer> => {
+  try {
+    if (typeof file.arrayBuffer === 'function') {
+      return Buffer.from(await file.arrayBuffer());
+    }
+    const res = await new Response(file).arrayBuffer();
+    return Buffer.from(res);
+  } catch (error) {
+    console.error('Failed to read gallery file buffer:', error);
+    throw new Error('Unable to process uploaded image');
+  }
+};

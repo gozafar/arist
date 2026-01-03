@@ -3,10 +3,12 @@ import { Types } from 'mongoose';
 import Gallery from '@/models/gallery';
 import Image from '@/models/Image';
 import { dbConnect } from '@/lib/db';
-import { uploadOnCloudinary, deleteFromCloudinary } from '../../../cloudinary';
-import fs from 'fs';
-import path from 'path';
+import { deleteFromCloudinary, extractPublicIdFromUrl, uploadBufferOnCloudinary } from '../../../cloudinary';
 import { requireRole } from '@/lib/rbac';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
 
 interface ImageMeta {
   _id: string;
@@ -239,23 +241,8 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
 }
 
 async function uploadImageToCloudinary(file: File) {
-  const tempDir = path.join(process.cwd(), 'temp');
-  if (!fs.existsSync(tempDir)) {
-    fs.mkdirSync(tempDir, { recursive: true });
-  }
-
-  const tempFileName = `temp-${Date.now()}-${file.name}`;
-  const tempFilePath = path.join(tempDir, tempFileName);
-
-  try {
-    const buffer = Buffer.from(await file.arrayBuffer());
-    fs.writeFileSync(tempFilePath, buffer);
-    return await uploadOnCloudinary(tempFilePath, 'rakhi-studio/gallery');
-  } finally {
-    if (fs.existsSync(tempFilePath)) {
-      fs.unlinkSync(tempFilePath);
-    }
-  }
+  const buffer = Buffer.from(await file.arrayBuffer());
+  return uploadBufferOnCloudinary(buffer, 'rakhi-studio/gallery', file.type);
 }
 
 // async function deleteImageById(imageId: string) {
@@ -267,14 +254,8 @@ async function uploadImageToCloudinary(file: File) {
 // }
 
 async function deleteImageFromCloudinary(url: string) {
-  // try {
-  const urlParts = url.split('/');
-  const fileName = urlParts[urlParts.length - 1]?.split('.')[0];
-  if (fileName) {
-    const publicId = `rakhi-studio/gallery/${fileName}`;
+  const publicId = extractPublicIdFromUrl(url);
+  if (publicId) {
     await deleteFromCloudinary(publicId);
   }
-  // } catch (error) {
-  //     // Silent error handling
-  // }
 }
