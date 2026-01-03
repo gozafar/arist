@@ -46,12 +46,12 @@ a:hover {
 
 .container-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  /* gap: 1.5rem; */
 }
 
 .section-heading {
-  @apply font-display text-3xl md:text-4xl lg:text-5xl tracking-tight;
+  @apply font-display text-3xl md:text-4xl lg:text-[40px] tracking-tight;
   color: var(--ink);
 }
 

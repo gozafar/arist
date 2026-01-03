@@ -3,12 +3,12 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import InputField from '@/components/InputField';
-import TextArea from '@/components/TextArea';
 import PriceInput from '@/components/PriceInput';
 import SubmitButton from '@/components/SubmitButton';
 import ImagePreview from '@/components/ImagePreview';
 import { NewPaintingInput } from '@/context/PaintingContext';
 import { adminGetCategories } from '@/lib/api/admin';
+import MDEditor from '@uiw/react-md-editor';
 import { toast } from 'react-toastify';
 
 interface Category {
@@ -28,6 +28,10 @@ const emptyState: NewPaintingInput & { categoryId?: string } = {
   price: 0,
   medium: '',
   size: '',
+  height: 0,
+  width: 0,
+  imageWidth: 0,
+  imageHeight: 0,
   year: new Date().getFullYear(),
   availability: 'in-stock',
   image: '',
@@ -41,7 +45,6 @@ const getInitialForm = (initial?: NewPaintingInput & { id?: string }) => ({
   price: initial?.price ?? 0,
   categoryId: initial?.categoryId ?? '',
 });
-
 const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPaintingFormProps) => {
   const [form, setForm] = useState<NewPaintingInput & { categoryId?: string }>(() => getInitialForm(initial));
   const [preview, setPreview] = useState<string>(() => initial?.image ?? '');
@@ -93,6 +96,30 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
       setPreview(result);
     };
     reader.readAsDataURL(file);
+
+    // 3️⃣ Get image dimensions
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+
+    img.src = objectUrl;
+
+    img.onload = () => {
+      const width = img.naturalWidth;
+      const height = img.naturalHeight;
+      const sizeBytes = file.size;
+
+      const sizeLabel = `${width} × ${height} px`;
+
+      setForm(prev => ({
+        ...prev,
+        imageWidth: width,
+        imageHeight: height,
+        imageSize: sizeBytes,
+        size: sizeLabel, // 👈 auto-filled
+      }));
+
+      URL.revokeObjectURL(objectUrl);
+    };
   };
 
   const handleChange = (key: keyof (NewPaintingInput & { categoryId?: string }), value: string | number) => {
@@ -170,13 +197,17 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
             onChange={value => handleChange('title', value)}
             required
           />
-          <TextArea
-            label='Description'
-            placeholder='A few lines about the piece'
-            rows={4}
-            value={form.description}
-            onChange={e => handleChange('description', e.target.value)}
-          />
+          <div data-color-mode='light'>
+            <MDEditor
+              value={form.description}
+              onChange={value => handleChange('description', value || '')}
+              height={220}
+              preview='edit'
+              textareaProps={{
+                placeholder: 'A few lines about the piece',
+              }}
+            />
+          </div>
           <div className='grid gap-4 md:grid-cols-2'>
             <PriceInput value={form.price} onChange={val => handleChange('price', val)} />
             <InputField
@@ -215,7 +246,7 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
                   Select a category
                 </option>
                 {categories.map(category => (
-                  <option key={category.id} value={category.id} className='bg-white/5 border-white/15 text-white'>
+                  <option key={category.id} value={category.id} className='bg-gray-800 text-white'>
                     {category.categoryName}
                   </option>
                 ))}
@@ -229,10 +260,10 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
                 onChange={e => handleChange('availability', e.target.value)}
                 className='w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-sand-400/60'
               >
-                <option value='in-stock' className='bg-white/5 border-white/15 text-white'>
+                <option value='in-stock' className='bg-black text-white'>
                   In Stock
                 </option>
-                <option value='sold' className='bg-white/5 border-white/15 text-white'>
+                <option value='sold' className='bg-black text-white'>
                   Sold
                 </option>
               </select>
@@ -246,7 +277,7 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
               type='file'
               accept='image/*'
               onChange={handleImage}
-              className='w-full rounded-2xl border border-dashed border-white/20 bg-white/5 px-4 py-3 text-white/80 file:mr-4 file:rounded-xl file:border file:border-white/20 file:bg-white/10 file:px-3 file:py-1 file:text-black/60'
+              className='w-full rounded-2xl border border-dashed border-white/20 bg-white/5 px-4 py-3 text-white/80 file:mr-4 file:rounded-xl file:border file:border-white/20 file:bg-white/10 file:px-3 file:py-1 file:text-black'
             />
             {errors.image && <p className='mt-2 text-xs text-red-300'>{errors.image}</p>}
           </label>
@@ -268,5 +299,4 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
     </form>
   );
 };
-
 export default AdminPaintingForm;

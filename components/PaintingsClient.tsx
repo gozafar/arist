@@ -32,13 +32,16 @@ const PaintingsContent = () => {
 
   return (
     <>
-      <div className='container-grid'>
+      <div className='grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'>
         {visible.map(painting => (
           <PaintingCard key={painting.id} painting={painting} />
         ))}
-        {!visible.length && !loaded && <p className='text-white/70'>Loading paintings…</p>}
-        {!visible.length && loaded && <p className='text-white/70'>No paintings found.</p>}
+
+        {!visible.length && !loaded && <p className='col-span-full text-white/70'>Loading paintings…</p>}
+
+        {!visible.length && loaded && <p className='col-span-full text-white/70'>No paintings found.</p>}
       </div>
+
       <Pagination
         total={paintings.length}
         perPage={PAGE_SIZE}
@@ -52,47 +55,47 @@ const PaintingsContent = () => {
 const PaintingsClient = () => {
   return (
     <div className='mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-16'>
-      <div className='mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
-        <div>
+      <div className='mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between'>
+        <div className='space-y-2'>
           <p className='text-sm uppercase tracking-[0.3em] text-white/60'>Available works</p>
-          <h1 className='section-heading'>Paintings</h1>
-          <p className='mt-3 max-w-2xl text-white/70'>
+          <h1 className='text-3xl md:text-4xl font-semibold text-white my font-display'>Paintings</h1>
+          <p className='max-w-2xl text-base leading-relaxed text-black/70 md:text-[16px]'>
             Shop original wall art curated for collectors in the UAE, India, USA, and Hong Kong. Each piece is sealed,
             certified, and ready to hang with worldwide shipping.
           </p>
         </div>
-        <div className='flex gap-3 text-sm text-white/70'>
+        <div className='flex gap-3 text-sm text-black/6 lg:mt-7'>
           <span className='rounded-full bg-white/5 px-4 py-2'>Originals</span>
           <span className='rounded-full bg-white/5 px-4 py-2'>Worldwide shipping</span>
         </div>
       </div>
 
-      <section id='categories' className='mb-10 space-y-6'>
-        <h2 className='font-display text-3xl text-sand-200'>Explore by category</h2>
+      <section id='categories' className='mb-10 space-y-4'>
+        <h1 className='text-2xl md:text-2xl font-semibold text-white font-display'>Explore by category</h1>
         <div className='grid gap-6 md:grid-cols-2'>
           <div className='card-glass rounded-2xl p-5'>
-            <h3 className='text-xl font-semibold text-white'>Abstract Paintings</h3>
-            <p className='mt-2 text-sm text-white/70'>
+            <h3 className='text-xl font-semibold text-white font-display mb-1'>Abstract Paintings</h3>
+            <p className='max-w-2xl text-base leading-relaxed text-black/70 md:text-[14px]'>
               Layered, expressive works that bring energy and movement to modern interiors in Dubai, Mumbai, New York,
               and Hong Kong.
             </p>
           </div>
           <div className='card-glass rounded-2xl p-5'>
-            <h3 className='text-xl font-semibold text-white'>Modern Art</h3>
-            <p className='mt-2 text-sm text-white/70'>
+            <h3 className='text-xl font-semibold text-white font-display mb-1'>Modern Art</h3>
+            <p className='max-w-2xl text-base leading-relaxed text-black/70 md:text-[14px]'>
               Contemporary compositions with bold palettes, ideal for luxury homes, offices, and boutique hospitality.
             </p>
           </div>
           <div className='card-glass rounded-2xl p-5'>
-            <h3 className='text-xl font-semibold text-white'>Traditional Art</h3>
-            <p className='mt-2 text-sm text-white/70'>
+            <h3 className='text-xl font-semibold text-white font-display mb-1'>Traditional Art</h3>
+            <p className='max-w-2xl text-base leading-relaxed text-black/70 md:text-[14px]'>
               Culturally rooted narratives and classic techniques that resonate with global collectors and heritage
               spaces.
             </p>
           </div>
           <div className='card-glass rounded-2xl p-5'>
-            <h3 className='text-xl font-semibold text-white'>Canvas &amp; Wall Art</h3>
-            <p className='mt-2 text-sm text-white/70'>
+            <h3 className='text-xl font-semibold text-white font-display mb-1'>Canvas &amp; Wall Art</h3>
+            <p className='max-w-2xl text-sm leading-relaxed text-black/70 md:text-[14px]'>
               Museum-grade canvases designed to elevate living rooms, entryways, and curated gallery walls worldwide.
             </p>
           </div>

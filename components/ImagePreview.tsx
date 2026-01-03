@@ -10,7 +10,7 @@ const ImagePreview = ({ src, alt }: { src?: string; alt: string }) => {
   }
 
   return (
-    <div className='relative h-64 overflow-hidden rounded-2xl border border-white/15 bg-black/40'>
+    <div className='relative h-96 overflow-hidden rounded-2xl border border-white/15 bg-black/40'>
       <Image
         src={src}
         alt={alt}

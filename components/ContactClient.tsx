@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Button from '@/components/Button';
 import { sendContactMessage } from '@/lib/api/public';
 import { toast } from 'react-toastify';
+import Link from 'next/link';
 
 interface ApiError extends Error {
   response?: {
@@ -31,11 +32,11 @@ const ContactClient = () => {
   };
 
   return (
-    <div className='mx-auto max-w-5xl px-4 py-12 lg:px-6 lg:py-16'>
-      <div className='mb-8 space-y-3'>
+    <div className='mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-16'>
+      <div className='mb-8 space-y-2'>
         <p className='text-sm uppercase tracking-[0.3em] text-white/60'>Connect</p>
-        <h1 className='section-heading'>Contact Rakhi</h1>
-        <p className='max-w-2xl text-white/70'>
+        <h1 className='text-3xl md:text-4xl font-semibold text-white my font-display'>Contact Rakhi</h1>
+        <p className='max-w-2xl text-base leading-relaxed text-black/70 md:text-[16px]'>
           For purchases, commissions, or studio visits, leave a note. Rakhi responds within one business day.
         </p>
       </div>
@@ -121,50 +122,64 @@ const ContactClient = () => {
           )}
         </div>
 
-        <div className='space-y-6 rounded-3xl border border-white/10 bg-white/5 p-6'>
-          <h2 className='font-display text-2xl'>Visit or follow</h2>
-          <div className='space-y-3 text-white/70'>
-            <p>Bangalore studio visits available by appointment. Weekdays 10am–6pm.</p>
+        <div className='space-y-4 rounded-3xl border border-white/10 bg-white/5 p-6'>
+          <div className='space-y-4 text-white/70'>
+            <div className='space-y-2'>
+              <h2 className='text-lg md:text-xl font-semibold text-white my font-display'>Visit or follow</h2>
+              <p className='max-w-2xl text-base leading-relaxed text-black/60 md:text-[14px]'>
+                Bangalore studio visits available by appointment. Weekdays 10am–6pm.
+              </p>
+            </div>
             <div className='space-y-2'>
               <p className='font-semibold text-white'>Social</p>
               <div className='flex gap-4'>
-                <a
+                <Link
                   href='https://www.instagram.com/rakhi_studio/'
                   className='button-outline text-xs'
                   target='_blank'
                   rel='noreferrer'
                 >
                   Instagram
-                </a>
+                </Link>
                 {/* <a href="https://www.behance.net" className="button-outline text-xs" target="_blank" rel="noreferrer">
                   Facebook
                 </a> */}
-                <a
+                <Link
                   href='https://www.linkedin.com/in/rakhi-vashisht-b373858/'
                   className='button-outline text-xs'
                   target='_blank'
                   rel='noreferrer'
                 >
                   Linkdin
-                </a>
-                <a href='mailto:studio@anandnarayan.art' className='button-outline text-xs'>
+                </Link>
+                <Link href='mailto:studio@anandnarayan.art' className='button-outline text-xs'>
                   Email
-                </a>
+                </Link>
               </div>
             </div>
             <div className='space-y-2 text-sm'>
-              <p className='font-semibold text-white'>Studio</p>
-              <p className='text-white/60'>Indiranagar, Bangalore</p>
-              <p className='text-white/60'>Call: +852 97236007 ,+91 9899757066</p>
+              <h2 className='text-lg md:text-xl font-semibold text-white my font-display'>Studio</h2>
+              <p className='max-w-2xl text-base leading-relaxed text-black/60 md:text-[14px]'>Indiranagar, Bangalore</p>
+              <p className='max-w-2xl text-base leading-relaxed text-black/60 md:text-[14px]'>
+                <span className='font-bold'>Call:</span> +852 97236007 ,+91 9899757066
+              </p>
               {/* <p className="text-white/60">Call: +91 9899757066</p> */}
             </div>
           </div>
           <div className='space-y-2 text-sm text-white/70'>
-            <h3 className='font-semibold text-white'>Worldwide support</h3>
-            <p className='text-white/60'>UAE &amp; Dubai: white-glove shipping and customs guidance.</p>
-            <p className='text-white/60'>India: studio pickups and insured domestic delivery.</p>
-            <p className='text-white/60'>USA: tracked international freight for collectors.</p>
-            <p className='text-white/60'>Hong Kong: local framing coordination upon request.</p>
+            <h2 className='text-lg md:text-xl font-semibold text-white my font-display'>Worldwide support</h2>
+            <p className='max-w-2xl text-base leading-relaxed text-black/60 md:text-[14px]'>
+              <span className='font-bold'> UAE &amp; Dubai:</span> white-glove shipping and customs guidance.
+            </p>
+            <p className='max-w-2xl text-base leading-relaxed text-black/60 md:text-[14px]'>
+              <span className='font-bold'>India:</span> studio pickups and insured domestic delivery.
+            </p>
+            <p className='max-w-2xl text-base leading-relaxed text-black/60 md:text-[14px]'>
+              <span className='font-bold'> USA:</span> tracked international freight for collectors.
+            </p>
+            <p className='max-w-2xl text-base leading-relaxed text-black/60 md:text-[14px]'>
+              <span className='font-bold'> Hong Kong:</span> local framing coordination upon request.
+            </p>
           </div>
         </div>
       </div>

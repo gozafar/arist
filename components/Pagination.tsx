@@ -15,7 +15,7 @@ const Pagination = ({ total, perPage, currentPage, onPageChange }: PaginationPro
 
   return (
     <div className='mt-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3'>
-      <div className='text-sm text-white/70'>
+      <div className='text-sm text-black/60 font-normal'>
         Page {currentPage} of {totalPages}
       </div>
       <div className='flex items-center gap-2'>

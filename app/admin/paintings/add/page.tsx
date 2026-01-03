@@ -1,14 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import AdminPaintingForm from '@/components/admin/AdminPaintingForm';
 import { usePaintings } from '@/context/PaintingContext';
+import AdminPaintingForm from '@/components/admin/AdminPaintingForm';
 
 const AdminAddPaintingPage = () => {
   const { addPainting } = usePaintings();
 
   return (
-    <div className='mx-auto max-w-5xl px-4 py-12 lg:px-6 lg:py-16'>
+    <div className='mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-16'>
       <div className='mb-8 flex items-center justify-between'>
         <div className='space-y-2'>
           <p className='text-sm uppercase tracking-[0.3em] text-[rgb(161,44,116)]'>Admin · Paintings</p>

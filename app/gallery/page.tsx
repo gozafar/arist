@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { GetGallery } from '@/lib/api/admin';
 import Image from 'next/image';
 import Pagination from '@/components/Pagination';
+import PhotoPreview from '@/components/PhototPreview';
 
 type GalleryName = 'Contemporary / Modern Art' | 'Portrait Paintings' | 'Landscape Paintings' | 'Abstract Art';
 
@@ -12,7 +13,7 @@ const GALLERY_NAMES: GalleryName[] = [
   'Portrait Paintings',
   'Landscape Paintings',
   'Abstract Art',
-];
+] as const;
 
 interface GalleryImage {
   _id: string;
@@ -145,22 +146,22 @@ export default function GalleryPage() {
   }
 
   return (
-    <div className='mx-auto max-w-7xl px-4 py-14'>
+    <div className='mx-auto max-w-6xl px-4 py-14'>
       {/* HEADER */}
       <div className='mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-6'>
-        <div>
-          <p className='text-xs tracking-[0.35em] uppercase text-white/50'>Collections</p>
-          <h1 className='text-3xl md:text-4xl font-semibold text-white mt-2'>Art Gallery</h1>
-          <p className='mt-3 max-w-xl text-white/60 text-sm'>
+        <div className='space-y-2'>
+          <p className='text-sm uppercase tracking-[0.3em] text-white/60'>Collections</p>
+          <h1 className='text-3xl md:text-4xl font-semibold text-white my font-display'>Art Gallery</h1>
+          <p className='max-w-2xl text-base leading-relaxed text-black/70 md:text-[16px]'>
             Browse through our gallery collections. Page through to explore all available galleries.
           </p>
         </div>
 
-        <div className='flex flex-col sm:flex-row gap-3 text-xs text-white/70'>
+        <div className='flex flex-col sm:flex-row gap-3 text-xs text-white/70 '>
           <select
             value={selectedGallery}
             onChange={e => setSelectedGallery(e.target.value)}
-            className='rounded-full bg-white/5 px-4 py-2 border border-white/10 focus:border-white/20 outline-none min-w-[150px] w-full sm:w-auto'
+            className='rounded-full bg-white/5 px-3 py-2 border border-white/10 focus:border-white/20 outline-none min-w-[150px] w-full sm:w-auto text-black/70'
             aria-label='Filter galleries'
             disabled={loading}
           >
@@ -171,8 +172,10 @@ export default function GalleryPage() {
               </option>
             ))}
           </select>
-          <span className='rounded-full bg-white/5 px-4 py-2'>{filteredGalleries.length} collections</span>
-          <span className='rounded-full bg-white/5 px-4 py-2'>{imageList.length} works</span>
+          <span className='rounded-full bg-white/5 px-4 py-2 text-black/70'>
+            {filteredGalleries.length} collections
+          </span>
+          <span className='rounded-full bg-white/5 px-4 py-2 text-black/70'>{imageList.length} works</span>
         </div>
       </div>
 
@@ -180,48 +183,53 @@ export default function GalleryPage() {
       {visibleImages.length > 0 ? (
         <section className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'>
           {visibleImages.map((item: GalleryImage) => (
-            <div
-              key={item._id || item.imageId}
-              className='group rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-white/20 transition'
-            >
-              {/* IMAGE */}
-              <div className='relative aspect-square'>
-                <Image
-                  src={item.url}
-                  alt={item.name || 'Artwork'}
-                  fill
-                  className='object-cover object-center transition-transform duration-500 group-hover:scale-110'
-                  sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
-                  loading='lazy'
-                  quality={75}
-                  onError={e => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = '/placeholder.jpg';
-                  }}
-                />
-              </div>
+            <PhotoPreview key={item._id || item.imageId} galleryId={`painting-${item._id || item.imageId}`}>
+              <div className='group overflow-hidden rounded-2xl border border-white/10 bg-white/5 transition hover:border-white/20'>
+                {/* IMAGE */}
+                <div className='relative aspect-square overflow-hidden'>
+                  <a
+                    href={item.url}
+                    data-pswp-width={item.width ?? 2000}
+                    data-pswp-height={item.height ?? 2000}
+                    className='block cursor-zoom-in'
+                  >
+                    <Image
+                      src={item.url}
+                      alt={item.name || 'Artwork'}
+                      fill
+                      className='object-cover object-center transition-transform duration-500 ease-in-out group-hover:scale-105'
+                      sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
+                      loading='lazy'
+                      quality={75}
+                    />
+                  </a>
+                </div>
 
-              {/* CONTENT */}
-              <div className='p-4 space-y-1'>
-                <h3 className='text-white font-medium text-sm'>{item.name || 'Untitled'}</h3>
-                {item.galleryName && <p className='text-xs text-white/60'>{item.galleryName}</p>}
-                <p className='text-xs text-white/40'>
-                  {item.createdAt
-                    ? new Date(item.createdAt).toLocaleDateString('en-US', {
-                        month: 'short',
-                        year: 'numeric',
-                      })
-                    : 'Date not available'}
-                </p>
+                {/* CONTENT */}
+                <div className='space-y-1 p-4'>
+                  <h3 className='text-sm font-semibold text-white'>{item.name || 'Untitled'}</h3>
+
+                  {item.galleryName && <p className='text-xs text-white/70'>{item.galleryName}</p>}
+
+                  <p className='text-xs text-white/50'>
+                    {item.createdAt
+                      ? new Date(item.createdAt).toLocaleDateString('en-US', {
+                          month: 'short',
+                          year: 'numeric',
+                        })
+                      : 'Date not available'}
+                  </p>
+                </div>
               </div>
-            </div>
+            </PhotoPreview>
           ))}
         </section>
       ) : (
-        <div className='text-center py-12'>
+        <div className='py-12 text-center'>
           <p className='text-white/60'>No artworks found.</p>
+
           {selectedGallery && (
-            <button onClick={() => setSelectedGallery('')} className='mt-2 text-blue-400 hover:text-blue-300 text-sm'>
+            <button onClick={() => setSelectedGallery('')} className='mt-2 text-sm text-blue-400 hover:text-blue-300'>
               Clear filters
             </button>
           )}

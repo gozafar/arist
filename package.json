@@ -12,6 +12,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@uiw/react-md-editor": "^4.0.11",
     "bcryptjs": "2.4.3",
     "cloudinary": "^2.8.0",
     "clsx": "2.1.1",
@@ -20,6 +21,8 @@
     "jsonwebtoken": "9.0.2",
     "mongoose": "8.8.1",
     "next": "16.0.10",
+    "patch-package": "^8.0.1",
+    "photoswipe": "^5.4.4",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-fast-marquee": "^1.6.5",
