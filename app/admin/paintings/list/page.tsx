@@ -181,7 +181,7 @@ export default function CategoriesListPage() {
                         >
                           Edit
                         </button>
-                        <button
+                        {/* <button
                           onClick={event => {
                             event.stopPropagation();
                             handleDeleteClick(category);
@@ -189,7 +189,7 @@ export default function CategoriesListPage() {
                           className='button-outline text-xs px-4 py-2 text-red-400 hover:text-red-300'
                         >
                           Delete
-                        </button>
+                        </button> */}
                       </div>
                     </td>
                   </tr>
