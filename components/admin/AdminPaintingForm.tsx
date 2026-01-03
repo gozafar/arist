@@ -3,13 +3,13 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import InputField from '@/components/InputField';
-import TextArea from '@/components/TextArea';
 import PriceInput from '@/components/PriceInput';
 import SubmitButton from '@/components/SubmitButton';
 import ImagePreview from '@/components/ImagePreview';
 import { NewPaintingInput } from '@/context/PaintingContext';
 import { adminGetCategories } from '@/lib/api/admin';
 import MDEditor from '@uiw/react-md-editor';
+import { toast } from 'react-toastify';
 
 interface Category {
   id: string;
@@ -39,13 +39,20 @@ const emptyState: NewPaintingInput & { categoryId?: string } = {
   categoryId: '',
 };
 
+const getInitialForm = (initial?: NewPaintingInput & { id?: string }) => ({
+  ...emptyState,
+  ...initial,
+  price: initial?.price ?? 0,
+  categoryId: initial?.categoryId ?? '',
+});
 const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPaintingFormProps) => {
-  const [form, setForm] = useState<NewPaintingInput & { categoryId?: string }>(initial ?? emptyState);
-  const [preview, setPreview] = useState<string>(initial?.image ?? '');
+  const [form, setForm] = useState<NewPaintingInput & { categoryId?: string }>(() => getInitialForm(initial));
+  const [preview, setPreview] = useState<string>(() => initial?.image ?? '');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [status, setStatus] = useState<{ type: 'success' | 'error' | null; message: string } | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Fetch categories on component mount
   useEffect(() => {
@@ -62,20 +69,27 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
   }, []);
 
   useEffect(() => {
-    if (initial) {
-      setForm(initial);
-      setPreview(initial.image || '');
-    }
+    if (!initial) return;
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      setForm(getInitialForm(initial));
+      setPreview(initial.image ?? '');
+      setImageFile(null);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [initial]);
 
   const handleImage = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // 1️⃣ Store file for upload
+    // Store the actual file for FormData upload
     setImageFile(file);
 
-    // 2️⃣ Read preview (base64)
+    // Create preview URL
     const reader = new FileReader();
     reader.onload = ev => {
       const result = ev.target?.result as string;
@@ -121,14 +135,17 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
     return newErrors;
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const validation = validate();
     setErrors(validation);
     if (Object.keys(validation).length) {
       setStatus({ type: 'error', message: 'Please fix the highlighted fields.' });
+      toast.error('Please fix the highlighted fields.');
       return;
     }
+
+    setIsSubmitting(true); // Start loading
 
     // Create FormData for API call
     const formData = new FormData();
@@ -145,15 +162,28 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
     formData.append('categoryId', form.categoryId || '');
     formData.append('tags', JSON.stringify(form.tags));
 
-    // Call onSubmit with FormData
-    onSubmit(formData);
+    try {
+      // Call onSubmit with FormData
+      await onSubmit(formData);
 
-    if (mode === 'create') {
-      setForm(emptyState);
-      setPreview('');
-      setImageFile(null);
+      if (mode === 'create') {
+        setForm(emptyState);
+        setPreview('');
+        setImageFile(null);
+      }
+
+      // Success toast notification
+      const successMessage = mode === 'create' ? 'Painting added successfully!' : 'Painting updated successfully!';
+      toast.success(successMessage);
+      setStatus({ type: 'success', message: successMessage });
+    } catch (error) {
+      console.error('Form submission error:', error);
+      const errorMessage = 'Failed to save painting. Please try again.';
+      toast.error(errorMessage);
+      setStatus({ type: 'error', message: errorMessage });
+    } finally {
+      setIsSubmitting(false); // Stop loading
     }
-    setStatus({ type: 'success', message: mode === 'create' ? 'Painting added.' : 'Painting updated.' });
   };
 
   return (
@@ -269,5 +299,4 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
     </form>
   );
 };
-
 export default AdminPaintingForm;

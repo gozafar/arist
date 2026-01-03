@@ -1,12 +1,12 @@
-import { NextResponse } from "next/server";
-import { CartStore } from "@/lib/server/cartStore";
+import { NextResponse } from 'next/server';
+import { CartStore } from '@/lib/server/cartStore';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 export const POST = async (req: Request) => {
   const { shipping } = (await req.json()) as { shipping?: Record<string, unknown> };
   if (!shipping) {
-    return NextResponse.json({ message: "shipping required" }, { status: 400 });
+    return NextResponse.json({ message: 'shipping required' }, { status: 400 });
   }
   const cart = await CartStore.get();
   const orderId = `order_${Date.now()}`;

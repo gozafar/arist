@@ -6,7 +6,9 @@ import Image from 'next/image';
 import Pagination from '@/components/Pagination';
 import PhotoPreview from '@/components/PhototPreview';
 
-const GALLERY_NAMES = [
+type GalleryName = 'Contemporary / Modern Art' | 'Portrait Paintings' | 'Landscape Paintings' | 'Abstract Art';
+
+const GALLERY_NAMES: GalleryName[] = [
   'Contemporary / Modern Art',
   'Portrait Paintings',
   'Landscape Paintings',
@@ -20,7 +22,7 @@ interface GalleryImage {
   name: string;
   galleryName?: string;
   createdAt?: string;
-  [key: string]: any;
+  [key: string]: string | undefined;
 }
 
 interface Gallery {
@@ -62,14 +64,14 @@ export default function GalleryPage() {
       setImageList(images);
       setCurrentPage(1); // Reset to page 1 when gallery changes
     } else {
-      const hardcodedFiltered = galleries.filter(gallery => GALLERY_NAMES.includes(gallery.name as any));
+      const hardcodedFiltered = galleries.filter(gallery => GALLERY_NAMES.includes(gallery.name as GalleryName));
       setFilteredGalleries(hardcodedFiltered);
 
       const allImages = hardcodedFiltered.flatMap(gallery =>
         gallery.imageIds.map(img => ({
           ...img,
           galleryName: gallery.name,
-          createdAt: (img as any).createdAt || gallery.createdAt,
+          createdAt: (img as { createdAt?: string }).createdAt || gallery.createdAt,
         }))
       );
       setImageList(allImages);
@@ -91,12 +93,14 @@ export default function GalleryPage() {
           const filtered = res.galleries.filter(gallery => gallery.name === selectedGallery);
           images = filtered[0]?.imageIds || [];
         } else {
-          const hardcodedFiltered = res.galleries.filter(gallery => GALLERY_NAMES.includes(gallery.name as any));
+          const hardcodedFiltered = res.galleries.filter(gallery =>
+            GALLERY_NAMES.includes(gallery.name as GalleryName)
+          );
           images = hardcodedFiltered.flatMap(gallery =>
             gallery.imageIds.map(img => ({
               ...img,
               galleryName: gallery.name,
-              createdAt: (img as any).createdAt || gallery.createdAt,
+              createdAt: (img as GalleryImage).createdAt || gallery.createdAt,
             }))
           );
         }

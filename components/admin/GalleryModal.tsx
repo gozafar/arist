@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { DeleteGallery } from "@/lib/api/admin";
-import { deleteContact } from "@/lib/api/contact";
+import { useState } from 'react';
+import { DeleteGallery } from '@/lib/api/admin';
+import { deleteContact } from '@/lib/api/contact';
 
 interface GalleryImage {
   _id: string;
@@ -35,17 +35,17 @@ interface GalleryModalProps {
   onClose: () => void;
   onDelete?: (id: string) => void;
   onDeleteContact?: (id: string) => void;
-  mode: "view" | "delete";
+  mode: 'view' | 'delete';
 }
 
-export default function GalleryModal({ 
-  gallery, 
+export default function GalleryModal({
+  gallery,
   contact,
-  isOpen, 
-  onClose, 
-  onDelete, 
+  isOpen,
+  onClose,
+  onDelete,
   onDeleteContact,
-  mode 
+  mode,
 }: GalleryModalProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -60,7 +60,7 @@ export default function GalleryModal({
         onDelete(gallery._id);
         onClose();
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Error deleting gallery");
+        setError(err instanceof Error ? err.message : 'Error deleting gallery');
       } finally {
         setLoading(false);
       }
@@ -73,7 +73,7 @@ export default function GalleryModal({
         onDeleteContact(contact._id);
         onClose();
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Error deleting contact");
+        setError(err instanceof Error ? err.message : 'Error deleting contact');
       } finally {
         setLoading(false);
       }
@@ -83,88 +83,81 @@ export default function GalleryModal({
   if (!isOpen || (!gallery && !contact)) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="card-glass rounded-3xl p-6 max-w-md w-full">
-        {mode === "view" ? (
+    <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4'>
+      <div className='card-glass rounded-3xl p-6 max-w-md w-full'>
+        {mode === 'view' ? (
           <>
-            <h2 className="text-xl font-semibold text-white mb-4">
-              {gallery ? "Gallery Details" : "Contact Details"}
-            </h2>
-            <div className="space-y-3 text-sm text-white/80">
+            <h2 className='text-xl font-semibold text-white mb-4'>{gallery ? 'Gallery Details' : 'Contact Details'}</h2>
+            <div className='space-y-3 text-sm text-white/80'>
               <div>
-                <p className="text-white/60">ID</p>
-                <p className="break-all">{gallery?._id || contact?._id}</p>
+                <p className='text-white/60'>ID</p>
+                <p className='break-all'>{gallery?._id || contact?._id}</p>
               </div>
               <div>
-                <p className="text-white/60">Name</p>
+                <p className='text-white/60'>Name</p>
                 <p>{gallery?.name || contact?.name}</p>
               </div>
               {gallery && (
                 <div>
-                  <p className="text-white/60">Images</p>
+                  <p className='text-white/60'>Images</p>
                   <p>{gallery.imageIds?.length || 0} images</p>
                 </div>
               )}
               {contact && (
                 <>
                   <div>
-                    <p className="text-white/60">Email</p>
+                    <p className='text-white/60'>Email</p>
                     <p>{contact.email}</p>
                   </div>
                   <div>
-                    <p className="text-white/60">Phone</p>
-                    <p>{contact.phone || "—"}</p>
+                    <p className='text-white/60'>Phone</p>
+                    <p>{contact.phone || '—'}</p>
                   </div>
                   <div>
-                    <p className="text-white/60">Message</p>
-                    <p className="line-clamp-3">{contact.message}</p>
+                    <p className='text-white/60'>Message</p>
+                    <p className='line-clamp-3'>{contact.message}</p>
                   </div>
                 </>
               )}
               <div>
-                <p className="text-white/60">Created</p>
-                <p>{new Date(gallery?.createdAt || contact?.createdAt || "").toLocaleString()}</p>
+                <p className='text-white/60'>Created</p>
+                <p>{new Date(gallery?.createdAt || contact?.createdAt || '').toLocaleString()}</p>
               </div>
               {gallery && (
                 <div>
-                  <p className="text-white/60">Updated</p>
+                  <p className='text-white/60'>Updated</p>
                   <p>{new Date(gallery.updatedAt).toLocaleString()}</p>
                 </div>
               )}
             </div>
-            <div className="mt-6">
-              <button onClick={onClose} className="w-full button-outline">
+            <div className='mt-6'>
+              <button onClick={onClose} className='w-full button-outline'>
                 Close
               </button>
             </div>
           </>
         ) : (
           <>
-            <h2 className="text-xl font-semibold text-white mb-4">
-              Confirm Delete
-            </h2>
-            <p className="text-white/70 mb-6">
-              Are you sure you want to delete the {gallery ? "gallery" : "contact message"} "{gallery?.name || contact?.name}"? 
-              {gallery && ` This action cannot be undone and will also delete all ${gallery.imageIds?.length || 0} images in this gallery.`}
-              {contact && " This action cannot be undone."}
+            <h2 className='text-xl font-semibold text-white mb-4'>Confirm Delete</h2>
+            <p className='text-white/70 mb-6'>
+              Are you sure you want to delete the {gallery ? 'gallery' : 'contact message'} &quot;
+              {gallery?.name || contact?.name}&quot;?
+              {gallery &&
+                ` This action cannot be undone and will also delete all ${gallery.imageIds?.length || 0} images in this gallery.`}
+              {contact && ' This action cannot be undone.'}
             </p>
 
-            {error && (
-              <p className="text-sm text-red-300 mb-4">{error}</p>
-            )}
+            {error && <p className='text-sm text-red-300 mb-4'>{error}</p>}
 
-            <div className="flex gap-4">
+            <div className='flex gap-4'>
               <button
                 onClick={handleDelete}
                 disabled={loading}
-                className="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+                className='flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50'
               >
-                {loading ? "Deleting..." : "Delete"}
+                {loading ? 'Deleting...' : 'Delete'}
               </button>
-              <button
-                onClick={onClose}
-                className="flex-1 button-outline"
-              >
+              <button onClick={onClose} className='flex-1 button-outline'>
                 Cancel
               </button>
             </div>

@@ -1,4 +1,5 @@
 'use client';
+import { useState } from 'react';
 import Link from 'next/link';
 import AddressForm, { Address } from '@/components/AddressForm';
 import Button from '@/components/Button';
@@ -7,11 +8,13 @@ import { checkout } from '@/lib/api/public';
 
 const CheckoutPage = () => {
   const { items, subtotal } = useCart();
+  const [formKey, setFormKey] = useState(0);
 
   const handleSubmit = async (address: Address) => {
     try {
       const order = await checkout({ shipping: address });
       sessionStorage.setItem('pending-order-id', order.orderId);
+      setFormKey(prev => prev + 1); // Reset form if user comes back
     } catch {
       // noop; proceed to payment screen for demo parity
     }
@@ -21,19 +24,17 @@ const CheckoutPage = () => {
   return (
     <div className='mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-16'>
       <div className='mb-8 flex items-center justify-between'>
-        <h1 className='text-3xl md:text-4xl font-semibold text-white my font-display'>Checkout</h1>
+        <h1 className='section-heading'>Checkout</h1>
         <Link href='/cart' className='button-outline text-xs'>
           Back to cart
         </Link>
       </div>
       <div className='grid gap-10 lg:grid-cols-[1.1fr_0.9fr]'>
         <div className='card-glass rounded-3xl p-6'>
-          <h2 className='text-3xl md:text-4xl font-semibold text-white my font-display'>Shipping details</h2>
-          <p className='max-w-2xl text-base leading-relaxed text-black/70 md:text-[16px]'>
-            We will confirm shipping timelines after payment.
-          </p>
+          <h2 className='font-display text-2xl'>Shipping details</h2>
+          <p className='mt-1 text-sm text-white/70'>We will confirm shipping timelines after payment.</p>
           <div className='mt-6'>
-            <AddressForm onSubmit={handleSubmit} />
+            <AddressForm key={`checkout-form-${formKey}`} onSubmit={handleSubmit} />
           </div>
         </div>
         <div className='card-glass rounded-3xl p-6'>

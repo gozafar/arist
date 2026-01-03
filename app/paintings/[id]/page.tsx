@@ -12,20 +12,31 @@ import PhotoPreview from '@/components/PhototPreview';
 type PaintingResponse = PaintingDTO;
 
 async function fetchPainting(id: string): Promise<PaintingResponse | null> {
-  const base = process.env.NEXT_PUBLIC_API_BASE_URL || '';
-  const res = await fetch(`${base}${endpoints.paintings.detail(id)}`, {
-    next: { tags: ['paintings'] },
-  });
-  if (res.status === 404) return null;
-  if (!res.ok) throw new Error('Failed to load painting');
-  return (await res.json()) as PaintingResponse;
+  try {
+    const base = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+    const endpoint =
+      typeof endpoints.paintings.detail === 'function'
+        ? endpoints.paintings.detail(id)
+        : `${endpoints.paintings.detail}/${id}`;
+
+    const res = await fetch(`${base}${endpoint}`, {
+      next: { tags: ['paintings'] },
+    });
+
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error('Failed to load painting');
+
+    return await res.json();
+  } catch (error) {
+    console.error('Error fetching painting:', error);
+    return null;
+  }
 }
 
-export const generateMetadata = async ({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> => {
+export const generateMetadata = async ({ params }: { params: { id: string } }): Promise<Metadata> => {
   const country = getCountryFromHeaders(await headers());
   const config = getCountryConfig(country);
-  const resolvedParams = await params;
-  const painting = await fetchPainting(resolvedParams.id);
+  const painting = await fetchPainting(params.id);
   if (!painting) {
     return { title: 'Painting not found', robots: { index: false } };
   }
@@ -42,9 +53,8 @@ export const generateMetadata = async ({ params }: { params: Promise<{ id: strin
   });
 };
 
-const PaintingDetailPage = async ({ params }: { params: Promise<{ id: string }> }) => {
-  const resolvedParams = await params;
-  const painting = await fetchPainting(resolvedParams.id);
+const PaintingDetailPage = async ({ params }: { params: { id: string } }) => {
+  const painting = await fetchPainting(params.id);
   if (!painting) {
     notFound();
   }

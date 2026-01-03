@@ -1,88 +1,95 @@
-import { NextResponse } from "next/server";
-import PaintingOrder from "@/models/PaintingOrder";
-import { dbConnect } from "@/lib/db";
-
+import { NextResponse } from 'next/server';
+import PaintingOrder from '@/models/PaintingOrder';
+import { dbConnect } from '@/lib/db';
+import {
+  validatePaintingOrderWithBusinessLogic,
+  PaintingOrderFormData,
+} from '../../../lib/validations/paintingOrderValidation';
 
 // POST - Create new order
 export async function POST(request: Request) {
-    try {
-        const body = await request.json();
-        // Basic validation
-        const requiredFields = ['name', 'email', 'phone', 'address', 'city', 'state', 'postal', 'country', 'paintingId'];
-        for (const field of requiredFields) {
-            if (!body[field] || typeof body[field] !== 'string' || body[field].trim() === '') {
-                return NextResponse.json(
-                    { success: false, error: `${field} is required` },
-                    { status: 400 }
-                );
-            }
-        }
+  try {
+    const body = await request.json();
 
-        // Email validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(body.email)) {
-            return NextResponse.json(
-                { success: false, error: "Invalid email address" },
-                { status: 400 }
-            );
-        }
+    // Validate using Joi schema with business logic
+    const validation = validatePaintingOrderWithBusinessLogic(body);
 
-        // Phone validation (basic)
-        if (body.phone.replace(/\D/g, '').length < 10) {
-            return NextResponse.json(
-                { success: false, error: "Invalid phone number" },
-                { status: 400 }
-            );
-        }
-
-        // Connect to database after validation
-        await dbConnect();
-
-        // Check for existing email
-        const existingEmail = await PaintingOrder.findOne({ 'user.email': body.email.toLowerCase().trim() });
-
-        if (existingEmail) {
-            return NextResponse.json(
-                { success: false, error: "Email already exists" },
-                { status: 409 }
-            );
-        }
-
-        // Check for existing phone
-        const existingPhone = await PaintingOrder.findOne({ 'user.phone': body.phone.trim() });
-
-        if (existingPhone) {
-            return NextResponse.json(
-                { success: false, error: "Phone number already exists" },
-                { status: 409 }
-            );
-        }
-
-        const order = await PaintingOrder.create({
-            user: {
-                name: body.name.trim(),
-                email: body.email.trim().toLowerCase(),
-                phone: body.phone.trim(),
-                address: body.address.trim(),
-                city: body.city.trim(),
-                state: body.state.trim(),
-                postal: body.postal.trim(),
-                country: body.country.trim(),
-            },
-            paintingId: body.paintingId.trim(),
-        });
-
-        return NextResponse.json(
-            { success: true, payload: order },
-            { status: 201 }
-        );
-
-    } catch (error) {
-        console.error("Error creating order:", error);
-        return NextResponse.json(
-            { success: false, error: "Failed to create order" },
-            { status: 500 }
-        );
+    if (!validation.isValid) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: validation.errors[0]?.message || 'Validation failed',
+        },
+        { status: 400 }
+      );
     }
-}
 
+    // Connect to database after validation
+    await dbConnect();
+
+    // Check for existing email
+    const existingEmail = await PaintingOrder.findOne({
+      'user.email': validation.sanitizedData!.email.toLowerCase().trim(),
+    });
+
+    if (existingEmail) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Email already exists',
+          field: 'email',
+        },
+        { status: 409 }
+      );
+    }
+
+    // Check for existing phone
+    const existingPhone = await PaintingOrder.findOne({
+      'user.phone': validation.sanitizedData!.phone.trim(),
+    });
+
+    if (existingPhone) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Phone number already exists',
+          field: 'phone',
+        },
+        { status: 409 }
+      );
+    }
+
+    const order = await PaintingOrder.create({
+      user: {
+        name: validation.sanitizedData!.name.trim(),
+        email: validation.sanitizedData!.email.trim().toLowerCase(),
+        phone: validation.sanitizedData!.phone.trim(),
+        address: validation.sanitizedData!.address.trim(),
+        city: validation.sanitizedData!.city.trim(),
+        state: validation.sanitizedData!.state.trim(),
+        postal: validation.sanitizedData!.postal.trim(),
+        country: validation.sanitizedData!.country.trim(),
+      },
+      paintingId: validation.sanitizedData!.paintingId.trim(),
+    });
+
+    return NextResponse.json(
+      {
+        success: true,
+        payload: order,
+        message: 'Order created successfully',
+      },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error('Error creating order:', error);
+    return NextResponse.json(
+      {
+        success: false,
+        // error: 'Failed to create order',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 }
+    );
+  }
+}

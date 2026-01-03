@@ -1,14 +1,14 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document } from 'mongoose';
 
 // Contact status enum for admin management
 export enum ContactStatus {
-  NEW_LEAD = "NEW_LEAD",
-  CONTACTED = "CONTACTED", 
-  QUALIFIED = "QUALIFIED",
-  PROPOSAL_SENT = "PROPOSAL_SENT",
-  NEGOTIATION = "NEGOTIATION",
-  WON = "WON",
-  LOST = "LOST"
+  NEW_LEAD = 'NEW_LEAD',
+  CONTACTED = 'CONTACTED',
+  QUALIFIED = 'QUALIFIED',
+  PROPOSAL_SENT = 'PROPOSAL_SENT',
+  NEGOTIATION = 'NEGOTIATION',
+  WON = 'WON',
+  LOST = 'LOST',
 }
 
 // Contact interface
@@ -45,7 +45,7 @@ const ContactSchema = new Schema<ContactDoc>(
       type: String,
       trim: true,
       maxlength: 20,
-      match: /^[+]?[\d\s\-\(\)]+$/,
+      match: /^[+]?[\d\s\-()]+$/,
     },
     message: {
       type: String,
@@ -67,7 +67,7 @@ const ContactSchema = new Schema<ContactDoc>(
   },
   {
     timestamps: true,
-    collection: "contacts",
+    collection: 'contacts',
   }
 );
 
@@ -76,6 +76,6 @@ ContactSchema.index({ status: 1, createdAt: -1 });
 ContactSchema.index({ email: 1 });
 
 // Export model
-const Contact = mongoose.models.Contact || mongoose.model<ContactDoc>("Contact", ContactSchema);
+const Contact = mongoose.models.Contact || mongoose.model<ContactDoc>('Contact', ContactSchema);
 
 export default Contact;

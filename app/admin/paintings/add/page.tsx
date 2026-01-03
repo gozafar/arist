@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import AdminPaintingForm from '@/components/admin/AdminPaintingForm';
 import { usePaintings } from '@/context/PaintingContext';
+import AdminPaintingForm from '@/components/admin/AdminPaintingForm';
 
 const AdminAddPaintingPage = () => {
   const { addPainting } = usePaintings();

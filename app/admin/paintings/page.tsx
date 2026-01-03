@@ -13,28 +13,50 @@ const AdminPaintingsPage = () => {
   const editRef = useRef<HTMLDivElement | null>(null);
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 8;
+  const [loading, setLoading] = useState(false);
 
   const totalPages = Math.max(1, Math.ceil(paintings.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
   const start = (currentPage - 1) * PAGE_SIZE;
   const paginated = paintings.slice(start, start + PAGE_SIZE);
 
-  const handleEditSubmit = (payload: FormData) => {
+  const handleEditSubmit = async (payload: FormData) => {
     if (editing) {
-      // Extract painting data from FormData
-      const paintingData: Partial<NewPaintingInput> = {
-        title: payload.get('title') as string,
-        description: payload.get('description') as string,
-        price: Number(payload.get('price')),
-        medium: payload.get('medium') as string,
-        size: payload.get('size') as string,
-        year: Number(payload.get('year')),
-        availability: payload.get('availability') as 'in-stock' | 'sold',
-        categoryId: payload.get('categoryId') as string,
-        tags: JSON.parse((payload.get('tags') as string) || '[]'),
-      };
+      setLoading(true);
+      // Check if there's an image file in FormData
+      const imageFile = payload.get('image') as File;
 
-      updatePainting(editing.id, paintingData);
+      if (imageFile && imageFile.size > 0) {
+        console.log('Sending FormData with image');
+        console.log('FormData entries:');
+        payload.forEach((value, key) => {
+          if (value instanceof File) {
+            console.log(`${key}: File(${value.name}, ${value.size} bytes)`);
+          } else {
+            console.log(`${key}: ${value}`);
+          }
+        });
+        // Send FormData directly when there's an image
+        await updatePainting(editing.id, payload);
+      } else {
+        console.log('Sending JSON without image');
+        // Extract painting data from FormData when no image
+        const paintingData: Partial<NewPaintingInput> = {
+          title: payload.get('title') as string,
+          description: payload.get('description') as string,
+          price: Number(payload.get('price')),
+          medium: payload.get('medium') as string,
+          size: payload.get('size') as string,
+          year: Number(payload.get('year')),
+          availability: payload.get('availability') as 'in-stock' | 'sold',
+          categoryId: payload.get('categoryId') as string,
+          tags: JSON.parse((payload.get('tags') as string) || '[]'),
+        };
+
+        await updatePainting(editing.id, paintingData);
+      }
+
+      setLoading(false);
       setEditing(null);
     }
   };
@@ -58,9 +80,7 @@ const AdminPaintingsPage = () => {
       <AdminPaintingTable
         paintings={paginated}
         onEdit={p => setEditing(p)}
-        onDelete={id => {
-          if (confirm('Delete this painting?')) deletePainting(id);
-        }}
+        onDelete={deletePainting}
         onToggle={toggleAvailability}
       />
       <AdminPagination total={paintings.length} perPage={PAGE_SIZE} currentPage={currentPage} onPageChange={setPage} />
