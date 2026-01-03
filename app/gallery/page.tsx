@@ -184,34 +184,41 @@ export default function GalleryPage() {
         <section className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'>
           {visibleImages.map((item: GalleryImage) => (
             <PhotoPreview key={item._id || item.imageId} galleryId={`painting-${item._id || item.imageId}`}>
-              <div className='group overflow-hidden rounded-2xl border border-white/10 bg-white/5 transition hover:border-white/20'>
+              <article className='group relative flex flex-col overflow-hidden rounded-3xl bg-white/5 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl'>
                 {/* IMAGE */}
                 <div className='relative aspect-square overflow-hidden'>
                   <a
                     href={item.url}
                     data-pswp-width={item.width ?? 2000}
                     data-pswp-height={item.height ?? 2000}
-                    className='block cursor-zoom-in'
+                    className='block h-full w-full cursor-zoom-in'
                   >
                     <Image
                       src={item.url}
                       alt={item.name || 'Artwork'}
                       fill
-                      className='object-cover object-center transition-transform duration-500 ease-in-out group-hover:scale-105'
+                      className='object-cover transition-transform duration-700 group-hover:scale-105'
                       sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
-                      loading='lazy'
-                      quality={75}
+                      quality={80}
                     />
                   </a>
+
+                  {/* Hover overlay */}
+                  <div className='pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100' />
+
+                  {/* Quick view badge */}
+                  <span className='pointer-events-none absolute bottom-4 right-4 rounded-full bg-black/70 px-3 py-1 text-xs text-white backdrop-blur'>
+                    View artwork
+                  </span>
                 </div>
 
                 {/* CONTENT */}
-                <div className='space-y-1 p-4'>
-                  <h3 className='text-sm font-semibold text-white'>{item.name || 'Untitled'}</h3>
+                <div className='flex flex-1 flex-col gap-1 p-4'>
+                  <h3 className='line-clamp-1 text-base font-semibold text-white'>{item.name || 'Untitled'}</h3>
 
-                  {item.galleryName && <p className='text-xs text-white/70'>{item.galleryName}</p>}
+                  {item.galleryName && <p className='text-xs text-black/80'>{item.galleryName}</p>}
 
-                  <p className='text-xs text-white/50'>
+                  <p className='text-xs text-black/70'>
                     {item.createdAt
                       ? new Date(item.createdAt).toLocaleDateString('en-US', {
                           month: 'short',
@@ -219,8 +226,15 @@ export default function GalleryPage() {
                         })
                       : 'Date not available'}
                   </p>
+
+                  {/* FOOTER */}
+                  <div className='mt-auto pt-4'>
+                    <button className='w-full rounded-xl border border-white/10 bg-white/10 px-4 py-2 text-xs font-medium text-white transition hover:bg-white/20'>
+                      View details
+                    </button>
+                  </div>
                 </div>
-              </div>
+              </article>
             </PhotoPreview>
           ))}
         </section>
