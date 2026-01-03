@@ -1,6 +1,7 @@
 import { Schema, Types, model, models } from 'mongoose';
 
 export interface PaintingDoc {
+  _id: Types.ObjectId;
   title: string;
   price: number;
   medium: string;

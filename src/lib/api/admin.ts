@@ -172,3 +172,9 @@ export const deleteImage = (id: string) =>
     method: 'DELETE',
     cache: 'no-store',
   });
+
+export const deleteGalleryImage = (imageId: string) =>
+  apiFetch<{ message: string }>(`/api/admin/gallery/images/${imageId}`, {
+    method: 'DELETE',
+    cache: 'no-store',
+  });

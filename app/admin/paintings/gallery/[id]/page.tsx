@@ -3,7 +3,7 @@
 import { useEffect, useState, use, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
-import { UpdateGallery } from '@/lib/api/admin';
+import { UpdateGallery, deleteGalleryImage } from '@/lib/api/admin';
 import GalleryModal from '@/components/admin/GalleryModal';
 import Image from 'next/image';
 
@@ -107,15 +107,24 @@ export default function EditGalleryPage({ params }: { params: Promise<{ id: stri
     setDeleteModalOpen(true);
   };
 
-  const confirmDeleteImage = () => {
+  const confirmDeleteImage = async () => {
     if (!imageToDelete) return;
 
-    // Mark image as deleted locally - no API call
-    setImages(prev => prev.map(img => (img._id === imageToDelete ? { ...img, isDeleted: true } : img)));
+    try {
+      // Delete image immediately from API
+      await deleteGalleryImage(imageToDelete);
 
-    toast.success('Image marked for deletion');
-    setDeleteModalOpen(false);
-    setImageToDelete(null);
+      // Remove from local state
+      setImages(prev => prev.filter(img => img._id !== imageToDelete));
+      setInitialImages(prev => prev.filter(img => img._id !== imageToDelete));
+
+      toast.success('Image deleted successfully');
+      setDeleteModalOpen(false);
+      setImageToDelete(null);
+    } catch (error) {
+      console.error('Failed to delete image:', error);
+      toast.error('Failed to delete image');
+    }
   };
 
   const cancelDelete = () => {
@@ -128,7 +137,7 @@ export default function EditGalleryPage({ params }: { params: Promise<{ id: stri
     setSubmitting(true);
 
     try {
-      const activeImages = images.filter(img => !img.isDeleted);
+      const activeImages = images;
 
       if (activeImages.length === 0) {
         toast.error('At least one image is required');
@@ -155,12 +164,11 @@ export default function EditGalleryPage({ params }: { params: Promise<{ id: stri
           const initial = initialImages.find(orig => orig._id === img._id);
           const nameChanged = initial?.name !== img.name;
           const replaced = Boolean(img.file);
-          const deleted = Boolean(img.isDeleted);
-          if (nameChanged || replaced || deleted) {
+          if (nameChanged || replaced) {
             return {
               _id: img._id,
               name: img.name.trim(),
-              isDeleted: deleted,
+              isDeleted: false,
             };
           }
           return null;
@@ -215,7 +223,7 @@ export default function EditGalleryPage({ params }: { params: Promise<{ id: stri
             </p>
           </div>
           <span className='rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs text-white/70'>
-            {images.filter(img => !img.isDeleted).length} image(s)
+            {images.length} image(s)
           </span>
         </div>
       </div>
@@ -250,68 +258,66 @@ export default function EditGalleryPage({ params }: { params: Promise<{ id: stri
           </div>
 
           <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-            {images
-              .filter(img => !img.isDeleted)
-              .map(img => {
-                const fileInputId = `replace-${img._id}`;
-                return (
-                  <div
-                    key={img._id}
-                    className='group relative overflow-hidden rounded-xl border border-white/10 bg-white/5 shadow-sm transition hover:border-white/20'
-                  >
-                    <div className='relative h-40 w-full'>
-                      <Image
-                        src={img.url}
-                        alt={img.name}
-                        fill
-                        className='object-cover'
-                        sizes='(max-width: 768px) 100vw, 33vw'
-                        loading='lazy'
-                        quality={75}
-                        placeholder='blur'
-                        blurDataURL='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiB2aWV3Qm94PSIwIDAgNDAwIDQwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YxZjFmMSIvPjwvc3ZnPg=='
+            {images.map(img => {
+              const fileInputId = `replace-${img._id}`;
+              return (
+                <div
+                  key={img._id}
+                  className='group relative overflow-hidden rounded-xl border border-white/10 bg-white/5 shadow-sm transition hover:border-white/20'
+                >
+                  <div className='relative h-40 w-full'>
+                    <Image
+                      src={img.url}
+                      alt={img.name}
+                      fill
+                      className='object-cover'
+                      sizes='(max-width: 768px) 100vw, 33vw'
+                      loading='lazy'
+                      quality={75}
+                      placeholder='blur'
+                      blurDataURL='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiB2aWV3Qm94PSIwIDAgNDAwIDQwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YxZjFmMSIvPjwvc3ZnPg=='
+                    />
+                    <span className='absolute left-3 top-3 rounded-full bg-black/60 px-2 py-1 text-[10px] uppercase tracking-[0.15em] !text-white'>
+                      Existing
+                    </span>
+                  </div>
+                  <div className='space-y-3 p-4'>
+                    <div>
+                      <label className='block text-xs text-white/60 mb-1'>Image Name</label>
+                      <input
+                        value={img.name}
+                        onChange={e => updateImageName(img._id, e.target.value)}
+                        className='w-full rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white outline-none transition focus:border-white/30'
+                        placeholder='Image name'
                       />
-                      <span className='absolute left-3 top-3 rounded-full bg-black/60 px-2 py-1 text-[10px] uppercase tracking-[0.15em] !text-white'>
-                        Existing
-                      </span>
                     </div>
-                    <div className='space-y-3 p-4'>
-                      <div>
-                        <label className='block text-xs text-white/60 mb-1'>Image Name</label>
-                        <input
-                          value={img.name}
-                          onChange={e => updateImageName(img._id, e.target.value)}
-                          className='w-full rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white outline-none transition focus:border-white/30'
-                          placeholder='Image name'
-                        />
-                      </div>
 
-                      <div className='flex items-center gap-2'>
-                        <label
-                          htmlFor={fileInputId}
-                          className='flex-1 cursor-pointer rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-xs text-white/80 text-center transition hover:border-white/30'
-                        >
-                          Replace Image
-                        </label>
-                        <input
-                          id={fileInputId}
-                          type='file'
-                          accept='image/*'
-                          className='hidden'
-                          onChange={e => e.target.files && replaceImage(img._id, e.target.files[0])}
-                        />
-                        <button
-                          type='button'
-                          onClick={() => deleteImage(img._id)}
-                          className='rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-300 transition hover:bg-red-500/20'
-                        >
-                          Delete
-                        </button>
-                      </div>
+                    <div className='flex items-center gap-2'>
+                      <label
+                        htmlFor={fileInputId}
+                        className='flex-1 cursor-pointer rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-xs text-white/80 text-center transition hover:border-white/30'
+                      >
+                        Replace Image
+                      </label>
+                      <input
+                        id={fileInputId}
+                        type='file'
+                        accept='image/*'
+                        className='hidden'
+                        onChange={e => e.target.files && replaceImage(img._id, e.target.files[0])}
+                      />
+                      <button
+                        type='button'
+                        onClick={() => deleteImage(img._id)}
+                        className='rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-300 transition hover:bg-red-500/20'
+                      >
+                        Delete
+                      </button>
                     </div>
                   </div>
-                );
-              })}
+                </div>
+              );
+            })}
           </div>
         </div>
 

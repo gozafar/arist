@@ -27,8 +27,6 @@ const AdminPaintingsPage = () => {
       const imageFile = payload.get('image') as File;
 
       if (imageFile && imageFile.size > 0) {
-        console.log('Sending FormData with image');
-        console.log('FormData entries:');
         payload.forEach((value, key) => {
           if (value instanceof File) {
             console.log(`${key}: File(${value.name}, ${value.size} bytes)`);
@@ -39,7 +37,6 @@ const AdminPaintingsPage = () => {
         // Send FormData directly when there's an image
         await updatePainting(editing.id, payload);
       } else {
-        console.log('Sending JSON without image');
         // Extract painting data from FormData when no image
         const paintingData: Partial<NewPaintingInput> = {
           title: payload.get('title') as string,

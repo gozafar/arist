@@ -5,7 +5,7 @@ import Painting from '@/models/Painting';
 import AdminLog from '@/models/AdminLog';
 import { requireRole } from '@/lib/rbac';
 import { verifyAccessToken } from '@/lib/jwt';
-import { deleteFromCloudinary, updateOnCloudinary } from '../../../cloudinary';
+import { deleteFromCloudinary, updateOnCloudinary, extractPublicIdFromUrl } from '../../../cloudinary';
 import fs from 'fs';
 import path from 'path';
 
@@ -54,9 +54,9 @@ export const PUT = async (req: NextRequest, context: { params: Promise<{ id: str
       // Extract existing public ID from current image URL
       let existingPublicId: string | undefined;
       if (existingPainting.image) {
-        const urlParts = existingPainting.image.split('/');
-        const publicIdWithExtension = urlParts[urlParts.length - 1];
-        existingPublicId = `paintings/${publicIdWithExtension.split('.')[0]}`;
+        const extractedId = extractPublicIdFromUrl(existingPainting.image);
+        existingPublicId = extractedId || undefined;
+        console.log('Extracted existing public ID:', existingPublicId);
       }
 
       // Upload new image to Cloudinary (will delete old one if existingPublicId provided)
@@ -139,16 +139,26 @@ export const DELETE = async (req: NextRequest, context: { params: Promise<{ id: 
     // Delete image from Cloudinary if it exists
     if (removed.image) {
       try {
-        // Extract public ID from Cloudinary URL
-        const urlParts = removed.image.split('/');
-        const publicIdWithExtension = urlParts[urlParts.length - 1];
-        const publicId = `paintings/${publicIdWithExtension.split('.')[0]}`;
-        const cloudinaryDeleted = await deleteFromCloudinary(publicId);
-        if (!cloudinaryDeleted) {
-          return NextResponse.json({ message: 'Failed to delete image from Cloudinary' }, { status: 500 });
+        console.log('Image URL to delete:', removed.image);
+
+        // Use the new helper function
+        const publicId = extractPublicIdFromUrl(removed.image);
+
+        if (publicId) {
+          console.log('Extracted public ID:', publicId);
+          const cloudinaryDeleted = await deleteFromCloudinary(publicId);
+          console.log('Cloudinary delete result:', cloudinaryDeleted);
+
+          // Don't fail the operation if Cloudinary delete fails
+          if (!cloudinaryDeleted) {
+            console.log('Warning: Cloudinary delete failed, but continuing with database deletion');
+          }
+        } else {
+          console.log('Could not extract public ID from URL:', removed.image);
         }
-      } catch {
-        return NextResponse.json({ message: 'Failed to delete image from Cloudinary' }, { status: 500 });
+      } catch (error) {
+        console.error('Failed to delete image from Cloudinary:', error);
+        // Continue with deletion even if Cloudinary delete fails
       }
     }
 

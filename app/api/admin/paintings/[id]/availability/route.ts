@@ -10,6 +10,12 @@ export const dynamic = 'force-dynamic';
 
 export const PATCH = async (req: NextRequest, context: { params: Promise<{ id: string }> }) => {
   const { id } = await context.params;
+
+  // Validate ID
+  if (!id || id === 'undefined' || id === 'invalid') {
+    return NextResponse.json({ message: 'Invalid painting ID' }, { status: 400 });
+  }
+
   const authError = await requireRole(req, ['ADMIN', 'SUPER_ADMIN']);
   if (authError) return authError;
 
