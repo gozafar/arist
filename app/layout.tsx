@@ -1,47 +1,54 @@
-import type { Metadata, Viewport } from "next";
-import { headers } from "next/headers";
-import { Playfair_Display, Inter } from "next/font/google";
-import "@/styles/globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import { CartProvider } from "@/context/CartContext";
-import { PaintingProvider } from "@/context/PaintingContext";
-import { defaultDescription, defaultKeywords, defaultOgImage, getCountryFromHeaders, getLangForCountry, siteUrl } from "@/lib/seo";
+import type { Metadata, Viewport } from 'next';
+import { headers } from 'next/headers';
+import { Playfair_Display, Inter } from 'next/font/google';
+import '@/styles/globals.css';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import { CartProvider } from '@/context/CartContext';
+import { PaintingProvider } from '@/context/PaintingContext';
+import {
+  defaultDescription,
+  defaultKeywords,
+  defaultOgImage,
+  getCountryFromHeaders,
+  getLangForCountry,
+  siteUrl,
+} from '@/lib/seo';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' });
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
   title: {
-    default: "Artistry – Online Painting Gallery",
-    template: "%s | Artistry Gallery"
+    default: 'Artistry – Online Painting Gallery',
+    template: '%s | Artistry Gallery',
   },
   description: defaultDescription,
   keywords: defaultKeywords,
   metadataBase: new URL(siteUrl),
   openGraph: {
-    title: "Artistry – Online Painting Gallery",
+    title: 'Artistry – Online Painting Gallery',
     description: defaultDescription,
     url: siteUrl,
-    siteName: "Artistry Gallery",
-    locale: "en_US",
-    type: "website",
-    images: [{ url: defaultOgImage, alt: "Artistry Gallery online painting marketplace" }]
+    siteName: 'Artistry Gallery',
+    locale: 'en_US',
+    type: 'website',
+    images: [{ url: defaultOgImage, alt: 'Artistry Gallery online painting marketplace' }],
   },
   twitter: {
-    card: "summary_large_image",
-    title: "Artistry – Online Painting Gallery",
+    card: 'summary_large_image',
+    title: 'Artistry – Online Painting Gallery',
     description: defaultDescription,
-    images: [defaultOgImage]
-  }
+    images: [defaultOgImage],
+  },
 };
 
 export const viewport: Viewport = {
-  width: "device-width",
+  width: 'device-width',
   initialScale: 1,
-  themeColor: "#F8F5F0"
+  themeColor: '#F8F5F0',
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -54,29 +61,29 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
         <PaintingProvider>
           <CartProvider>
-            <div className="min-h-screen flex flex-col">
+            <div className='min-h-screen flex flex-col'>
               <Navbar />
-              <main className="flex-1">
+              <main className='flex-1'>
                 <script
-                  type="application/ld+json"
+                  type='application/ld+json'
                   dangerouslySetInnerHTML={{
                     __html: JSON.stringify({
-                      "@context": "https://schema.org",
-                      "@type": "Organization",
-                      name: "Rakhi Studio",
-                      url: siteUrl,
-                      logo: `${siteUrl}/logo.png`,
-                      sameAs: ["https://www.instagram.com", "https://www.behance.net"],
-                      areaServed: ["United States", "India", "United Arab Emirates", "Hong Kong"],
-                      contactPoint: [
+                      '@context': 'https://schema.org',
+                      '@type': 'Organization',
+                      'name': 'Rakhi Studio',
+                      'url': siteUrl,
+                      'logo': `${siteUrl}/logo.png`,
+                      'sameAs': ['https://www.instagram.com', 'https://www.behance.net'],
+                      'areaServed': ['United States', 'India', 'United Arab Emirates', 'Hong Kong'],
+                      'contactPoint': [
                         {
-                          "@type": "ContactPoint",
-                          contactType: "sales",
-                          areaServed: ["US", "IN", "AE", "HK"],
-                          availableLanguage: ["English"]
-                        }
-                      ]
-                    })
+                          '@type': 'ContactPoint',
+                          'contactType': 'sales',
+                          'areaServed': ['US', 'IN', 'AE', 'HK'],
+                          'availableLanguage': ['English'],
+                        },
+                      ],
+                    }),
                   }}
                 />
                 {children}

@@ -1,16 +1,16 @@
-import { NextRequest, NextResponse } from "next/server";
-import Gallery from "@/models/gallery";
-import Image from "@/models/Image";
-import Category from "@/models/Category"; // Ensure Category model is loaded
-import { dbConnect } from "@/lib/db";
+import { NextRequest, NextResponse } from 'next/server';
+import Gallery from '@/models/gallery';
+import Image from '@/models/Image';
+// import Category from "@/models/Category"; // Ensure Category model is loaded
+import { dbConnect } from '@/lib/db';
 // import { requireRole } from "@/lib/rbac";
-import { uploadOnCloudinary } from "../../cloudinary";
-import fs from "fs";
-import path from "path";
+import { uploadOnCloudinary } from '../../cloudinary';
+import fs from 'fs';
+import path from 'path';
 
 // Ensure Category model is registered
-import "@/models/Category";
-import "@/models/Image";
+import '@/models/Category';
+import '@/models/Image';
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,17 +23,20 @@ export async function POST(request: NextRequest) {
 
     // Validate gallery name against hardcoded enum
     const validGalleryNames = [
-      "Contemporary / Modern Art",
-      "Portrait Paintings", 
-      "Landscape Paintings",
-      "Abstract Art"
+      'Contemporary / Modern Art',
+      'Portrait Paintings',
+      'Landscape Paintings',
+      'Abstract Art',
     ];
-    
+
     if (!validGalleryNames.includes(name)) {
-      return NextResponse.json({
-        error: "Validation failed",
-        errors: { name: "Invalid gallery name. Must be one of the predefined categories." }
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: 'Validation failed',
+          errors: { name: 'Invalid gallery name. Must be one of the predefined categories.' },
+        },
+        { status: 400 }
+      );
     }
 
     await dbConnect();
@@ -69,11 +72,11 @@ export async function POST(request: NextRequest) {
         fs.writeFileSync(tempFilePath, buffer);
 
         // Upload to Cloudinary
-        const uploadResult = await uploadOnCloudinary(tempFilePath, "rakhi-studio/gallery");
+        const uploadResult = await uploadOnCloudinary(tempFilePath, 'rakhi-studio/gallery');
 
         return {
           url: uploadResult?.secure_url,
-          name: imageName
+          name: imageName,
         };
       } finally {
         // Clean up temp file
@@ -90,7 +93,7 @@ export async function POST(request: NextRequest) {
     const processedImages = uploadResults.filter(result => result.url);
 
     if (processedImages.length === 0) {
-      throw new Error("Failed to upload any images to Cloudinary");
+      throw new Error('Failed to upload any images to Cloudinary');
     }
 
     // Prepare image documents with gallery reference
@@ -108,17 +111,17 @@ export async function POST(request: NextRequest) {
     await gallery.save();
 
     // Populate gallery with images
-    await gallery.populate([
-      { path: "imageIds", select: "url name" },
-    ]);
+    await gallery.populate([{ path: 'imageIds', select: 'url name' }]);
 
-    return NextResponse.json({ gallery, message: "Gallery created successfully" }, { status: 201 });
-
+    return NextResponse.json({ gallery, message: 'Gallery created successfully' }, { status: 201 });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Failed to create gallery";
-    console.error("Gallery create error:", error);
-    return NextResponse.json({
-      error: message,
-    }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Failed to create gallery';
+    console.error('Gallery create error:', error);
+    return NextResponse.json(
+      {
+        error: message,
+      },
+      { status: 500 }
+    );
   }
 }

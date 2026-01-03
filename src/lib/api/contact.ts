@@ -1,5 +1,5 @@
-import { apiFetch } from "./client";
-import { endpoints } from "./endpoints";
+import { apiFetch } from './client';
+import { endpoints } from './endpoints';
 
 export type ContactRequest = {
   name: string;
@@ -38,35 +38,35 @@ export type GetContactsResponse = {
 
 export const createContact = (payload: ContactRequest) =>
   apiFetch<ContactResponse>(endpoints.contactUser.post, {
-    method: "POST",
+    method: 'POST',
     body: payload,
-    cache: "no-store"
+    cache: 'no-store',
   });
 
 export const getContacts = (params?: { page?: number; limit?: number; status?: string; search?: string }) => {
   const query = new URLSearchParams();
-  if (params?.page) query.set("page", String(params.page));
-  if (params?.limit) query.set("limit", String(params.limit));
-  if (params?.status) query.set("status", params.status);
-  if (params?.search) query.set("search", params.search);
+  if (params?.page) query.set('page', String(params.page));
+  if (params?.limit) query.set('limit', String(params.limit));
+  if (params?.status) query.set('status', params.status);
+  if (params?.search) query.set('search', params.search);
 
-  const suffix = query.size ? `?${query.toString()}` : "";
+  const suffix = query.size ? `?${query.toString()}` : '';
 
   return apiFetch<GetContactsResponse>(`${endpoints.contactUser.get}${suffix}`, {
-    method: "GET",
-    cache: "no-store"
+    method: 'GET',
+    cache: 'no-store',
   });
 };
 
 export const updateContact = (id: string, payload: Partial<ContactRequest>) =>
   apiFetch<ContactResponse>(endpoints.contactUser.update(id), {
-    method: "PUT",
+    method: 'PUT',
     body: payload,
-    cache: "no-store"
+    cache: 'no-store',
   });
 
 export const deleteContact = (id: string) =>
   apiFetch<void>(endpoints.contactUser.delete(id), {
-    method: "DELETE",
-    cache: "no-store"
+    method: 'DELETE',
+    cache: 'no-store',
   });

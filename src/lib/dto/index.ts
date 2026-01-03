@@ -1,4 +1,4 @@
-import { UserRole } from "@/models/User";
+import { UserRole } from '@/models/User';
 
 export type PaintingDTO = {
   id: string;
@@ -10,7 +10,7 @@ export type PaintingDTO = {
   description: string;
   image: string;
   tags: string[];
-  availability: "in-stock" | "sold";
+  availability: 'in-stock' | 'sold';
   categoryId: string;
   createdAt: string;
   updatedAt: string;

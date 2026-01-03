@@ -1,47 +1,55 @@
-"use client";
+'use client';
 
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
-import clsx from "clsx";
-import InputField from "@/components/InputField";
-import TextArea from "@/components/TextArea";
-import PriceInput from "@/components/PriceInput";
-import SubmitButton from "@/components/SubmitButton";
-import ImagePreview from "@/components/ImagePreview";
-import { NewPaintingInput } from "@/context/PaintingContext";
-import { adminGetCategories } from "@/lib/api/admin";
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import clsx from 'clsx';
+import InputField from '@/components/InputField';
+import TextArea from '@/components/TextArea';
+import PriceInput from '@/components/PriceInput';
+import SubmitButton from '@/components/SubmitButton';
+import ImagePreview from '@/components/ImagePreview';
+import { NewPaintingInput } from '@/context/PaintingContext';
+import { adminGetCategories } from '@/lib/api/admin';
+import { toast } from 'react-toastify';
 
 interface Category {
   id: string;
   categoryName: string;
 }
 
-
 export type AdminPaintingFormProps = {
   initial?: NewPaintingInput & { id?: string };
   onSubmit: (payload: FormData) => void;
-  mode?: "create" | "edit";
+  mode?: 'create' | 'edit';
 };
 
 const emptyState: NewPaintingInput & { categoryId?: string } = {
-  title: "",
-  description: "",
+  title: '',
+  description: '',
   price: 0,
-  medium: "",
-  size: "",
+  medium: '',
+  size: '',
   year: new Date().getFullYear(),
-  availability: "in-stock",
-  image: "",
+  availability: 'in-stock',
+  image: '',
   tags: [],
-  categoryId: ""
+  categoryId: '',
 };
 
-const AdminPaintingForm = ({ initial, onSubmit, mode = "create" }: AdminPaintingFormProps) => {
-  const [form, setForm] = useState<NewPaintingInput & { categoryId?: string }>(initial ?? emptyState);
-  const [preview, setPreview] = useState<string>(initial?.image ?? "");
+const getInitialForm = (initial?: NewPaintingInput & { id?: string }) => ({
+  ...emptyState,
+  ...initial,
+  price: initial?.price ?? 0,
+  categoryId: initial?.categoryId ?? '',
+});
+
+const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPaintingFormProps) => {
+  const [form, setForm] = useState<NewPaintingInput & { categoryId?: string }>(() => getInitialForm(initial));
+  const [preview, setPreview] = useState<string>(() => initial?.image ?? '');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [status, setStatus] = useState<{ type: "success" | "error" | null; message: string } | null>(null);
+  const [status, setStatus] = useState<{ type: 'success' | 'error' | null; message: string } | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Fetch categories on component mount
   useEffect(() => {
@@ -50,30 +58,37 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = "create" }: AdminPainting
         const data = await adminGetCategories();
         setCategories(data);
       } catch (error) {
-        console.error("Failed to load categories", error);
-        setStatus({ type: "error", message: "Failed to load categories" });
+        console.error('Failed to load categories', error);
+        setStatus({ type: 'error', message: 'Failed to load categories' });
       }
     };
     loadCategories();
   }, []);
 
   useEffect(() => {
-    if (initial) {
-      setForm(initial);
-      setPreview(initial.image || "");
-    }
+    if (!initial) return;
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      setForm(getInitialForm(initial));
+      setPreview(initial.image ?? '');
+      setImageFile(null);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [initial]);
 
   const handleImage = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
     // Store the actual file for FormData upload
     setImageFile(file);
-    
+
     // Create preview URL
     const reader = new FileReader();
-    reader.onload = (ev) => {
+    reader.onload = ev => {
       const result = ev.target?.result as string;
       setPreview(result);
     };
@@ -81,29 +96,30 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = "create" }: AdminPainting
   };
 
   const handleChange = (key: keyof (NewPaintingInput & { categoryId?: string }), value: string | number) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
+    setForm(prev => ({ ...prev, [key]: value }));
   };
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
-    if (!form.title.trim()) newErrors.title = "Title is required";
-    if (!imageFile && !form.image) newErrors.image = "Image is required";
-    if (!form.price || Number.isNaN(Number(form.price))) newErrors.price = "Price is required";
-    if (!form.categoryId) newErrors.category = "Category is required";
+    if (!form.title.trim()) newErrors.title = 'Title is required';
+    if (!imageFile && !form.image) newErrors.image = 'Image is required';
+    if (!form.price || Number.isNaN(Number(form.price))) newErrors.price = 'Price is required';
+    if (!form.categoryId) newErrors.category = 'Category is required';
     return newErrors;
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const validation = validate();
     setErrors(validation);
     if (Object.keys(validation).length) {
-      setStatus({ type: "error", message: "Please fix the highlighted fields." });
+      setStatus({ type: 'error', message: 'Please fix the highlighted fields.' });
+      toast.error('Please fix the highlighted fields.');
       return;
     }
 
+    setIsSubmitting(true); // Start loading
 
-    
     // Create FormData for API call
     const formData = new FormData();
     if (imageFile) {
@@ -118,124 +134,137 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = "create" }: AdminPainting
     formData.append('availability', form.availability);
     formData.append('categoryId', form.categoryId || '');
     formData.append('tags', JSON.stringify(form.tags));
-    
-    // Call onSubmit with FormData
-    onSubmit(formData);
-    
-    if (mode === "create") {
-      setForm(emptyState);
-      setPreview("");
-      setImageFile(null);
+
+    try {
+      // Call onSubmit with FormData
+      await onSubmit(formData);
+
+      if (mode === 'create') {
+        setForm(emptyState);
+        setPreview('');
+        setImageFile(null);
+      }
+
+      // Success toast notification
+      const successMessage = mode === 'create' ? 'Painting added successfully!' : 'Painting updated successfully!';
+      toast.success(successMessage);
+      setStatus({ type: 'success', message: successMessage });
+    } catch (error) {
+      console.error('Form submission error:', error);
+      const errorMessage = 'Failed to save painting. Please try again.';
+      toast.error(errorMessage);
+      setStatus({ type: 'error', message: errorMessage });
+    } finally {
+      setIsSubmitting(false); // Stop loading
     }
-    setStatus({ type: "success", message: mode === "create" ? "Painting added." : "Painting updated." });
   };
 
-
-
   return (
-    <form className="space-y-6" onSubmit={handleSubmit}>
-      <div className="grid gap-4 lg:grid-cols-2">
-        <div className="space-y-4">
+    <form className='space-y-6' onSubmit={handleSubmit}>
+      <div className='grid gap-4 lg:grid-cols-2'>
+        <div className='space-y-4'>
           <InputField
-            label="Painting title"
-            placeholder="Monsoon Script"
+            label='Painting title'
+            placeholder='Monsoon Script'
             value={form.title}
-            onChange={(value) => handleChange("title", value)}
+            onChange={value => handleChange('title', value)}
             required
           />
           <TextArea
-            label="Description"
-            placeholder="A few lines about the piece"
+            label='Description'
+            placeholder='A few lines about the piece'
             rows={4}
             value={form.description}
-            onChange={(e) => handleChange("description", e.target.value)}
+            onChange={e => handleChange('description', e.target.value)}
           />
-          <div className="grid gap-4 md:grid-cols-2">
-            <PriceInput value={form.price} onChange={(val) => handleChange("price", val)} />
+          <div className='grid gap-4 md:grid-cols-2'>
+            <PriceInput value={form.price} onChange={val => handleChange('price', val)} />
             <InputField
-              label="Medium"
-              placeholder="Acrylic on canvas"
+              label='Medium'
+              placeholder='Acrylic on canvas'
               value={form.medium}
-              onChange={(value) => handleChange("medium", value)}
+              onChange={value => handleChange('medium', value)}
             />
           </div>
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className='grid gap-4 md:grid-cols-2'>
             <InputField
-              label="Size / Dimensions"
-              placeholder="30 x 40 in"
+              label='Size / Dimensions'
+              placeholder='30 x 40 in'
               value={form.size}
-              onChange={(value) => handleChange("size", value)}
+              onChange={value => handleChange('size', value)}
             />
             <InputField
-              label="Year"
-              type="number"
-              value={form.year?.toString() || ""}
-              onChange={(value) => handleChange("year", Number(value))}
+              label='Year'
+              type='number'
+              value={form.year?.toString() || ''}
+              onChange={value => handleChange('year', Number(value))}
               min={2015}
               max={new Date().getFullYear() + 1}
             />
           </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            <label className="block text-sm">
-              <span className="mb-2 block text-white">Category</span>
+          <div className='grid gap-4 md:grid-cols-2'>
+            <label className='block text-sm'>
+              <span className='mb-2 block text-white'>Category</span>
               <select
-                value={form.categoryId || ""}
-                onChange={(e) => handleChange("categoryId", e.target.value)}
-                className="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-sand-400/60"
+                value={form.categoryId || ''}
+                onChange={e => handleChange('categoryId', e.target.value)}
+                className='w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-sand-400/60'
                 required
               >
-                <option value="" disabled>Select a category</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id} className="bg-gray-800 text-white">
+                <option value='' disabled>
+                  Select a category
+                </option>
+                {categories.map(category => (
+                  <option key={category.id} value={category.id} className='bg-white/5 border-white/15 text-white'>
                     {category.categoryName}
                   </option>
                 ))}
               </select>
-              {errors.category && <p className="mt-1 text-xs text-red-300">{errors.category}</p>}
+              {errors.category && <p className='mt-1 text-xs text-red-300'>{errors.category}</p>}
             </label>
-            <label className="block text-sm">
-              <span className="mb-2 block text-white">Availability</span>
+            <label className='block text-sm'>
+              <span className='mb-2 block text-white'>Availability</span>
               <select
                 value={form.availability}
-                onChange={(e) => handleChange("availability", e.target.value)}
-                className="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-sand-400/60"
+                onChange={e => handleChange('availability', e.target.value)}
+                className='w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-sand-400/60'
               >
-                <option value="in-stock" className="bg-black text-white">
+                <option value='in-stock' className='bg-white/5 border-white/15 text-white'>
                   In Stock
                 </option>
-                <option value="sold" className="bg-black text-white">
+                <option value='sold' className='bg-white/5 border-white/15 text-white'>
                   Sold
                 </option>
               </select>
             </label>
           </div>
         </div>
-        <div className="space-y-4">
-          <label className="block text-sm">
-            <span className="mb-2 block text-white">Painting image</span>
+        <div className='space-y-4'>
+          <label className='block text-sm'>
+            <span className='mb-2 block text-white'>Painting image</span>
             <input
-              type="file"
-              accept="image/*"
+              type='file'
+              accept='image/*'
               onChange={handleImage}
-              className="w-full rounded-2xl border border-dashed border-white/20 bg-white/5 px-4 py-3 text-white/80 file:mr-4 file:rounded-xl file:border file:border-white/20 file:bg-white/10 file:px-3 file:py-1 file:text-white"
+              className='w-full rounded-2xl border border-dashed border-white/20 bg-white/5 px-4 py-3 text-white/80 file:mr-4 file:rounded-xl file:border file:border-white/20 file:bg-white/10 file:px-3 file:py-1 file:text-black/60'
             />
-            {errors.image && <p className="mt-2 text-xs text-red-300">{errors.image}</p>}
+            {errors.image && <p className='mt-2 text-xs text-red-300'>{errors.image}</p>}
           </label>
-          <ImagePreview src={preview || form.image} alt={form.title || "New painting"} />
+          <ImagePreview src={preview || form.image} alt={form.title || 'New painting'} />
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3">
-        <SubmitButton className="button-primary">{mode === "create" ? "Add painting" : "Save changes"}</SubmitButton>
+      <div className='flex flex-wrap items-center gap-3'>
+        <SubmitButton className='button-primary'>{mode === 'create' ? 'Add painting' : 'Save changes'}</SubmitButton>
         {status?.message && (
-          <span className={clsx("text-sm", status.type === "success" ? "text-green-200" : "text-red-300")}>
+          <span className={clsx('text-sm', status.type === 'success' ? 'text-green-200' : 'text-red-300')}>
             {status.message}
           </span>
         )}
       </div>
-      {errors.title && <p className="text-sm text-red-300">{errors.title}</p>}
-      {errors.price && <p className="text-sm text-red-300">{errors.price}</p>}
-      {errors.category && <p className="text-sm text-red-300">{errors.category}</p>}
+      {errors.title && <p className='text-sm text-red-300'>{errors.title}</p>}
+      {errors.price && <p className='text-sm text-red-300'>{errors.price}</p>}
+      {errors.category && <p className='text-sm text-red-300'>{errors.category}</p>}
     </form>
   );
 };
