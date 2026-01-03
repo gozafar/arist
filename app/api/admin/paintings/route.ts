@@ -9,6 +9,7 @@ import { uploadBufferOnCloudinary } from '../../cloudinary';
 
 export const runtime = 'nodejs'; // 🔴 REQUIRED
 export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
 
 /* ================= GET ================= */
 
@@ -60,7 +61,8 @@ export const POST = async (req: NextRequest) => {
   }
 
   const formData = await req.formData();
-  const imageFile = formData.get('image') as File | null;
+  const imageEntry = formData.get('image');
+  const imageFile = imageEntry instanceof File ? imageEntry : null;
 
   if (!imageFile) {
     return NextResponse.json({ message: 'Image is required' }, { status: 400 });
@@ -73,11 +75,14 @@ export const POST = async (req: NextRequest) => {
 
   /* ===== CLOUDINARY UPLOAD ===== */
 
+  const buffer = await safeFileToBuffer(imageFile);
+
   let cloudinaryRes;
   try {
-    const buffer = Buffer.from(await imageFile.arrayBuffer());
     cloudinaryRes = await uploadBufferOnCloudinary(buffer, 'rakhi-studio/paintings', imageFile.type);
   } catch (err) {
+    console.error('Cloudinary upload failed:', err);
+    const message = err instanceof Error ? err.message : 'Image upload failed';
     return NextResponse.json({ message: 'Image upload failed' }, { status: 500 });
   }
 
@@ -117,4 +122,18 @@ export const POST = async (req: NextRequest) => {
   revalidateTag('paintings', 'default'); // ✅ correct usage
 
   return NextResponse.json(created, { status: 201 });
+};
+
+const safeFileToBuffer = async (file: File): Promise<Buffer> => {
+  try {
+    if (typeof file.arrayBuffer === 'function') {
+      return Buffer.from(await file.arrayBuffer());
+    }
+    // Fallback for environments where arrayBuffer might not be present
+    const res = await new Response(file).arrayBuffer();
+    return Buffer.from(res);
+  } catch (error) {
+    console.error('Failed to read file buffer:', error);
+    throw new Error('Unable to process uploaded file');
+  }
 };

@@ -6,6 +6,9 @@ import { dbConnect } from '@/lib/db';
 import { deleteFromCloudinary, extractPublicIdFromUrl, uploadBufferOnCloudinary } from '../../../cloudinary';
 import { requireRole } from '@/lib/rbac';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 interface ImageMeta {
   _id: string;
   name: string;

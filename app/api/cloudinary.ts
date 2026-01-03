@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from 'cloudinary';
 import fs from 'fs';
+import { Readable } from 'stream';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
@@ -35,33 +36,31 @@ export const uploadOnCloudinary = async (localFilePath: string, folder?: string)
 
 export const uploadBufferOnCloudinary = async (buffer: Buffer, folder?: string, mimeType?: string) => {
   try {
-    if (!buffer) return null;
-
-    // Detect MIME type if not provided (basic detection)
-    let detectedMimeType = mimeType;
-    if (!detectedMimeType) {
-      // Simple MIME type detection based on buffer signature
-      if (buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) {
-        detectedMimeType = 'image/jpeg';
-      } else if (buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4e && buffer[3] === 0x47) {
-        detectedMimeType = 'image/png';
-      } else if (buffer[0] === 0x52 && buffer[1] === 0x49 && buffer[2] === 0x46 && buffer[3] === 0x46) {
-        detectedMimeType = 'image/webp';
-      } else {
-        detectedMimeType = 'image/jpeg'; // Default to JPEG
-      }
+    if (!buffer || buffer.length === 0) {
+      throw new Error('Empty buffer provided for Cloudinary upload');
     }
 
-    // Convert buffer to base64 data URI with correct MIME type
-    const base64Data = buffer.toString('base64');
-    const dataURI = `data:${detectedMimeType};base64,${base64Data}`;
+    const response = await new Promise<Awaited<ReturnType<typeof cloudinary.uploader.upload>> | undefined>(
+      (resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            folder: folder || 'rakhi-studio',
+            resource_type: 'auto',
+          },
+          (error, result) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(result ?? undefined);
+            }
+          }
+        );
 
-    const response = await cloudinary.uploader.upload(dataURI, {
-      folder: folder || 'rakhi-studio',
-      resource_type: 'auto',
-    });
+        Readable.from(buffer).on('error', reject).pipe(uploadStream);
+      }
+    );
 
-    console.log('Cloudinary buffer upload successful:', response.public_id);
+    console.log('Cloudinary buffer upload successful:', response?.public_id);
     return response;
   } catch (error: unknown) {
     const message =

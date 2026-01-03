@@ -10,12 +10,21 @@ import { uploadBufferOnCloudinary } from '../../cloudinary';
 import '@/models/Category';
 import '@/models/Image';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
+    const contentType = request.headers.get('content-type');
+    if (!contentType?.includes('multipart/form-data')) {
+      return NextResponse.json({ error: 'Content-Type must be multipart/form-data' }, { status: 400 });
+    }
+
     const formData = await request.formData();
 
     // Extract fields from FormData
-    const imageFiles = formData.getAll('images') as File[];
+    const imageEntries = formData.getAll('images');
+    const imageFiles = imageEntries.filter((entry): entry is File => entry instanceof File);
     const imageNames = formData.getAll('imageNames') as string[];
     const name = formData.get('name') as string;
 
@@ -51,13 +60,17 @@ export async function POST(request: NextRequest) {
       await gallery.save();
     }
 
+    if (imageFiles.length === 0) {
+      return NextResponse.json({ error: 'No images provided for upload' }, { status: 400 });
+    }
+
     // Process images in parallel for better performance
     const imageUploadPromises = imageFiles.map(async (file, index) => {
       const imageName = imageNames[index] || file.name;
 
       try {
         // Convert File to buffer and upload directly to Cloudinary
-        const buffer = Buffer.from(await file.arrayBuffer());
+        const buffer = await fileToBuffer(file);
         const uploadResult = await uploadBufferOnCloudinary(buffer, 'rakhi-studio/gallery', file.type);
 
         return {
@@ -111,3 +124,16 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+const fileToBuffer = async (file: File): Promise<Buffer> => {
+  try {
+    if (typeof file.arrayBuffer === 'function') {
+      return Buffer.from(await file.arrayBuffer());
+    }
+    const res = await new Response(file).arrayBuffer();
+    return Buffer.from(res);
+  } catch (error) {
+    console.error('Failed to read gallery file buffer:', error);
+    throw new Error('Unable to process uploaded image');
+  }
+};
