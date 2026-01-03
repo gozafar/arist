@@ -19,7 +19,6 @@ export const generateMetadata = async (): Promise<Metadata> => {
     ogDescription: `Explore curated originals and wall art with secure delivery to ${config.label}.`,
   });
 };
-
 const PaintingsPage = () => <PaintingsClient />;
 
 export default PaintingsPage;

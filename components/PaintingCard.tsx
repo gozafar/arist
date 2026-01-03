@@ -10,7 +10,7 @@ import PhotoPreview from './PhototPreview';
 const PaintingCard = ({ painting }: { painting: PaintingDTO }) => {
   const router = useRouter();
   const isSold = painting.availability === 'sold';
-
+  console.log('Rendering PaintingsContent:');
   return (
     <div className='card-glass group flex h-full flex-col overflow-hidden rounded-3xl border border-white/10'>
       {/* IMAGE */}

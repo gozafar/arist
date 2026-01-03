@@ -33,10 +33,10 @@ async function fetchPainting(id: string): Promise<PaintingResponse | null> {
   }
 }
 
-export const generateMetadata = async ({ params }: { params: { id: string } }): Promise<Metadata> => {
+export const generateMetadata = async ({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> => {
   const country = getCountryFromHeaders(await headers());
   const config = getCountryConfig(country);
-  const painting = await fetchPainting(params.id);
+  const painting = await fetchPainting((await params).id);
   if (!painting) {
     return { title: 'Painting not found', robots: { index: false } };
   }
@@ -52,9 +52,12 @@ export const generateMetadata = async ({ params }: { params: { id: string } }): 
     ogImage: painting.image,
   });
 };
+console.log('Painting details:');
 
-const PaintingDetailPage = async ({ params }: { params: { id: string } }) => {
-  const painting = await fetchPainting(params.id);
+const PaintingDetailPage = async ({ params }: { params: Promise<{ id: string }> }) => {
+  const resolvedParams = await params;
+  const painting = await fetchPainting(resolvedParams.id);
+
   if (!painting) {
     notFound();
   }
