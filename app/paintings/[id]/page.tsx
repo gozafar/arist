@@ -95,64 +95,36 @@ const PaintingDetailPage = async ({ params }: { params: Promise<{ id: string }> 
       <script type='application/ld+json' dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       <script type='application/ld+json' dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <div className='grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start'>
-        <PhotoPreview galleryId={`painting-${painting.id}`}>
-          <div className='card-glass relative mx-auto w-full max-w-[520px] overflow-hidden rounded-[20px] border border-white/10'>
-            <div className='relative aspect-square overflow-hidden'>
-              <a
-                href={painting.image}
-                data-pswp-width={painting.imageWidth ?? 2000}
-                data-pswp-height={painting.imageHeight ?? 2000}
-                className='block h-full w-full cursor-zoom-in'
-              >
-                <Image
-                  src={painting.image}
-                  alt={`${painting.title} by Rakhi Vashisht – ${painting.medium}`}
-                  fill
-                  className='object-cover'
-                  sizes='(max-width: 640px) 90vw, 320px'
-                  loading='lazy'
-                />
-              </a>
+        <div className='flex flex-col space-y-6'>
+          <PhotoPreview galleryId={`painting-${painting.id}`}>
+            <div className='relative mx-auto w-full max-w-full'>
+              <div className='group relative overflow-hidden rounded-3xl bg-black shadow-2xl'>
+                <div className='relative aspect-square'>
+                  <a
+                    href={painting.image}
+                    data-pswp-width={painting.imageWidth ?? 2000}
+                    data-pswp-height={painting.imageHeight ?? 2500}
+                    className='block h-full w-full cursor-zoom-in'
+                  >
+                    <Image
+                      src={painting.image}
+                      alt={`${painting.title} by Rakhi Vashisht`}
+                      fill
+                      priority
+                      className='object-cover transition-transform duration-700 group-hover:scale-105'
+                    />
+                  </a>
+                </div>
+
+                <div className='pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent' />
+
+                <span className='absolute bottom-4 right-4 rounded-full bg-black/70 px-3 py-1 text-xs text-white backdrop-blur'>
+                  Click to zoom
+                </span>
+              </div>
             </div>
-          </div>
-        </PhotoPreview>
-
-        <div className='space-y-8'>
-          {/* HEADER */}
-          <div className='space-y-3'>
-            <p className='text-sm uppercase tracking-[0.3em] text-white/60'>Painting details</p>
-
-            <h1 className='text-3xl md:text-4xl font-semibold text-white my font-display'>{painting.title}</h1>
-          </div>
-
-          {/* META GRID */}
-          <div className='grid grid-cols-2 gap-4 rounded-2xl border border-white/10 bg-white/5 p-5 text-sm'>
-            <Info label='Year' value={painting.year.toString()} />
-            <Info label='Medium' value={painting.medium} />
-            <Info label='Size' value={painting.size} />
-            <Info label='Tags' value={painting.tags.join(', ')} />
-            <Info label='Availability' value={isSold ? 'Sold' : 'In stock'} />
-          </div>
-
-          {/* PRICE & ACTIONS */}
-          <div className='flex flex-wrap items-center gap-4'>
-            <p className='text-3xl font-semibold text-sand-700'>${painting.price.toLocaleString()}</p>
-
-            <AddToCartButton painting={painting} disabled={isSold} />
-
-            <Link href='/paintings' className='button-outline'>
-              Back to gallery
-            </Link>
-          </div>
-
-          <div className='rounded-2xl border border-white/10 bg-white/5 p-4 text-sm leading-relaxed text-black/70'>
-            {painting.description}
-          </div>
+          </PhotoPreview>
           {/* SHIPPING NOTE */}
-          <div className='rounded-2xl border border-white/10 bg-white/5 p-4 text-sm leading-relaxed text-black/70'>
-            Ships worldwide in museum-grade crates. Includes certificate of authenticity and full provenance
-            documentation.
-          </div>
 
           {/* COLLECTOR NOTES */}
           <div className='space-y-4 rounded-2xl border border-white/10 bg-white/5 p-5'>
@@ -171,16 +143,72 @@ const PaintingDetailPage = async ({ params }: { params: Promise<{ id: string }> 
             </p>
           </div>
         </div>
+
+        <div className='space-y-6'>
+          {/* HEADER */}
+          <div className='space-y-3'>
+            <p className='text-sm uppercase tracking-[0.3em] text-white/60'>Painting details</p>
+
+            <h1 className='text-3xl md:text-4xl font-semibold text-white my font-display'>{painting.title}</h1>
+          </div>
+
+          {/* META GRID */}
+          <div className='flex flex-wrap gap-2 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm'>
+            <MetaChip label='Year' value={painting.year.toString()} />
+            <MetaChip label='Medium' value={painting.medium} />
+            <MetaChip label='Size' value={painting.size} />
+            <MetaChip label='Availability' value={isSold ? 'Sold' : 'In stock'} />
+
+            {painting.tags.map(tag => (
+              <span key={tag} className='rounded-full bg-white/10 px-3 py-1 text-white/70'>
+                #{tag}
+              </span>
+            ))}
+          </div>
+
+          {/* PRICE & ACTIONS */}
+          <div className='flex flex-wrap justify-between items-center gap-4'>
+            <div className='flex items-center justify-between gap-3'>
+              <p className='text-4xl font-bold text-black/80'>${painting.price.toLocaleString()}</p>
+
+              <span
+                className={`rounded-full px-3 py-1 text-xs font-medium ${
+                  isSold ? 'bg-red-500/20 text-red-300' : 'bg-emerald-500/20 text-emerald-700'
+                }`}
+              >
+                {isSold ? 'Sold out' : 'Available'}
+              </span>
+            </div>
+
+            <div className='flex gap-3'>
+              <AddToCartButton painting={painting} disabled={isSold} />
+
+              <Link href='/paintings' className='button-outline'>
+                Back to gallery
+              </Link>
+            </div>
+          </div>
+
+          <div className='space-y-4 rounded-2xl border border-white/10 bg-white/5 p-5'>
+            <h2 className='text-base font-semibold text-white'>Description</h2>
+
+            <p className='text-sm leading-relaxed text-black/70'>{painting.description}</p>
+          </div>
+          <div className='rounded-2xl border border-white/10 bg-white/5 p-4 text-sm leading-relaxed text-black/70'>
+            Ships worldwide in museum-grade crates. Includes certificate of authenticity and full provenance
+            documentation.
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
-const Info = ({ label, value }: { label: string; value: string }) => (
-  <div>
-    <p className='text-black/50'>{label}</p>
-    <p className='mt-1 font-semibold text-white'>{value}</p>
-  </div>
+const MetaChip = ({ label, value }: { label: string; value: string }) => (
+  <span className='flex items-center gap-1 rounded-full bg-black/50 px-3 py-1 text-black/80'>
+    <span className='opacity-60'>{label}:</span>
+    <span className='font-medium'>{value}</span>
+  </span>
 );
 
 export default PaintingDetailPage;

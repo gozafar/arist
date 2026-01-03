@@ -108,14 +108,11 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
       const height = img.naturalHeight;
       const sizeBytes = file.size;
 
-      const sizeLabel = `${width} × ${height} px`;
-
       setForm(prev => ({
         ...prev,
         imageWidth: width,
         imageHeight: height,
         imageSize: sizeBytes,
-        size: sizeLabel, // 👈 auto-filled
       }));
 
       URL.revokeObjectURL(objectUrl);
@@ -197,17 +194,7 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
             onChange={value => handleChange('title', value)}
             required
           />
-          <div data-color-mode='light'>
-            <MDEditor
-              value={form.description}
-              onChange={value => handleChange('description', value || '')}
-              height={220}
-              preview='edit'
-              textareaProps={{
-                placeholder: 'A few lines about the piece',
-              }}
-            />
-          </div>
+
           <div className='grid gap-4 md:grid-cols-2'>
             <PriceInput value={form.price} onChange={val => handleChange('price', val)} />
             <InputField
@@ -220,10 +207,11 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
           <div className='grid gap-4 md:grid-cols-2'>
             <InputField
               label='Size / Dimensions'
-              placeholder='30 x 40 in'
+              placeholder='30 × 40 in or 76 × 102 cm'
               value={form.size}
               onChange={value => handleChange('size', value)}
             />
+
             <InputField
               label='Year'
               type='number'
@@ -246,7 +234,7 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
                   Select a category
                 </option>
                 {categories.map(category => (
-                  <option key={category.id} value={category.id} className='bg-gray-800 text-white'>
+                  <option key={category.id} value={category.id}>
                     {category.categoryName}
                   </option>
                 ))}
@@ -260,12 +248,8 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
                 onChange={e => handleChange('availability', e.target.value)}
                 className='w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-sand-400/60'
               >
-                <option value='in-stock' className='bg-black text-white'>
-                  In Stock
-                </option>
-                <option value='sold' className='bg-black text-white'>
-                  Sold
-                </option>
+                <option value='in-stock'>In Stock</option>
+                <option value='sold'>Sold</option>
               </select>
             </label>
           </div>
@@ -283,6 +267,17 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
           </label>
           <ImagePreview src={preview || form.image} alt={form.title || 'New painting'} />
         </div>
+      </div>
+      <div data-color-mode='light'>
+        <MDEditor
+          value={form.description}
+          onChange={value => handleChange('description', value || '')}
+          height={220}
+          preview='edit'
+          textareaProps={{
+            placeholder: 'A few lines about the piece',
+          }}
+        />
       </div>
 
       <div className='flex flex-wrap items-center gap-3'>
