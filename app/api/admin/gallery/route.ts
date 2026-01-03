@@ -4,9 +4,7 @@ import Image from '@/models/Image';
 // import Category from "@/models/Category"; // Ensure Category model is loaded
 import { dbConnect } from '@/lib/db';
 // import { requireRole } from "@/lib/rbac";
-import { uploadOnCloudinary } from '../../cloudinary';
-import fs from 'fs';
-import path from 'path';
+import { uploadBufferOnCloudinary } from '../../cloudinary';
 
 // Ensure Category model is registered
 import '@/models/Category';
@@ -57,32 +55,18 @@ export async function POST(request: NextRequest) {
     const imageUploadPromises = imageFiles.map(async (file, index) => {
       const imageName = imageNames[index] || file.name;
 
-      // Create temporary file
-      const tempDir = path.join(process.cwd(), 'temp');
-      if (!fs.existsSync(tempDir)) {
-        fs.mkdirSync(tempDir, { recursive: true });
-      }
-
-      const tempFileName = `gallery-${Date.now()}-${Math.random().toString(36).substring(7)}-${file.name}`;
-      const tempFilePath = path.join(tempDir, tempFileName);
-
       try {
-        // Convert File to buffer and write to temp file
+        // Convert File to buffer and upload directly to Cloudinary
         const buffer = Buffer.from(await file.arrayBuffer());
-        fs.writeFileSync(tempFilePath, buffer);
-
-        // Upload to Cloudinary
-        const uploadResult = await uploadOnCloudinary(tempFilePath, 'rakhi-studio/gallery');
+        const uploadResult = await uploadBufferOnCloudinary(buffer, 'rakhi-studio/gallery', file.type);
 
         return {
           url: uploadResult?.secure_url,
           name: imageName,
         };
-      } finally {
-        // Clean up temp file
-        if (fs.existsSync(tempFilePath)) {
-          fs.unlinkSync(tempFilePath);
-        }
+      } catch (error) {
+        console.error(`Failed to upload image ${imageName}:`, error);
+        return null;
       }
     });
 
@@ -90,7 +74,9 @@ export async function POST(request: NextRequest) {
     const uploadResults = await Promise.all(imageUploadPromises);
 
     // Filter out failed uploads
-    const processedImages = uploadResults.filter(result => result.url);
+    const processedImages = uploadResults.filter(
+      (result): result is { url: string; name: string } => result !== null && result.url !== undefined
+    );
 
     if (processedImages.length === 0) {
       throw new Error('Failed to upload any images to Cloudinary');

@@ -5,9 +5,7 @@ import Painting, { PaintingDoc } from '@/models/Painting';
 import AdminLog from '@/models/AdminLog';
 import { requireRole } from '@/lib/rbac';
 import { verifyAccessToken } from '@/lib/jwt';
-import fs from 'fs';
-import path from 'path';
-import { uploadOnCloudinary } from '../../cloudinary';
+import { uploadBufferOnCloudinary } from '../../cloudinary';
 
 export const runtime = 'nodejs'; // 🔴 REQUIRED
 export const dynamic = 'force-dynamic';
@@ -73,22 +71,12 @@ export const POST = async (req: NextRequest) => {
     return NextResponse.json({ message: 'Only image files are allowed' }, { status: 400 });
   }
 
-  /* ===== TEMP FILE SAVE ===== */
-
-  const tempDir = path.join(process.cwd(), 'public/temp');
-  if (!fs.existsSync(tempDir)) {
-    fs.mkdirSync(tempDir, { recursive: true });
-  }
-
-  const tempPath = path.join(tempDir, `${Date.now()}-${imageFile.name}`);
-  const buffer = Buffer.from(await imageFile.arrayBuffer());
-  fs.writeFileSync(tempPath, buffer);
-
   /* ===== CLOUDINARY UPLOAD ===== */
 
   let cloudinaryRes;
   try {
-    cloudinaryRes = await uploadOnCloudinary(tempPath, 'rakhi-studio/paintings');
+    const buffer = Buffer.from(await imageFile.arrayBuffer());
+    cloudinaryRes = await uploadBufferOnCloudinary(buffer, 'rakhi-studio/paintings', imageFile.type);
   } catch (err) {
     return NextResponse.json({ message: 'Image upload failed' }, { status: 500 });
   }
