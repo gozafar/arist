@@ -2,20 +2,32 @@ import { v2 as cloudinary } from 'cloudinary';
 import fs from 'fs';
 import { Readable } from 'stream';
 
-const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } = process.env;
+let cloudinaryConfigured = false;
 
-if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) {
-  throw new Error('Cloudinary env vars missing: set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET');
-}
+const ensureCloudinaryConfig = () => {
+  if (cloudinaryConfigured) return;
 
-cloudinary.config({
-  cloud_name: CLOUDINARY_CLOUD_NAME,
-  api_key: CLOUDINARY_API_KEY,
-  api_secret: CLOUDINARY_API_SECRET,
-});
+  const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } = process.env;
+
+  if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) {
+    throw new Error(
+      'Cloudinary env vars missing: set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET'
+    );
+  }
+
+  cloudinary.config({
+    cloud_name: CLOUDINARY_CLOUD_NAME,
+    api_key: CLOUDINARY_API_KEY,
+    api_secret: CLOUDINARY_API_SECRET,
+  });
+
+  cloudinaryConfigured = true;
+};
 
 export const uploadOnCloudinary = async (localFilePath: string, folder?: string) => {
   try {
+    ensureCloudinaryConfig();
+
     if (!localFilePath) return null;
 
     const response = await cloudinary.uploader.upload(localFilePath, {
@@ -42,6 +54,8 @@ export const uploadOnCloudinary = async (localFilePath: string, folder?: string)
 
 export const uploadBufferOnCloudinary = async (buffer: Buffer, folder?: string, mimeType?: string) => {
   try {
+    ensureCloudinaryConfig();
+
     if (!buffer || buffer.length === 0) {
       throw new Error('Empty buffer provided for Cloudinary upload');
     }
@@ -83,6 +97,8 @@ export const uploadBufferOnCloudinary = async (buffer: Buffer, folder?: string, 
 
 export const deleteFromCloudinary = async (publicId: string) => {
   try {
+    ensureCloudinaryConfig();
+
     if (!publicId) {
       console.log('No public ID provided for deletion');
       return false;
@@ -102,6 +118,8 @@ export const deleteFromCloudinary = async (publicId: string) => {
 
 export const updateOnCloudinary = async (localFilePath: string, existingPublicId?: string, folder?: string) => {
   try {
+    ensureCloudinaryConfig();
+
     if (!localFilePath) return null;
 
     // If there's an existing image, delete it first
