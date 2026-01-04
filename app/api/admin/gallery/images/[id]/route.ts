@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import Image from '@/models/Image';
 import Gallery from '@/models/gallery';
 import { dbConnect } from '@/lib/db';
-import { deleteFromCloudinary } from '../../../../cloudinary';
+import { deleteFromCloudinary, extractPublicIdFromUrl } from '../../../../cloudinary';
 import { requireRole } from '@/lib/rbac';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -19,17 +22,15 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       return NextResponse.json({ error: 'Image not found' }, { status: 404 });
     }
 
-    // Delete from Cloudinary
-    try {
-      const urlParts = image.url.split('/');
-      const fileName = urlParts[urlParts.length - 1]?.split('.')[0];
-      if (fileName) {
-        const publicId = `rakhi-studio/gallery/${fileName}`;
+    // Delete from Cloudinary (best effort)
+    const publicId = extractPublicIdFromUrl(image.url);
+    if (publicId) {
+      try {
         await deleteFromCloudinary(publicId);
+      } catch (cloudinaryError) {
+        console.error('Failed to delete Cloudinary asset:', cloudinaryError);
+        // Continue with database deletion even if Cloudinary fails
       }
-    } catch (cloudinaryError) {
-      return NextResponse.json({ error: 'Failed to delete image from Cloudinary' }, { status: 500 });
-      // Continue with database deletion even if Cloudinary fails
     }
 
     // Remove image reference from gallery

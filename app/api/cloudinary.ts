@@ -2,26 +2,18 @@ import { v2 as cloudinary } from 'cloudinary';
 import fs from 'fs';
 import { Readable } from 'stream';
 
-let cloudinaryConfigured = false;
+// let cloudinaryConfigured = false;
 
 const ensureCloudinaryConfig = () => {
-  if (cloudinaryConfigured) return;
-
-  const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } = process.env;
-
-  if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) {
-    throw new Error(
-      'Cloudinary env vars missing: set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET'
-    );
-  }
+  // if (cloudinaryConfigured) return;
 
   cloudinary.config({
-    cloud_name: CLOUDINARY_CLOUD_NAME,
-    api_key: CLOUDINARY_API_KEY,
-    api_secret: CLOUDINARY_API_SECRET,
+    cloud_name: 'dsqu6pi0d',
+    api_key: '538764932745156',
+    api_secret: 'qbsE65TEBC9QnD8TMf-P7rbFxvQ',
   });
 
-  cloudinaryConfigured = true;
+  // cloudinaryConfigured = true;
 };
 
 export const uploadOnCloudinary = async (localFilePath: string, folder?: string) => {
