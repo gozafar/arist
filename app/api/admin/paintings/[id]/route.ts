@@ -113,7 +113,10 @@ export const PUT = async (req: NextRequest, context: { params: Promise<{ id: str
   if (user) await AdminLog.create({ adminId: user.userId, action: 'UPDATE_PAINTING' });
   revalidateTag('paintings', 'default');
   const { _id, ...rest } = updated;
-  return NextResponse.json({ ...rest, id: _id?.toString?.() || id });
+  return NextResponse.json({
+    message: 'Painting updated successfully!',
+    painting: { ...rest, id: _id?.toString?.() || id },
+  });
 };
 
 export const DELETE = async (req: NextRequest, context: { params: Promise<{ id: string }> }) => {

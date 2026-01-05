@@ -25,14 +25,14 @@ export const adminPaintingsList = (params?: { page?: number; limit?: number }) =
 };
 
 export const adminCreatePainting = (payload: FormData | PaintingInput) =>
-  apiFetch<PaintingDTO>(endpoints.admin.paintings.root, {
+  apiFetch<{ message: string; painting: PaintingDTO }>(endpoints.admin.paintings.root, {
     method: 'POST',
     body: payload,
     cache: 'no-store',
   });
 
 export const adminUpdatePainting = (id: string, payload: Partial<PaintingInput> | FormData) =>
-  apiFetch<PaintingDTO>(endpoints.admin.paintings.detail(id), {
+  apiFetch<{ message: string; painting: PaintingDTO }>(endpoints.admin.paintings.detail(id), {
     method: 'PUT',
     body: payload,
     cache: 'no-store',

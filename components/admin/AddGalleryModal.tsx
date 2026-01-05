@@ -55,7 +55,7 @@ export default function AddGalleryModal({ isOpen, onClose, onGalleryAdded }: Add
           <div className='mb-6 flex items-center justify-between'>
             <div className='space-y-2'>
               <p className='text-sm uppercase tracking-[0.3em] text-[rgb(161,44,116)]'>Admin · Gallery</p>
-              <h2 className='section-heading text-[rgb(161,44,116)]'>Add New Gallery</h2>
+              <h2 className='section-heading text-[rgb(161,44,116)]'>Add image in gallery</h2>
             </div>
             <button
               onClick={onClose}

@@ -9,6 +9,7 @@ import {
   adminToggleAvailability,
   adminUpdatePainting,
 } from '@/lib/api/admin';
+import { toast } from 'react-toastify';
 
 type Painting = PaintingDTO;
 
@@ -50,9 +51,25 @@ export const PaintingProvider = ({ children }: { children: ReactNode }) => {
     const create = async () => {
       try {
         const saved = await adminCreatePainting(painting as FormData);
-        setPaintings(prev => [saved, ...prev]);
+        setPaintings(prev => [saved.painting, ...prev]);
+
+        // Show backend success message if available
+        if (saved && typeof saved === 'object' && 'message' in saved) {
+          toast.success((saved as { message: string }).message);
+        }
       } catch (error) {
-        // For FormData, we can't create a local fallback
+        // Show backend error message
+        let errorMessage = 'Failed to create painting';
+
+        if (error instanceof Error && error.message) {
+          errorMessage = error.message;
+        } else if (error && typeof error === 'object' && 'message' in error) {
+          errorMessage = (error as { message: string }).message;
+        } else if (typeof error === 'string') {
+          errorMessage = error;
+        }
+
+        toast.error(errorMessage);
         console.error('Failed to create painting:', error);
       }
     };
@@ -63,7 +80,7 @@ export const PaintingProvider = ({ children }: { children: ReactNode }) => {
     const apply = async () => {
       try {
         const updated = await adminUpdatePainting(id, painting);
-        setPaintings(prev => prev.map(p => (p.id === id ? updated : p)));
+        setPaintings(prev => prev.map(p => (p.id === id ? updated.painting : p)));
       } catch {
         setPaintings(prev => prev.map(p => (p.id === id ? { ...p, updatedAt: new Date().toISOString() } : p)));
       }

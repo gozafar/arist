@@ -115,12 +115,31 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
         imageSize: sizeBytes,
       }));
 
-      URL.revokeObjectURL(objectUrl);
+      // URL.revokeObjectURL(objectUrl);
     };
   };
 
   const handleChange = (key: keyof (NewPaintingInput & { categoryId?: string }), value: string | number) => {
     setForm(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleSizeChange = (value: string) => {
+    // Allow empty value
+    if (!value.trim()) {
+      handleChange('size', '');
+      return;
+    }
+
+    // Only allow numbers, spaces, and * or ×
+    const cleanValue = value.replace(/[^0-9\s×*]/gi, '');
+
+    // Normalize the input
+    const normalized = cleanValue
+      .replace(/[x*]/gi, '×') // Standardize to multiplication sign
+      .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+      .trim();
+
+    handleChange('size', normalized);
   };
 
   const validate = () => {
@@ -129,6 +148,15 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
     if (!imageFile && !form.image) newErrors.image = 'Image is required';
     if (!form.price || Number.isNaN(Number(form.price))) newErrors.price = 'Price is required';
     if (!form.categoryId) newErrors.category = 'Category is required';
+
+    // Size validation
+    if (form.size) {
+      const sizePattern = /^\d+(?:\.\d+)?\s*[×*]\s*\d+(?:\.\d+)?(?:\s*[×*]\s*\d+(?:\.\d+)?)*$/;
+      if (!sizePattern.test(form.size.trim())) {
+        newErrors.size = 'Enter size like "20*40" or "30 × 40"';
+      }
+    }
+
     return newErrors;
   };
 
@@ -138,7 +166,6 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
     setErrors(validation);
     if (Object.keys(validation).length) {
       setStatus({ type: 'error', message: 'Please fix the highlighted fields.' });
-      toast.error('Please fix the highlighted fields.');
       return;
     }
 
@@ -160,7 +187,7 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
     formData.append('tags', JSON.stringify(form.tags));
 
     try {
-      // Call onSubmit with FormData
+      // Call onSubmit with FormData - backend will handle response
       await onSubmit(formData);
 
       if (mode === 'create') {
@@ -168,14 +195,20 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
         setPreview('');
         setImageFile(null);
       }
-
-      // Success toast notification
-      const successMessage = mode === 'create' ? 'Painting added successfully!' : 'Painting updated successfully!';
-      toast.success(successMessage);
-      setStatus({ type: 'success', message: successMessage });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Form submission error:', error);
-      const errorMessage = 'Failed to save painting. Please try again.';
+
+      // Show backend error message in toast
+      let errorMessage = 'Failed to save painting. Please try again.';
+
+      if (error instanceof Error && error.message) {
+        errorMessage = error.message;
+      } else if (error && typeof error === 'object' && 'message' in error) {
+        errorMessage = (error as { message: string }).message;
+      } else if (typeof error === 'string' && error) {
+        errorMessage = error;
+      }
+
       toast.error(errorMessage);
       setStatus({ type: 'error', message: errorMessage });
     } finally {
@@ -205,12 +238,15 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
             />
           </div>
           <div className='grid gap-4 md:grid-cols-2'>
-            <InputField
-              label='Size / Dimensions'
-              placeholder='30 × 40 in or 76 × 102 cm'
-              value={form.size}
-              onChange={value => handleChange('size', value)}
-            />
+            <div>
+              <InputField
+                label='Size / Dimensions'
+                placeholder='20*40 or 30 × 40'
+                value={form.size}
+                onChange={handleSizeChange}
+              />
+              {errors.size && <p className='mt-1 text-xs text-red-300'>{errors.size}</p>}
+            </div>
 
             <InputField
               label='Year'

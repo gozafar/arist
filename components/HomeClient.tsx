@@ -157,9 +157,10 @@ const HomeClient = () => {
           </Link>
         </div>
         <div className='container-grid gap-6'>
-          {featured.map(painting => (
-            <PaintingCard key={painting.id} painting={painting} />
-          ))}
+          {featured.map((painting, index) => {
+            console.log('Painting:', index, painting);
+            return <PaintingCard key={painting.id || `painting-${index}`} painting={painting} />;
+          })}
         </div>
         <div className='mt-5 rounded-[28px] border border-white/15 bg-white/80 px-10 py-10 md:px-10 shadow-card'>
           <div className='flex items-center justify-between flex-wrap'>

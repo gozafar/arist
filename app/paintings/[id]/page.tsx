@@ -1,3 +1,4 @@
+import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -8,6 +9,7 @@ import type { PaintingDTO } from '@/lib/dto';
 import { buildSeoMetadata, getCountryConfig, getCountryFromHeaders, siteUrl } from '@/lib/seo';
 import { endpoints } from '@/lib/api/endpoints';
 import PhotoPreview from '@/components/PhototPreview';
+import PaintingDescription from '@/components/PaintingDescription';
 
 type PaintingResponse = PaintingDTO;
 
@@ -52,7 +54,6 @@ export const generateMetadata = async ({ params }: { params: Promise<{ id: strin
     ogImage: painting.image,
   });
 };
-console.log('Painting details:');
 
 const PaintingDetailPage = async ({ params }: { params: Promise<{ id: string }> }) => {
   const resolvedParams = await params;
@@ -192,7 +193,9 @@ const PaintingDetailPage = async ({ params }: { params: Promise<{ id: string }> 
           <div className='space-y-4 rounded-2xl border border-white/10 bg-white/5 p-5'>
             <h2 className='text-base font-semibold text-white'>Description</h2>
 
-            <p className='text-sm leading-relaxed text-black/70'>{painting.description}</p>
+            <div className='h-80 overflow-y-auto'>
+              <PaintingDescription description={painting.description} />
+            </div>
           </div>
           <div className='rounded-2xl border border-white/10 bg-white/5 p-4 text-sm leading-relaxed text-black/70'>
             Ships worldwide in museum-grade crates. Includes certificate of authenticity and full provenance

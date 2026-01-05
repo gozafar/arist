@@ -15,7 +15,7 @@ const AdminAddPaintingPage = () => {
           <h1 className='section-heading text-[rgb(161,44,116)]'>Add a new painting</h1>
           <p className='text-slate-600'>Upload an artwork to publish it to the public gallery and checkout flow.</p>
         </div>
-        <Link href='/admin/paintings' className='button-primary text-xs'>
+        <Link href='/admin/paintings' className='button-primary hover:text-white text-xs'>
           View list
         </Link>
       </div>

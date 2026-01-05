@@ -150,7 +150,8 @@ export default function GalleryListPage() {
           <h1 className='section-heading'>All Galleries</h1>
         </div>
         <button onClick={() => router.push('/admin/paintings/gallery/new')} className='button-primary text-xs'>
-          Add New Gallery
+          {/* Add New Gallery */}
+          Add image in gallery
         </button>
       </div>
 
