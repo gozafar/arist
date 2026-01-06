@@ -154,7 +154,7 @@ export default function ContactManagementPage() {
                   <td className='px-5 py-3 max-w-xs'>
                     <span className='line-clamp-2 text-white/80'>{contact.message}</span>
                   </td>
-                  <td className='px-5 py-3'>
+                  <td className='px-5 py-3 '>
                     <select
                       value={contact.status}
                       onChange={e => handleStatusChange(contact._id, e.target.value)}

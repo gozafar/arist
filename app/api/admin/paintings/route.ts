@@ -82,8 +82,8 @@ export const POST = async (req: NextRequest) => {
     cloudinaryRes = await uploadBufferOnCloudinary(buffer, 'rakhi-studio/paintings', imageFile.type);
   } catch (err) {
     console.error('Cloudinary upload failed:', err);
-    const message = err instanceof Error ? err.message : 'Image upload failed';
-    return NextResponse.json({ message: 'Image upload failed' }, { status: 500 });
+    const message = err instanceof Error ? err.message : 'Image upload failed - please try again';
+    return NextResponse.json({ message }, { status: 500 });
   }
 
   if (!cloudinaryRes) {
@@ -121,7 +121,13 @@ export const POST = async (req: NextRequest) => {
 
   revalidateTag('paintings', 'default'); // ✅ correct usage
 
-  return NextResponse.json(created, { status: 201 });
+  return NextResponse.json(
+    {
+      message: 'Painting created successfully!',
+      painting: created,
+    },
+    { status: 201 }
+  );
 };
 
 const safeFileToBuffer = async (file: File): Promise<Buffer> => {

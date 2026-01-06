@@ -23,8 +23,8 @@ const PaintingCard = ({ painting }: { painting: PaintingDTO }) => {
             data-caption={`${painting.imageWidth ?? 2000} × ${painting.imageHeight ?? 2000} px`}
           >
             <Image
-              src={painting.image}
-              alt={`${painting.title} original painting`}
+              src={painting?.image}
+              alt={`${painting?.title || 'Painting'} original painting`}
               fill
               priority={false}
               className='object-cover transition-transform duration-700 group-hover:scale-105'
@@ -57,16 +57,17 @@ const PaintingCard = ({ painting }: { painting: PaintingDTO }) => {
         </div>
 
         {/* DESCRIPTION */}
-        <p className='line-clamp-3 text-sm leading-relaxed text-white/70'>{painting.description}</p>
+        {/* <p className='line-clamp-3 text-sm leading-relaxed text-white/70'>{painting.description}</p> */}
 
         {/* FOOTER */}
         <div className='mt-auto space-y-3 pt-4'>
           <div className='flex items-center justify-between'>
-            <p className='text-xl font-bold text-sand-600'>${painting.price.toLocaleString()}</p>
+            <p className='text-xl font-bold text-sand-600'>${painting?.price?.toLocaleString()}</p>
           </div>
 
           <div className='flex gap-2 items-center'>
             <Link
+              onClick={() => console.log('Painting ID:', painting.id)}
               href={`/paintings/${painting.id}`}
               className='flex-1 rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-center text-xs font-medium text-white transition hover:bg-white/20'
             >

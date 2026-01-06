@@ -55,7 +55,7 @@ export default function NewGalleryPage() {
           <p className='text-sm uppercase tracking-[0.3em] text-white/60'>Admin · Gallery</p>
           <h1 className='section-heading'>Add New Gallery</h1>
         </div>
-        <button onClick={() => router.back()} className='text-xs text-white/70 hover:text-white'>
+        <button onClick={() => router.back()} className='button-primary hover:text-white text-xs'>
           Back
         </button>
       </div>

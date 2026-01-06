@@ -54,14 +54,22 @@ const Navbar = () => {
 
   const linkClass = (href: string) =>
     `relative px-3 py-2 text-sm font-medium transition ${
-      pathname === href ? 'text-[#0ac9bc] font-semibold' : 'text-black/80 '
+      pathname === href || (href === '/paintings' && pathname.startsWith('/paintings/'))
+        ? 'text-[#0ac9bc] font-semibold'
+        : 'text-black/80 '
     }`;
 
   return (
     <header className='sticky top-0 z-40 backdrop-blur-xl bg-white/80 border-b border-white/15'>
       <div className='mx-auto flex max-w-6xl items-center justify-between px-4 py-3 lg:px-6'>
         <Link href='/' className='flex items-center gap-3'>
-          <div className='h-10 w-10 rounded-full bg-gradient-to-br from-sand-400 via-sand-500 to-sand-700 shadow-card' />
+          <img
+            src='/favicon.svg'
+            alt='Artistry Logo'
+            className='h-10 w-10 rounded-full shadow-card'
+            width={40}
+            height={40}
+          />
           <div>
             <p className='text-xs uppercase tracking-[0.35em] text-black/60'>Artistry</p>
             <p className='font-display text-xl text-black font-semibold'>Online Gallery</p>

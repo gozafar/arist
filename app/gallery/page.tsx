@@ -199,7 +199,8 @@ export default function GalleryPage() {
                       fill
                       className='object-cover transition-transform duration-700 group-hover:scale-105'
                       sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
-                      quality={80}
+                      quality={75}
+                      priority={true}
                     />
                   </a>
 
@@ -229,9 +230,9 @@ export default function GalleryPage() {
 
                   {/* FOOTER */}
                   <div className='mt-auto pt-4'>
-                    <button className='w-full rounded-xl border border-white/10 bg-white/10 px-4 py-2 text-xs font-medium text-white transition hover:bg-white/20'>
+                    {/* <button className='w-full rounded-xl border border-white/10 bg-white/10 px-4 py-2 text-xs font-medium text-white transition hover:bg-white/20'>
                       View details
-                    </button>
+                    </button> */}
                   </div>
                 </div>
               </article>

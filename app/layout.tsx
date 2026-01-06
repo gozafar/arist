@@ -37,6 +37,13 @@ export const metadata: Metadata = {
     type: 'website',
     images: [{ url: defaultOgImage, alt: 'Artistry Gallery online painting marketplace' }],
   },
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    apple: [{ url: '/apple-touch-icon.png' }],
+  },
   twitter: {
     card: 'summary_large_image',
     title: 'Artistry – Online Painting Gallery',
