@@ -127,7 +127,7 @@ const ContactClient = () => {
             <div className='space-y-2'>
               <h2 className='text-lg md:text-xl font-semibold text-white my font-display'>Visit or follow</h2>
               <p className='max-w-2xl text-base leading-relaxed text-black/60 md:text-[14px]'>
-                Bangalore studio visits available by appointment. Weekdays 10am–6pm.
+                Hong Kong studio visits available by appointment. Weekdays 10am–6pm.
               </p>
             </div>
             <div className='space-y-2'>
@@ -159,7 +159,7 @@ const ContactClient = () => {
             </div>
             <div className='space-y-2 text-sm'>
               <h2 className='text-lg md:text-xl font-semibold text-white my font-display'>Studio</h2>
-              <p className='max-w-2xl text-base leading-relaxed text-black/60 md:text-[14px]'>Indiranagar, Bangalore</p>
+              <p className='max-w-2xl text-base leading-relaxed text-black/60 md:text-[14px]'>Tung Chung, Hong Kong</p>
               <p className='max-w-2xl text-base leading-relaxed text-black/60 md:text-[14px]'>
                 <span className='font-bold'>Call:</span> +852 97236007 ,+91 9899757066
               </p>
@@ -168,7 +168,7 @@ const ContactClient = () => {
           </div>
           <div className='space-y-2 text-sm text-white/70'>
             <h2 className='text-lg md:text-xl font-semibold text-white my font-display'>Worldwide support</h2>
-            <p className='max-w-2xl text-base leading-relaxed text-black/60 md:text-[14px]'>
+            {/* <p className='max-w-2xl text-base leading-relaxed text-black/60 md:text-[14px]'>
               <span className='font-bold'> UAE &amp; Dubai:</span> white-glove shipping and customs guidance.
             </p>
             <p className='max-w-2xl text-base leading-relaxed text-black/60 md:text-[14px]'>
@@ -176,9 +176,10 @@ const ContactClient = () => {
             </p>
             <p className='max-w-2xl text-base leading-relaxed text-black/60 md:text-[14px]'>
               <span className='font-bold'> USA:</span> tracked international freight for collectors.
-            </p>
+            </p> */}
             <p className='max-w-2xl text-base leading-relaxed text-black/60 md:text-[14px]'>
-              <span className='font-bold'> Hong Kong:</span> local framing coordination upon request.
+              <span className='font-bold'> Hong Kong:</span> Rakhi Vashisht, 29E, Coastal Skyline, Block 1, Tung Chung,
+              Hong Kong
             </p>
           </div>
         </div>

@@ -8,9 +8,9 @@ const ensureCloudinaryConfig = () => {
   // if (cloudinaryConfigured) return;
 
   cloudinary.config({
-    cloud_name: 'dsqu6pi0d',
-    api_key: '538764932745156',
-    api_secret: 'qbsE65TEBC9QnD8TMf-P7rbFxvQ',
+    cloud_name: 'dvtmoopfw',
+    api_key: '873926628995261',
+    api_secret: '6AIKZwvUqoDAqniXQJnYkz-yN5M',
   });
 
   // cloudinaryConfigured = true;

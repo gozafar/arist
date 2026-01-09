@@ -112,9 +112,9 @@ const Footer = () => {
               <div className='flex items-start justify-center gap-2 sm:justify-start'>
                 <FiMapPin className='mt-0.5 h-4 w-4 text-sand-600' />
                 <div>
-                  <p>123 Art Street</p>
-                  <p>Mumbai, Maharashtra 400001</p>
-                  <p>India</p>
+                  <p>Rakhi Vashisht</p>
+                  <p>29E, Coastal Skyline, Block 1</p>
+                  <p>Tung Chung, Hong Kong.</p>
                 </div>
               </div>
 
