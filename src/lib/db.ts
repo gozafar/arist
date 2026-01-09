@@ -12,6 +12,7 @@ export const dbConnect = () => {
     })
     .catch(err => {
       connection = null;
+      console.error('Failed to connect to MongoDB:', err);
       throw err;
     });
   return connection;
