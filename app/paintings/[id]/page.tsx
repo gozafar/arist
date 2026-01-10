@@ -1,134 +1,103 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import AddToCartButton from '@/components/AddToCartButton';
-import { headers } from 'next/headers';
-import type { Metadata } from 'next';
 import type { PaintingDTO } from '@/lib/dto';
-import { buildSeoMetadata, getCountryConfig, getCountryFromHeaders, siteUrl } from '@/lib/seo';
 import { endpoints } from '@/lib/api/endpoints';
 import PhotoPreview from '@/components/PhototPreview';
 import PaintingDescription from '@/components/PaintingDescription';
+import ImageModal from '@/components/ImageModal';
 
 type PaintingResponse = PaintingDTO;
 
-async function fetchPainting(id: string): Promise<PaintingResponse | null> {
-  try {
-    const base = process.env.NEXT_PUBLIC_CLIENT_BASE_URL || '';
-    const endpoint =
-      typeof endpoints.paintings.detail === 'function'
-        ? endpoints.paintings.detail(id)
-        : `${endpoints.paintings.detail}/${id}`;
+const PaintingDetailPage = ({ params }: { params: Promise<{ id: string }> }) => {
+  const resolvedParams = React.use(params);
+  const [painting, setPainting] = useState<PaintingDTO | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const res = await fetch(`${base}${endpoint}`, {
-      next: { tags: ['paintings'] },
-    });
+  useEffect(() => {
+    const fetchPainting = async () => {
+      try {
+        const base = process.env.NEXT_PUBLIC_CLIENT_BASE_URL || '';
+        const endpoint =
+          typeof endpoints.paintings.detail === 'function'
+            ? endpoints.paintings.detail(resolvedParams.id)
+            : `${endpoints.paintings.detail}/${resolvedParams.id}`;
 
-    if (res.status === 404) return null;
-    if (!res.ok) throw new Error('Failed to load painting');
+        const res = await fetch(`${base}${endpoint}`, {
+          next: { tags: ['paintings'] },
+        });
 
-    return await res.json();
-  } catch (error) {
-    console.error('Error fetching painting:', error);
-    return null;
+        if (res.status === 404) return null;
+        if (!res.ok) throw new Error('Failed to load painting');
+
+        const data = await res.json();
+        setPainting(data);
+      } catch (error) {
+        console.error('Error fetching painting:', error);
+        setError('Failed to load painting. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPainting();
+  }, [resolvedParams.id]);
+
+  if (loading) {
+    return (
+      <div className='mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-16'>
+        <div className='animate-pulse space-y-4'>
+          <div className='h-96 bg-white/5 rounded-3xl' />
+          <div className='h-8 bg-white/5 rounded-lg w-1/2' />
+          <div className='h-4 bg-white/5 rounded-lg w-1/3' />
+        </div>
+      </div>
+    );
   }
-}
 
-export const generateMetadata = async ({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> => {
-  const country = getCountryFromHeaders(await headers());
-  const config = getCountryConfig(country);
-  const painting = await fetchPainting((await params).id);
-  if (!painting) {
-    return { title: 'Painting not found', robots: { index: false } };
+  if (error || !painting) {
+    return (
+      <div className='mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-16 text-center'>
+        <p className='text-red-400 mb-4'>{error || 'Painting not found'}</p>
+        <Link href='/paintings' className='px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition'>
+          Back to gallery
+        </Link>
+      </div>
+    );
   }
-  const title = `${painting.title} – ${painting.medium} | ${config.label}`;
-  const description = `${painting.title} by Rakhi Vashisht. ${painting.medium}, ${painting.size}. Certified original available for collectors in ${config.label}.`;
 
-  return buildSeoMetadata({
-    path: `/paintings/${painting.id}`,
-    title,
-    description,
-    keywords: [painting.title, painting.medium, painting.size, ...(painting.tags ?? [])],
-    country,
-    ogImage: painting.image,
-  });
-};
-
-const PaintingDetailPage = async ({ params }: { params: Promise<{ id: string }> }) => {
-  const resolvedParams = await params;
-  const painting = await fetchPainting(resolvedParams.id);
-
-  if (!painting) {
-    notFound();
-  }
   const isSold = painting.availability === 'sold';
-  const breadcrumbSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    'itemListElement': [
-      { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': `${siteUrl}/` },
-      { '@type': 'ListItem', 'position': 2, 'name': 'Paintings', 'item': `${siteUrl}/paintings` },
-      { '@type': 'ListItem', 'position': 3, 'name': painting.title, 'item': `${siteUrl}/paintings/${painting.id}` },
-    ],
-  };
-
-  const structuredData = {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    'name': painting.title,
-    'image': [painting.image],
-    'description': `${painting.title} - ${painting.medium}, ${painting.size}. Original artwork with certificate of authenticity.`,
-    'brand': 'Rakhi Studio',
-    'sku': painting.id,
-    'category': painting.medium,
-    'offers': {
-      '@type': 'Offer',
-      'priceCurrency': 'USD',
-      'price': painting.price,
-      'availability': isSold ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock',
-      'url': `${siteUrl}/paintings/${painting.id}`,
-    },
-  };
 
   return (
     <div className='mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-16'>
-      <script type='application/ld+json' dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
-      <script type='application/ld+json' dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <div className='grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start'>
         <div className='flex flex-col space-y-6'>
-          <PhotoPreview galleryId={`painting-${painting.id}`}>
-            <div className='relative mx-auto w-full max-w-full'>
-              <div className='group relative overflow-hidden rounded-3xl bg-black shadow-2xl'>
-                <div className='relative aspect-square'>
-                  <a
-                    href={painting.image}
-                    data-pswp-width={painting.imageWidth ?? 2000}
-                    data-pswp-height={painting.imageHeight ?? 2500}
-                    className='block h-full w-full cursor-zoom-in'
-                  >
-                    <Image
-                      src={painting.image}
-                      alt={`${painting.title} by Rakhi Vashisht`}
-                      fill
-                      priority
-                      className='object-cover transition-transform duration-700 group-hover:scale-105'
-                    />
-                  </a>
+          <div className='relative mx-auto w-full max-w-full'>
+            <div className='group relative overflow-hidden rounded-3xl bg-black shadow-2xl'>
+              <div className='relative aspect-square'>
+                <div className='block h-full w-full cursor-zoom-in' onClick={() => setIsModalOpen(true)}>
+                  <Image
+                    src={painting.image}
+                    alt={`${painting.title} by Rakhi Vashisht`}
+                    fill
+                    priority
+                    className='object-cover transition-transform duration-700 group-hover:scale-105'
+                  />
                 </div>
-
-                <div className='pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent' />
-
-                <span className='absolute bottom-4 right-4 rounded-full bg-black/70 px-3 py-1 text-xs text-white backdrop-blur'>
-                  Click to zoom
-                </span>
               </div>
-            </div>
-          </PhotoPreview>
-          {/* SHIPPING NOTE */}
 
+              <div className='pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent' />
+            </div>
+          </div>{' '}
+          {/* SHIPPING NOTE */}
           {/* COLLECTOR NOTES */}
-          <div className='space-y-4 rounded-2xl border border-white/10 bg-white/5 p-5'>
+          <div className=' rounded-2xl border border-white/10 bg-white/5 p-5'>
             <h2 className='text-base font-semibold text-white'>Collector notes</h2>
 
             <p className='text-sm leading-relaxed text-black/70'>
@@ -145,7 +114,7 @@ const PaintingDetailPage = async ({ params }: { params: Promise<{ id: string }> 
           </div>
         </div>
 
-        <div className='space-y-6'>
+        <div>
           {/* HEADER */}
           <div className='space-y-3'>
             <p className='text-sm uppercase tracking-[0.3em] text-white/60'>Painting details</p>
@@ -201,6 +170,16 @@ const PaintingDetailPage = async ({ params }: { params: Promise<{ id: string }> 
             Ships worldwide in museum-grade crates. Includes certificate of authenticity and full provenance
             documentation.
           </div>
+
+          {/* IMAGE MODAL */}
+          {isModalOpen && (
+            <ImageModal
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+              imageSrc={painting.image}
+              title={painting.title}
+            />
+          )}
         </div>
       </div>
     </div>
