@@ -77,6 +77,7 @@ const PaintingDetailPage = ({ params }: { params: Promise<{ id: string }> }) => 
   return (
     <div className='mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-16'>
       <div className='grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start'>
+        {/* LEFT COLUMN - IMAGE */}
         <div className='flex flex-col space-y-6'>
           <div className='relative mx-auto w-full max-w-full'>
             <div className='group relative overflow-hidden rounded-3xl bg-black shadow-2xl'>
@@ -94,15 +95,15 @@ const PaintingDetailPage = ({ params }: { params: Promise<{ id: string }> }) => 
 
               <div className='pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent' />
             </div>
-          </div>{' '}
-          {/* SHIPPING NOTE */}
+          </div>
+
           {/* COLLECTOR NOTES */}
-          <div className=' rounded-2xl border border-white/10 bg-white/5 p-5'>
+          <div className='rounded-2xl border border-white/10 bg-white/5 p-5'>
             <h2 className='text-base font-semibold text-white'>Collector notes</h2>
 
             <p className='text-sm leading-relaxed text-black/70'>
-              Ideal for luxury residences and curated hospitality spaces in the UAE and USA, with investment-grade
-              appeal for collectors worldwide.
+              Ideal for luxury residences and curated hospitality spaces in UAE and USA, with investment-grade appeal
+              for collectors worldwide.
             </p>
 
             <h3 className='text-sm font-semibold text-white'>Shipping &amp; authenticity</h3>
@@ -114,11 +115,11 @@ const PaintingDetailPage = ({ params }: { params: Promise<{ id: string }> }) => 
           </div>
         </div>
 
-        <div>
+        {/* RIGHT COLUMN - DETAILS */}
+        <div className='space-y-6'>
           {/* HEADER */}
           <div className='space-y-3'>
             <p className='text-sm uppercase tracking-[0.3em] text-white/60'>Painting details</p>
-
             <h1 className='text-3xl md:text-4xl font-semibold text-white my font-display'>{painting.title}</h1>
           </div>
 
@@ -159,6 +160,7 @@ const PaintingDetailPage = ({ params }: { params: Promise<{ id: string }> }) => 
             </div>
           </div>
 
+          {/* DESCRIPTION */}
           <div className='space-y-4 rounded-2xl border border-white/10 bg-white/5 p-5'>
             <h2 className='text-base font-semibold text-white'>Description</h2>
 
@@ -166,22 +168,24 @@ const PaintingDetailPage = ({ params }: { params: Promise<{ id: string }> }) => 
               <PaintingDescription description={painting.description} />
             </div>
           </div>
+
+          {/* SHIPPING NOTE */}
           <div className='rounded-2xl border border-white/10 bg-white/5 p-4 text-sm leading-relaxed text-black/70'>
             Ships worldwide in museum-grade crates. Includes certificate of authenticity and full provenance
             documentation.
           </div>
-
-          {/* IMAGE MODAL */}
-          {isModalOpen && (
-            <ImageModal
-              isOpen={isModalOpen}
-              onClose={() => setIsModalOpen(false)}
-              imageSrc={painting.image}
-              title={painting.title}
-            />
-          )}
         </div>
       </div>
+
+      {/* IMAGE MODAL */}
+      {isModalOpen && (
+        <ImageModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          imageSrc={painting.image}
+          title={painting.title}
+        />
+      )}
     </div>
   );
 };

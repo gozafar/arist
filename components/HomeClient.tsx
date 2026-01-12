@@ -5,10 +5,14 @@ import Link from 'next/link';
 import PaintingCard from '@/components/PaintingCard';
 import { usePaintings } from '@/context/PaintingContext';
 import Marquee from 'react-fast-marquee';
+import { useState } from 'react';
+import ImageModal from '@/components/ImageModal';
+import type { PaintingDTO } from '@/lib/dto';
 
 const HomeClient = () => {
   const { paintings } = usePaintings();
   const featured = paintings.slice(0, 3);
+  const [selectedImage, setSelectedImage] = useState<PaintingDTO | null>(null);
   const testimonials = [
     {
       quote:
@@ -159,7 +163,13 @@ const HomeClient = () => {
         <div className='container-grid gap-6'>
           {featured.map((painting, index) => {
             console.log('Painting:', index, painting);
-            return <PaintingCard key={painting.id || `painting-${index}`} painting={painting} />;
+            return (
+              <PaintingCard
+                key={painting.id || `painting-${index}`}
+                painting={painting}
+                onImageClick={() => setSelectedImage(painting)}
+              />
+            );
           })}
         </div>
         <div className='mt-5 rounded-[28px] border border-white/15 bg-white/80 px-10 py-10 md:px-10 shadow-card'>
@@ -203,6 +213,18 @@ const HomeClient = () => {
           </p>
         </div>
       </section>
+
+      {/* IMAGE MODAL */}
+      {selectedImage && (
+        <ImageModal
+          isOpen={!!selectedImage}
+          onClose={() => setSelectedImage(null)}
+          imageSrc={selectedImage.image}
+          imageWidth={selectedImage.width}
+          imageHeight={selectedImage.height}
+          title={selectedImage.title}
+        />
+      )}
     </div>
   );
 };
