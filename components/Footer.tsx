@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { FiInstagram, FiFacebook, FiLinkedin, FiMail, FiPhone, FiMapPin } from 'react-icons/fi';
 
@@ -43,9 +44,9 @@ const Footer = () => {
           <div>
             <div className='flex flex-col items-center sm:items-start'>
               <div className='mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-sand-400 via-sand-500 to-sand-700 shadow-card'>
-                <span className='text-xl font-bold text-white'>A</span>
+                <Image src='/favicon.svg' alt="Rakhi's Studio" width={56} height={56} className='rounded-full' />
               </div>
-              <h3 className='text-lg font-display text-gray-900 font-semibold'>Artistry Gallery</h3>
+              <h3 className='text-lg font-display text-gray-900 font-semibold'>Rakhi&apos;s Studio</h3>
             </div>
 
             <p className='mt-3 text-center text-sm text-gray-800 sm:text-left'>
@@ -139,7 +140,7 @@ const Footer = () => {
 
         {/* Bottom Bar */}
         <div className='mt-12 flex flex-col items-center justify-between gap-4 border-t border-sand-200 pt-6 text-xs text-gray-800 md:flex-row'>
-          <p>© {new Date().getFullYear()} Artistry Gallery. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Rakhi&apos;s Studio. All rights reserved.</p>
 
           <div className='flex gap-6'>
             <Link href='/terms' className='text-gray-800 hover:text-sand-700'>

@@ -83,7 +83,6 @@ export async function POST(request: NextRequest) {
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Unknown upload error';
         lastUploadError = message;
-        console.error(`Failed to upload image ${imageName}:`, error);
         return null;
       }
     });
@@ -121,7 +120,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ gallery, message: 'Gallery created successfully' }, { status: 201 });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to create gallery';
-    console.error('Gallery create error:', error);
     return NextResponse.json(
       {
         error: message,
@@ -138,8 +136,7 @@ const fileToBuffer = async (file: File): Promise<Buffer> => {
     }
     const res = await new Response(file).arrayBuffer();
     return Buffer.from(res);
-  } catch (error) {
-    console.error('Failed to read gallery file buffer:', error);
+  } catch {
     throw new Error('Unable to process uploaded image');
   }
 };

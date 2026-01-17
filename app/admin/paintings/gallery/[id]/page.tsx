@@ -122,7 +122,7 @@ export default function EditGalleryPage({ params }: { params: Promise<{ id: stri
       setDeleteModalOpen(false);
       setImageToDelete(null);
     } catch (error) {
-      console.error('Failed to delete image:', error);
+      // console.error('Failed to delete image:', error);
       toast.error('Failed to delete image');
     }
   };

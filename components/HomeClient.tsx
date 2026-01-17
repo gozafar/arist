@@ -73,17 +73,26 @@ const HomeClient = () => {
   return (
     <div className='mx-auto max-w-6xl px-4 pb-16 pt-10 lg:px-6 lg:pt-14'>
       <section className='hero-gradient relative overflow-hidden rounded-[32px] border border-white/15 px-6 py-12 shadow-soft md:px-10 lg:px-14 lg:py-16'>
-        <div className='mx-auto grid max-w-7xl gap-12 lg:grid-cols-2 lg:items-center'>
+        <div className='mx-auto grid max-w-7xl gap-12 lg:grid-cols-2 lg:items-start'>
           {/* LEFT CONTENT */}
-          <div className='flex flex-col justify-center space-y-6'>
-            <p className='text-sm uppercase tracking-[0.3em] text-white/60'>Curated originals</p>
-            <h1 className='text-3xl md:text-4xl font-semibold text-white my font-display'>
+          <div className='flex flex-col justify-center space-y-3'>
+            <p className='text-sm uppercase tracking-[0.2em] text-white/60'>Curated originals</p>
+            <h1 className='text-2xl md:text-2xl font-semibold text-white my font-display'>
               Buy Original Paintings Online – Trusted Art Gallery for UAE, India, USA &amp; Hong Kong
             </h1>
 
             <p className='max-w-2xl text-base leading-relaxed text-black/70 md:text-[16px]'>
-              Artistry is an international painting marketplace connecting collectors in Dubai, Mumbai, New York, and
-              Hong Kong with certified originals, museum-grade framing, and worldwide delivery.
+              When you buy an Original Painting, you bring home a piece of the artist’s soul. Each creation reflects
+              Rakhi’s vision, making this trusted studio a global destination for timeless wall décor.
+            </p>
+
+            <p>
+              For Rakhi, art is meditation—a harmony of mind and soul. Every brushstroke inspires, provokes thought, and
+              builds connection. She believes art is a bridge to personal journeys, speaking uniquely to each viewer.
+            </p>
+            <p>
+              Owning her work means more than decorating a space—it’s embracing a soulful experience that transforms
+              walls into reflections of humanity.
             </p>
 
             {/* CTA BUTTONS */}
@@ -172,8 +181,8 @@ const HomeClient = () => {
             );
           })}
         </div>
-        <div className='mt-5 rounded-[28px] border border-white/15 bg-white/80 px-10 py-10 md:px-10 shadow-card'>
-          <div className='flex items-center justify-between flex-wrap'>
+        {/* <div className='mt-5 rounded-[28px] border border-white/15 bg-white/80 px-10 py-10 md:px-10 shadow-card'> */}
+        {/* <div className='flex items-center justify-between flex-wrap'>
             <h1 className='text-3xl md:text-4xl font-semibold text-white my font-display'>Testimonials</h1>
             <span className='text-sm text-black/60'>Collectors on Rakhi’s paintings</span>
           </div>
@@ -189,8 +198,8 @@ const HomeClient = () => {
                 </div>
               ))}
             </Marquee>
-          </div>
-        </div>
+          </div> */}
+        {/* </div> */}
       </section>
 
       <section className='mt-16 grid gap-10 rounded-[28px] border border-white/15 bg-white/80 px-6 py-10 md:grid-cols-3 md:px-10 shadow-card'>

@@ -28,11 +28,11 @@ const AdminPaintingsPage = () => {
 
       if (imageFile && imageFile.size > 0) {
         payload.forEach((value, key) => {
-          if (value instanceof File) {
-            console.log(`${key}: File(${value.name}, ${value.size} bytes)`);
-          } else {
-            console.log(`${key}: ${value}`);
-          }
+          // if (value instanceof File) {
+          //   console.log(`${key}: File(${value.name}, ${value.size} bytes)`);
+          // } else {
+          //   console.log(`${key}: ${value}`);
+          // }
         });
         // Send FormData directly when there's an image
         await updatePainting(editing.id, payload);

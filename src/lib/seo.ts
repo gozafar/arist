@@ -6,6 +6,7 @@ export const siteUrl =
 
 export const defaultKeywords = [
   'Artistry gallery',
+  "Rakhi's Studio",
   'online painting gallery',
   'buy original art',
   'modern art shop',
@@ -135,7 +136,7 @@ export const buildSeoMetadata = ({
       title: ogTitleValue,
       description: ogDescriptionValue,
       url: canonical,
-      siteName: 'Artistry Gallery',
+      siteName: "Rakhi's Studio",
       locale: config.ogLocale,
       type: ogType,
       images: ogImage ? [{ url: ogImage, alt: ogTitleValue }] : undefined,

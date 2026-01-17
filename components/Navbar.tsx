@@ -72,7 +72,7 @@ const Navbar = () => {
           />
           <div>
             <p className='text-xs uppercase tracking-[0.35em] text-black/60'>Artistry</p>
-            <p className='font-display text-xl text-black font-semibold'>Online Gallery</p>
+            <p className='font-display text-xl text-black font-semibold'>Rakhi&apos;s Studio</p>
           </div>
         </Link>
 

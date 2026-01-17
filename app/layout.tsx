@@ -23,7 +23,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 export const metadata: Metadata = {
   title: {
     default: 'Artistry – Online Painting Gallery',
-    template: '%s | Artistry Gallery',
+    template: "%s | Rakhi's Studio",
   },
   description: defaultDescription,
   keywords: defaultKeywords,
@@ -32,10 +32,10 @@ export const metadata: Metadata = {
     title: 'Artistry – Online Painting Gallery',
     description: defaultDescription,
     url: siteUrl,
-    siteName: 'Artistry Gallery',
+    siteName: "Rakhi's Studio",
     locale: 'en_US',
     type: 'website',
-    images: [{ url: defaultOgImage, alt: 'Artistry Gallery online painting marketplace' }],
+    images: [{ url: defaultOgImage, alt: "Rakhi's Studio online painting marketplace" }],
   },
   icons: {
     icon: [
