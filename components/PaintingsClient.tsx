@@ -5,13 +5,16 @@ import Link from 'next/link';
 import { usePaintings } from '@/context/PaintingContext';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Pagination from '@/components/Pagination';
-import { Suspense, useMemo } from 'react';
+import { Suspense, useMemo, useState } from 'react';
+import ImageModal from '@/components/ImageModal';
+import type { PaintingDTO } from '@/lib/dto';
 
 const PaintingsContent = () => {
   const { paintings, loaded } = usePaintings();
   const PAGE_SIZE = 10;
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [selectedImage, setSelectedImage] = useState<PaintingDTO | null>(null);
 
   const currentPage = useMemo(() => {
     const pageParam = Number(searchParams.get('page') || '1');
@@ -34,7 +37,9 @@ const PaintingsContent = () => {
     <>
       <div className='grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'>
         {visible.map(painting => (
-          <PaintingCard key={painting.id} painting={painting} />
+          <div key={painting.id}>
+            <PaintingCard painting={painting} onImageClick={() => setSelectedImage(painting)} />
+          </div>
         ))}
 
         {!visible.length && !loaded && <p className='col-span-full text-white/70'>Loading paintings…</p>}
@@ -48,6 +53,18 @@ const PaintingsContent = () => {
         currentPage={clampedPage}
         onPageChange={handlePageChange}
       />
+
+      {/* IMAGE MODAL */}
+      {selectedImage && (
+        <ImageModal
+          isOpen={!!selectedImage}
+          onClose={() => setSelectedImage(null)}
+          imageSrc={selectedImage.image}
+          imageWidth={selectedImage.width}
+          imageHeight={selectedImage.height}
+          title={selectedImage.title}
+        />
+      )}
     </>
   );
 };

@@ -27,7 +27,7 @@ export const uploadOnCloudinary = async (localFilePath: string, folder?: string)
       resource_type: 'auto',
     });
 
-    console.log('Cloudinary upload successful:', response.public_id);
+    // console.log('Cloudinary upload successful:', response.public_id);
     return response;
   } catch (error: unknown) {
     // remove temp file even if upload fails
@@ -39,7 +39,7 @@ export const uploadOnCloudinary = async (localFilePath: string, folder?: string)
           ? error.error.message
           : 'Unknown Cloudinary upload error';
 
-    console.error('Cloudinary Error:', error);
+    // console.error('Cloudinary Error:', error);
     throw new Error(message);
   }
 };
@@ -72,7 +72,6 @@ export const uploadBufferOnCloudinary = async (buffer: Buffer, folder?: string, 
       }
     );
 
-    console.log('Cloudinary buffer upload successful:', response?.public_id);
     return response;
   } catch (error: unknown) {
     const message =
@@ -82,7 +81,6 @@ export const uploadBufferOnCloudinary = async (buffer: Buffer, folder?: string, 
           ? error.error.message
           : 'Unknown Cloudinary upload error';
 
-    console.error('Cloudinary Buffer Upload Error:', error);
     throw new Error(message);
   }
 };
@@ -92,18 +90,14 @@ export const deleteFromCloudinary = async (publicId: string) => {
     ensureCloudinaryConfig();
 
     if (!publicId) {
-      console.log('No public ID provided for deletion');
       return false;
     }
 
-    console.log('Attempting to delete Cloudinary image:', publicId);
     const response = await cloudinary.uploader.destroy(publicId);
-    console.log('Cloudinary delete response:', response);
 
     // Consider both 'ok' and 'not found' as success
     return response.result === 'ok' || response.result === 'not found';
   } catch (error) {
-    console.error('Cloudinary Delete Error:', error);
     return false;
   }
 };
@@ -116,7 +110,6 @@ export const updateOnCloudinary = async (localFilePath: string, existingPublicId
 
     // If there's an existing image, delete it first
     if (existingPublicId) {
-      console.log('Deleting existing image:', existingPublicId);
       await deleteFromCloudinary(existingPublicId);
     }
 
@@ -125,7 +118,6 @@ export const updateOnCloudinary = async (localFilePath: string, existingPublicId
       resource_type: 'auto',
     });
 
-    console.log('Cloudinary update successful:', response.public_id);
     return response;
   } catch (error) {
     // remove temp file even if upload fails
@@ -133,7 +125,6 @@ export const updateOnCloudinary = async (localFilePath: string, existingPublicId
       fs.unlinkSync(localFilePath);
     }
 
-    console.error('Cloudinary Update Error:', error);
     return null;
   }
 };
@@ -157,8 +148,7 @@ export const extractPublicIdFromUrl = (url: string): string | null => {
     }
 
     return null;
-  } catch (error) {
-    console.error('Error extracting public ID from URL:', error);
+  } catch {
     return null;
   }
 };

@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { GetGallery } from '@/lib/api/admin';
 import Image from 'next/image';
 import Pagination from '@/components/Pagination';
-import PhotoPreview from '@/components/PhototPreview';
+import ImageModal from '@/components/ImageModal';
 
 type GalleryName = 'Contemporary / Modern Art' | 'Portrait Paintings' | 'Landscape Paintings' | 'Abstract Art';
 
@@ -39,6 +39,7 @@ export default function GalleryPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [imageList, setImageList] = useState<GalleryImage[]>([]);
+  const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
 
   const PAGE_SIZE = 12;
 
@@ -183,60 +184,56 @@ export default function GalleryPage() {
       {visibleImages.length > 0 ? (
         <section className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'>
           {visibleImages.map((item: GalleryImage) => (
-            <PhotoPreview key={item._id || item.imageId} galleryId={`painting-${item._id || item.imageId}`}>
-              <article className='group relative flex flex-col overflow-hidden rounded-3xl bg-white/5 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl'>
-                {/* IMAGE */}
-                <div className='relative aspect-square overflow-hidden'>
-                  <a
-                    href={item.url}
-                    data-pswp-width={item.width ?? 2000}
-                    data-pswp-height={item.height ?? 2000}
-                    className='block h-full w-full cursor-zoom-in'
-                  >
-                    <Image
-                      src={item.url}
-                      alt={item.name || 'Artwork'}
-                      fill
-                      className='object-cover transition-transform duration-700 group-hover:scale-105'
-                      sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
-                      quality={75}
-                      priority={true}
-                    />
-                  </a>
-
-                  {/* Hover overlay */}
-                  <div className='pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100' />
-
-                  {/* Quick view badge */}
-                  <span className='pointer-events-none absolute bottom-4 right-4 rounded-full bg-black/70 px-3 py-1 text-xs text-white backdrop-blur'>
-                    View artwork
-                  </span>
+            <article
+              key={item._id || item.imageId}
+              className='group relative flex flex-col overflow-hidden rounded-3xl bg-white/5 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl'
+            >
+              {/* IMAGE */}
+              <div className='relative aspect-square overflow-hidden'>
+                <div className='block h-full w-full cursor-zoom-in' onClick={() => setSelectedImage(item)}>
+                  <Image
+                    src={item.url}
+                    alt={item.name || 'Artwork'}
+                    fill
+                    className='object-cover transition-transform duration-700 group-hover:scale-105'
+                    sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
+                    quality={75}
+                    priority={true}
+                  />
                 </div>
 
-                {/* CONTENT */}
-                <div className='flex flex-1 flex-col gap-1 p-4'>
-                  <h3 className='line-clamp-1 text-base font-semibold text-white'>{item.name || 'Untitled'}</h3>
+                {/* Hover overlay */}
+                <div className='pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100' />
 
-                  {item.galleryName && <p className='text-xs text-black/80'>{item.galleryName}</p>}
+                {/* Quick view badge */}
+                <span className='pointer-events-none absolute bottom-4 right-4 rounded-full bg-black/70 px-3 py-1 text-xs text-white backdrop-blur'>
+                  View artwork
+                </span>
+              </div>
 
-                  <p className='text-xs text-black/70'>
-                    {item.createdAt
-                      ? new Date(item.createdAt).toLocaleDateString('en-US', {
-                          month: 'short',
-                          year: 'numeric',
-                        })
-                      : 'Date not available'}
-                  </p>
+              {/* CONTENT */}
+              <div className='flex flex-1 flex-col gap-1 p-4'>
+                <h3 className='line-clamp-1 text-base font-semibold text-white'>{item.name || 'Untitled'}</h3>
 
-                  {/* FOOTER */}
-                  <div className='mt-auto pt-4'>
-                    {/* <button className='w-full rounded-xl border border-white/10 bg-white/10 px-4 py-2 text-xs font-medium text-white transition hover:bg-white/20'>
+                {item.galleryName && <p className='text-xs text-black/80'>{item.galleryName}</p>}
+
+                <p className='text-xs text-black/70'>
+                  {item.createdAt
+                    ? new Date(item.createdAt).toLocaleDateString('en-US', {
+                        month: 'short',
+                        year: 'numeric',
+                      })
+                    : 'Date not available'}
+                </p>
+
+                {/* FOOTER */}
+                <div className='mt-auto pt-4'>
+                  {/* <button className='w-full rounded-xl border border-white/10 bg-white/10 px-4 py-2 text-xs font-medium text-white transition hover:bg-white/20'>
                       View details
                     </button> */}
-                  </div>
                 </div>
-              </article>
-            </PhotoPreview>
+              </div>
+            </article>
           ))}
         </section>
       ) : (
@@ -258,6 +255,18 @@ export default function GalleryPage() {
           perPage={PAGE_SIZE}
           currentPage={clampedPage}
           onPageChange={handlePageChange}
+        />
+      )}
+
+      {/* IMAGE MODAL */}
+      {selectedImage && (
+        <ImageModal
+          isOpen={!!selectedImage}
+          onClose={() => setSelectedImage(null)}
+          imageSrc={selectedImage.url}
+          imageWidth={selectedImage.width}
+          imageHeight={selectedImage.height}
+          title={selectedImage.name || 'Artwork'}
         />
       )}
     </div>
