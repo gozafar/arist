@@ -55,8 +55,6 @@ export async function GET(
       { status: 200 }
     );
   } catch (error) {
-    console.error('Error fetching admin order:', error);
-
     return NextResponse.json(
       {
         success: false,

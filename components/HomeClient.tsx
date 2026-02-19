@@ -5,10 +5,14 @@ import Link from 'next/link';
 import PaintingCard from '@/components/PaintingCard';
 import { usePaintings } from '@/context/PaintingContext';
 import Marquee from 'react-fast-marquee';
+import { useState } from 'react';
+import ImageModal from '@/components/ImageModal';
+import type { PaintingDTO } from '@/lib/dto';
 
 const HomeClient = () => {
   const { paintings } = usePaintings();
   const featured = paintings.slice(0, 3);
+  const [selectedImage, setSelectedImage] = useState<PaintingDTO | null>(null);
   const testimonials = [
     {
       quote:
@@ -69,7 +73,7 @@ const HomeClient = () => {
   return (
     <div className='mx-auto max-w-6xl px-4 pb-16 pt-10 lg:px-6 lg:pt-14'>
       <section className='hero-gradient relative overflow-hidden rounded-[32px] border border-white/15 px-6 py-12 shadow-soft md:px-10 lg:px-14 lg:py-16'>
-        <div className='mx-auto grid max-w-7xl gap-12 lg:grid-cols-2 lg:items-center'>
+        <div className='mx-auto grid max-w-7xl gap-12 lg:grid-cols-2 lg:items-start'>
           {/* LEFT CONTENT */}
           <div className='flex flex-col justify-center space-y-6'>
             {/* <p className='text-sm uppercase tracking-[0.3em] text-white/60'>Curated originals</p> */}
@@ -164,11 +168,17 @@ const HomeClient = () => {
         <div className='container-grid gap-6'>
           {featured.map((painting, index) => {
             console.log('Painting:', index, painting);
-            return <PaintingCard key={painting.id || `painting-${index}`} painting={painting} />;
+            return (
+              <PaintingCard
+                key={painting.id || `painting-${index}`}
+                painting={painting}
+                onImageClick={() => setSelectedImage(painting)}
+              />
+            );
           })}
         </div>
-        <div className='mt-5 rounded-[28px] border border-white/15 bg-white/80 px-10 py-10 md:px-10 shadow-card'>
-          <div className='flex items-center justify-between flex-wrap'>
+        {/* <div className='mt-5 rounded-[28px] border border-white/15 bg-white/80 px-10 py-10 md:px-10 shadow-card'> */}
+        {/* <div className='flex items-center justify-between flex-wrap'>
             <h1 className='text-3xl md:text-4xl font-semibold text-white my font-display'>Testimonials</h1>
             <span className='text-sm text-black/60'>Collectors on Rakhi’s paintings</span>
           </div>
@@ -184,8 +194,8 @@ const HomeClient = () => {
                 </div>
               ))}
             </Marquee>
-          </div>
-        </div>
+          </div> */}
+        {/* </div> */}
       </section>
 
       <section className='mt-16 grid gap-10 rounded-[28px] border border-white/15 bg-white/80 px-6 py-10 md:grid-cols-3 md:px-10 shadow-card'>
@@ -209,6 +219,18 @@ const HomeClient = () => {
           <p className='text-black/70 text-sm leading-relaxed'>Worldwide shipping in museum-grade crates.</p>
         </div>
       </section>
+
+      {/* IMAGE MODAL */}
+      {selectedImage && (
+        <ImageModal
+          isOpen={!!selectedImage}
+          onClose={() => setSelectedImage(null)}
+          imageSrc={selectedImage.image}
+          imageWidth={selectedImage.width}
+          imageHeight={selectedImage.height}
+          title={selectedImage.title}
+        />
+      )}
     </div>
   );
 };

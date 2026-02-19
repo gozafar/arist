@@ -202,11 +202,20 @@ const AboutPage = () => {
       <div className='card-glass rounded-[28px] border border-white/10 bg-white/5 p-6 md:p-8 space-y-4'>
         <h1 className='text-3xl md:text-4xl font-semibold text-white my font-display mb-4'>Artist Statement</h1>
         <p className=' text-base leading-relaxed text-black/70 md:text-[16px]'>
-          For Rakhi, art is meditation—a sanctuary where mind and soul find harmony. Each brushstroke is an offering, a
-          way to inspire, provoke thought, and build bridges of connection. She believes art is both personal and
-          communal, driving her to teach children, guide communities through workshops, and bring creativity into
-          corporate spaces. Through her work, Rakhi reminds us that art is a reflection of the self and a celebration of
-          humanity.
+          For Rakhi, art is like meditation—a sanctuary where mind and soul find harmony. Each painting becomes a way of
+          reliving a memory or expressing her innermost self, capturing emotions that transcend words. Her work is not
+          simply about creating visuals; it is about offering spaces where viewers can connect with something deeply
+          personal yet universally human.
+        </p>
+        <p>
+          She views art as both personal and communal, a bridge that unites people with their own journeys while
+          fostering shared experiences. This belief inspires her to teach children, guide communities through workshops,
+          and bring creativity into corporate spaces—ensuring that art is accessible and transformative in every
+          environment.
+        </p>
+        <p>
+          Through her practice, Rakhi reminds us that each brushstroke is an invitation to pause, to feel, to connect
+          and celebrate.
         </p>
       </div>
     </div>

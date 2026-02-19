@@ -5,45 +5,58 @@ import Link from 'next/link';
 import type { PaintingDTO } from '@/lib/dto';
 import Button from './Button';
 import { useRouter } from 'next/navigation';
-import PhotoPreview from './PhototPreview';
 
-const PaintingCard = ({ painting }: { painting: PaintingDTO }) => {
+const PaintingCard = ({ painting, onImageClick }: { painting: PaintingDTO; onImageClick?: () => void }) => {
   const router = useRouter();
   const isSold = painting.availability === 'sold';
 
   return (
     <article className='group relative flex h-full flex-col overflow-hidden rounded-3xl bg-white/5 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl'>
       {/* IMAGE */}
-      <PhotoPreview galleryId={`painting-${painting.id}`}>
-        <div className='relative aspect-square overflow-hidden'>
-          <a
-            href={painting.image}
-            data-pswp-width={painting.imageWidth ?? 2000}
-            data-pswp-height={painting.imageHeight ?? 2500}
-            data-caption={`${painting.imageWidth ?? 2000} × ${painting.imageHeight ?? 2000} px`}
-          >
-            <Image
-              src={painting?.image}
-              alt={`${painting?.title || 'Painting'} original painting`}
-              fill
-              priority={false}
-              className='object-cover transition-transform duration-700 group-hover:scale-105'
-            />
-          </a>
-
-          {/* Gradient overlay */}
-          <div className='pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent' />
-
-          {/* Availability badge */}
-          <span
-            className={`absolute left-4 top-4 rounded-full px-3 py-1 text-xs font-medium backdrop-blur ${
-              isSold ? 'bg-red-500/20 text-red-300' : 'bg-emerald-500/20 text-emerald-700'
-            }`}
-          >
-            {isSold ? 'Sold' : 'Available'}
-          </span>
+      <div className='relative aspect-square overflow-hidden'>
+        <div className='block h-full w-full cursor-zoom-in' onClick={onImageClick}>
+          <Image
+            src={painting?.image}
+            alt={`${painting?.title || 'Painting'} original painting`}
+            fill
+            priority={false}
+            className='object-cover transition-transform duration-700 group-hover:scale-105'
+          />
         </div>
-      </PhotoPreview>
+
+        {/* Gradient overlay */}
+        <div className='pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent' />
+
+        {/* Availability badge */}
+        <span
+          className={`absolute left-4 top-4 rounded-full px-3 py-1 text-xs font-medium backdrop-blur-sm border ${
+            isSold ? 'bg-red-500/30 text-white border-red-400/40' : 'bg-emerald-500/30 text-white border-emerald-400/40'
+          }`}
+        >
+          {isSold ? 'Sold' : 'Available'}
+        </span>
+
+        {/* Quick view button */}
+        <button
+          onClick={onImageClick}
+          // className="absolute bottom-4 right-4 z-10 w-10 h-10 flex items-center justify-center bg-black/50 backdrop-blur-sm rounded-full text-white/80 hover:text-white hover:bg-black/70 transition-all duration-200"
+          aria-label='View artwork'
+        >
+          {/* <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="black"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg> */}
+        </button>
+      </div>
 
       {/* CONTENT */}
       <div className='flex flex-1 flex-col gap-2 p-4'>

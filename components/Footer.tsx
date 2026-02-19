@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { FiInstagram, FiFacebook, FiLinkedin, FiMail, FiPhone, FiMapPin } from 'react-icons/fi';
 
@@ -43,7 +44,7 @@ const Footer = () => {
           <div>
             <div className='flex flex-col items-center sm:items-start'>
               <div className='mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-sand-400 via-sand-500 to-sand-700 shadow-card'>
-                <span className='text-xl font-bold text-white'>A</span>
+                <Image src='/favicon.svg' alt="Rakhi's Studio" width={56} height={56} className='rounded-full' />
               </div>
               <h3 className='text-lg font-display text-gray-900 font-semibold'>Rakhi&apos;s Studio Gallery</h3>
             </div>

@@ -37,7 +37,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       },
     });
   } catch (error) {
-    console.error('Error fetching contact:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -111,8 +110,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         updatedAt: contact.updatedAt,
       },
     });
-  } catch (error) {
-    console.error('Error updating contact:', error);
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -144,8 +142,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
         email: contact.email,
       },
     });
-  } catch (error) {
-    console.error('Error deleting contact:', error);
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
