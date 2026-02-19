@@ -45,11 +45,12 @@ const Footer = () => {
               <div className='mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-sand-400 via-sand-500 to-sand-700 shadow-card'>
                 <span className='text-xl font-bold text-white'>A</span>
               </div>
-              <h3 className='text-lg font-display text-gray-900 font-semibold'>Artistry Gallery</h3>
+              <h3 className='text-lg font-display text-gray-900 font-semibold'>Rakhi&apos;s Studio Gallery</h3>
             </div>
 
             <p className='mt-3 text-center text-sm text-gray-800 sm:text-left'>
-              A curated collection of fine art pieces from talented artists around the world.
+              {/* A curated collection of fine art pieces from talented artists around the world. */}
+              Soulful collection of art pieces to decorate your home and office space
             </p>
           </div>
 
@@ -139,7 +140,7 @@ const Footer = () => {
 
         {/* Bottom Bar */}
         <div className='mt-12 flex flex-col items-center justify-between gap-4 border-t border-sand-200 pt-6 text-xs text-gray-800 md:flex-row'>
-          <p>© {new Date().getFullYear()} Artistry Gallery. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Rakhi&apos;s Studio Gallery. All rights reserved.</p>
 
           <div className='flex gap-6'>
             <Link href='/terms' className='text-gray-800 hover:text-sand-700'>

@@ -6,7 +6,7 @@ import { buildSeoMetadata, getCountryConfig, getCountryFromHeaders } from '@/lib
 export const generateMetadata = async (): Promise<Metadata> => {
   const country = getCountryFromHeaders(await headers());
   const config = getCountryConfig(country);
-  const title = `Contact Artistry Gallery | ${config.label}`;
+  const title = `Contact Rakhi's Studio Gallery | ${config.label}`;
   const description = `Reach out for original paintings, commissions, or worldwide shipping to ${config.label}.`;
 
   return buildSeoMetadata({

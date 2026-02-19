@@ -37,7 +37,7 @@ const ContactClient = () => {
         <p className='text-sm uppercase tracking-[0.3em] text-white/60'>Connect</p>
         <h1 className='text-3xl md:text-4xl font-semibold text-white my font-display'>Contact Rakhi</h1>
         <p className='max-w-2xl text-base leading-relaxed text-black/70 md:text-[16px]'>
-          For purchases, commissions, or studio visits, leave a note. Rakhi responds within one business day.
+          For purchases or commissions, leave a note. Rakhi responds within one business day.
         </p>
       </div>
 
@@ -125,10 +125,7 @@ const ContactClient = () => {
         <div className='space-y-4 rounded-3xl border border-white/10 bg-white/5 p-6'>
           <div className='space-y-4 text-white/70'>
             <div className='space-y-2'>
-              <h2 className='text-lg md:text-xl font-semibold text-white my font-display'>Visit or follow</h2>
-              <p className='max-w-2xl text-base leading-relaxed text-black/60 md:text-[14px]'>
-                Hong Kong studio visits available by appointment. Weekdays 10am–6pm.
-              </p>
+              <h2 className='text-lg md:text-xl font-semibold text-white my font-display'>Follow</h2>
             </div>
             <div className='space-y-2'>
               <p className='font-semibold text-white'>Social</p>
@@ -152,7 +149,7 @@ const ContactClient = () => {
                 >
                   Linkdin
                 </Link>
-                <Link href='mailto:studio@anandnarayan.art' className='button-outline text-xs'>
+                <Link href='mailto:rakhistudio1010@gmail.com' className='button-outline text-xs'>
                   Email
                 </Link>
               </div>

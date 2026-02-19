@@ -2,10 +2,10 @@ import type { Metadata } from 'next';
 
 export const siteUrl =
   (process.env.NEXT_PUBLIC_CLIENT_BASE_URL || process.env.NEXT_PUBLIC_SERVER_BASE_URL || '').replace(/\/$/, '') ||
-  'https://artistry-gallery.com';
+  'https://www.rakhistudios.com/';
 
 export const defaultKeywords = [
-  'Artistry gallery',
+  'Rakhis Studio gallery',
   'online painting gallery',
   'buy original art',
   'modern art shop',
@@ -17,7 +17,7 @@ export const defaultKeywords = [
 ];
 
 export const defaultDescription =
-  'Artistry is a modern online painting gallery featuring curated originals, luminous abstracts, and statement pieces for refined spaces.';
+  'Rakhis Studio is a modern online painting gallery featuring curated originals, luminous abstracts, and statement pieces for refined spaces.';
 
 export const defaultOgImage =
   'https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1600&q=80';
@@ -135,7 +135,7 @@ export const buildSeoMetadata = ({
       title: ogTitleValue,
       description: ogDescriptionValue,
       url: canonical,
-      siteName: 'Artistry Gallery',
+      siteName: 'Rakhis Studio Gallery',
       locale: config.ogLocale,
       type: ogType,
       images: ogImage ? [{ url: ogImage, alt: ogTitleValue }] : undefined,

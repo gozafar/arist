@@ -22,20 +22,20 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
   title: {
-    default: 'Artistry – Online Painting Gallery',
-    template: '%s | Artistry Gallery',
+    default: 'Rakhis Studio – Online Painting Gallery',
+    template: '%s | Rakhis Studio Gallery',
   },
   description: defaultDescription,
   keywords: defaultKeywords,
   metadataBase: new URL(siteUrl),
   openGraph: {
-    title: 'Artistry – Online Painting Gallery',
+    title: 'Rakhis Studio – Online Painting Gallery',
     description: defaultDescription,
     url: siteUrl,
-    siteName: 'Artistry Gallery',
+    siteName: 'Rakhis Studio Gallery',
     locale: 'en_US',
     type: 'website',
-    images: [{ url: defaultOgImage, alt: 'Artistry Gallery online painting marketplace' }],
+    images: [{ url: defaultOgImage, alt: 'Rakhis Studio Gallery online painting marketplace' }],
   },
   icons: {
     icon: [
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Artistry – Online Painting Gallery',
+    title: 'Rakhis Studio – Online Painting Gallery',
     description: defaultDescription,
     images: [defaultOgImage],
   },

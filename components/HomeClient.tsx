@@ -72,14 +72,15 @@ const HomeClient = () => {
         <div className='mx-auto grid max-w-7xl gap-12 lg:grid-cols-2 lg:items-center'>
           {/* LEFT CONTENT */}
           <div className='flex flex-col justify-center space-y-6'>
-            <p className='text-sm uppercase tracking-[0.3em] text-white/60'>Curated originals</p>
+            {/* <p className='text-sm uppercase tracking-[0.3em] text-white/60'>Curated originals</p> */}
             <h1 className='text-3xl md:text-4xl font-semibold text-white my font-display'>
-              Buy Original Paintings Online – Trusted Art Gallery for UAE, India, USA &amp; Hong Kong
+              {/* Buy Original Paintings Online – Trusted Art Gallery for UAE, India, USA &amp; Hong Kong */}
+              Buy Original Art works online – Offering soulful collection of art pieces to decorate your home and office
+              space for clients globally
             </h1>
-
             <p className='max-w-2xl text-base leading-relaxed text-black/70 md:text-[16px]'>
-              Artistry is an international painting marketplace connecting collectors in Dubai, Mumbai, New York, and
-              Hong Kong with certified originals, museum-grade framing, and worldwide delivery.
+              Rakhi&apos;s Studio is an international painting marketplace connecting collectors in Dubai, Mumbai, New
+              York, and Hong Kong with certified originals, museum-grade framing, and worldwide delivery.
             </p>
 
             {/* CTA BUTTONS */}
@@ -91,7 +92,7 @@ const HomeClient = () => {
                 Shop global collection
               </Link>
               <Link href='/contact' className='button-outline'>
-                Talk to the curator
+                Talk to the artist
               </Link>
             </div>
 
@@ -105,6 +106,7 @@ const HomeClient = () => {
               <div className='rounded-2xl bg-white/80 px-5 py-4 text-center shadow-card'>
                 <p className='text-2xl font-semibold text-sand-700'>Worldwide</p>
                 <p className='text-sm text-black/70'>Insured global shipping</p>
+                <p className='text-sm text-black/70'>India, USA, UAE, Hong Kong</p>
               </div>
             </div>
           </div>
@@ -142,8 +144,11 @@ const HomeClient = () => {
           </div>
           <div className='card-glass rounded-2xl p-5'>
             <h3 className='text-lg md:text-xl font-semibold text-white my font-display'>Secure payments</h3>
-            <p className='mt-2 text-black/70 text-sm'>
+            {/* <p className='mt-2 text-black/70 text-sm'>
               Trusted checkout and white-glove support for collectors, designers, and hospitality teams.
+            </p> */}
+            <p className='mt-2 text-black/70 text-sm'>
+              Trusted checkout and white-glove support for collectors, architects, art agencies and galleries.
             </p>
           </div>
         </div>
@@ -185,9 +190,12 @@ const HomeClient = () => {
 
       <section className='mt-16 grid gap-10 rounded-[28px] border border-white/15 bg-white/80 px-6 py-10 md:grid-cols-3 md:px-10 shadow-card'>
         <div className='space-y-3'>
-          <h3 className='text-xl md:text-2xl font-semibold text-white my font-display'>Studio visits</h3>
-          <p className='text-black/70 text-sm leading-relaxed'>
+          <h3 className='text-xl md:text-2xl font-semibold text-white my font-display'>Corporate workshops</h3>
+          {/* <p className='text-black/70 text-sm leading-relaxed'>
             View works by appointment. Private walkthroughs with curated lighting and framing guidance.
+          </p> */}
+          <p className='text-black/70 text-sm leading-relaxed'>
+            Bond, create, and beat burnout with immersive corporate art workshops.
           </p>
         </div>
         <div className='space-y-3'>
@@ -198,9 +206,7 @@ const HomeClient = () => {
         </div>
         <div className='space-y-3'>
           <h3 className='text-xl md:text-2xl font-semibold text-white my font-display'>Shipping</h3>
-          <p className='text-black/70 text-sm leading-relaxed'>
-            Worldwide shipping in museum-grade crates. Works ship 7–10 days after purchase.
-          </p>
+          <p className='text-black/70 text-sm leading-relaxed'>Worldwide shipping in museum-grade crates.</p>
         </div>
       </section>
     </div>

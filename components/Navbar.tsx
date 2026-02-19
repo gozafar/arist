@@ -65,13 +65,13 @@ const Navbar = () => {
         <Link href='/' className='flex items-center gap-3'>
           <img
             src='/favicon.svg'
-            alt='Artistry Logo'
+            alt='Rakhis Studio Logo'
             className='h-10 w-10 rounded-full shadow-card'
             width={40}
             height={40}
           />
           <div>
-            <p className='text-xs uppercase tracking-[0.35em] text-black/60'>Artistry</p>
+            <p className='text-xs uppercase tracking-[0.35em] text-black/60'>Rakhi&apos;s Studio</p>
             <p className='font-display text-xl text-black font-semibold'>Online Gallery</p>
           </div>
         </Link>
