@@ -14,6 +14,7 @@ import {
   getLangForCountry,
   siteUrl,
 } from '@/lib/seo';
+import PWAInstallBanner from '@/components/PWAInstallBanner';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -21,6 +22,7 @@ const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfa
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
+  applicationName: 'Rakhi Studio Gallery',
   title: {
     default: 'Rakhis Studio – Online Painting Gallery',
     template: '%s | Rakhis Studio Gallery',
@@ -41,8 +43,11 @@ export const metadata: Metadata = {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
       { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
     ],
-    apple: [{ url: '/apple-touch-icon.png' }],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180' }],
+    shortcut: ['/favicon.ico'],
   },
   twitter: {
     card: 'summary_large_image',
@@ -50,6 +55,8 @@ export const metadata: Metadata = {
     description: defaultDescription,
     images: [defaultOgImage],
   },
+  manifest: '/manifest.json',
+  themeColor: '#F8F5F0',
 };
 
 export const viewport: Viewport = {
@@ -95,6 +102,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 />
                 {children}
               </main>
+              <PWAInstallBanner />
               <ToastContainer
                 position='bottom-right'
                 autoClose={5000}
