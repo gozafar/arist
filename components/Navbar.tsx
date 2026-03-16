@@ -55,16 +55,16 @@ const Navbar = () => {
   const linkClass = (href: string) =>
     `relative px-3 py-2 text-sm font-medium transition ${
       pathname === href || (href === '/paintings' && pathname.startsWith('/paintings/'))
-        ? 'text-[#0ac9bc] font-semibold'
-        : 'text-black/80 '
+        ? '!text-black font-semibold'
+        : '!text-white hover:!text-black '
     }`;
 
   return (
-    <header className='sticky top-0 z-40 backdrop-blur-xl bg-white/80 border-b border-white/15'>
+    <header className='sticky top-0 z-40 backdrop-blur-xl bg-[#FFA501] border-b border-white/15'>
       <div className='mx-auto flex max-w-6xl items-center justify-between px-4 py-3 lg:px-6'>
         <Link href='/' className='flex items-center gap-3'>
           <img
-            src='/favicon.svg'
+            src='/Icon.png'
             alt='Rakhis Studio Logo'
             className='h-10 w-10 rounded-full shadow-card'
             width={40}

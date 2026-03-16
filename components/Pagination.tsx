@@ -14,15 +14,15 @@ const Pagination = ({ total, perPage, currentPage, onPageChange }: PaginationPro
   const pages = Array.from({ length: totalPages }).map((_, i) => i + 1);
 
   return (
-    <div className='mt-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3'>
-      <div className='text-sm text-black/60 font-normal'>
+    <div className='mt-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#FFA501]/25 bg-white/5 px-4 py-3'>
+      <div className='text-sm text-black font-normal'>
         Page {currentPage} of {totalPages}
       </div>
       <div className='flex items-center gap-2'>
         <button
           onClick={() => onPageChange(Math.max(1, currentPage - 1))}
           disabled={currentPage === 1}
-          className='button-outline px-3 py-2 text-xs disabled:opacity-50'
+          className='rounded-full border border-[#FFA501] bg-white px-3 py-2 text-xs font-medium !text-black transition hover:bg-[#FFA501] hover:!text-black disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white disabled:hover:!text-black'
         >
           Prev
         </button>
@@ -32,8 +32,10 @@ const Pagination = ({ total, perPage, currentPage, onPageChange }: PaginationPro
               key={page}
               onClick={() => onPageChange(page)}
               className={clsx(
-                'h-9 w-9 rounded-full border border-white/10 text-sm transition',
-                page === currentPage ? 'bg-sand-500 text-black shadow-card' : 'bg-white/5 text-white'
+                'h-9 w-9 rounded-full border text-sm font-medium transition',
+                page === currentPage
+                  ? 'border-[#FFA501] bg-[#FFA501] !text-black shadow-card'
+                  : 'border-[#FFA501]/35 bg-white !text-black hover:border-[#FFA501] hover:bg-[#FFA501]/15 hover:!text-black'
               )}
             >
               {page}
@@ -43,7 +45,7 @@ const Pagination = ({ total, perPage, currentPage, onPageChange }: PaginationPro
         <button
           onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
           disabled={currentPage === totalPages}
-          className='button-outline px-3 py-2 text-xs disabled:opacity-50'
+          className='rounded-full border border-[#FFA501] bg-white px-3 py-2 text-xs font-medium !text-black transition hover:bg-[#FFA501] hover:!text-black disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white disabled:hover:!text-black'
         >
           Next
         </button>

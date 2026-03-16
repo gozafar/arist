@@ -92,10 +92,11 @@ const HomeClient = () => {
               <Link
                 href='/paintings'
                 className='button-primary shadow-soft transition hover:shadow-lg hover:text-white'
+                style={{ backgroundColor: '#FFA501', borderColor: '#FFA501' }}
               >
                 Shop global collection
               </Link>
-              <Link href='/contact' className='button-outline'>
+              <Link href='/contact' className='button-outline' style={{ color: '#FFA501', borderColor: '#FFA501' }}>
                 Talk to the artist
               </Link>
             </div>
@@ -110,7 +111,7 @@ const HomeClient = () => {
               <div className='rounded-2xl bg-white/80 px-5 py-4 text-center shadow-card'>
                 <p className='text-2xl font-semibold text-sand-700'>Worldwide</p>
                 <p className='text-sm text-black/70'>Insured global shipping</p>
-                <p className='text-sm text-black/70'>India, USA, UAE, Hong Kong</p>
+                {/* <p className='text-sm text-black/70'>India, USA, UAE, Hong Kong</p> */}
               </div>
             </div>
           </div>
@@ -143,7 +144,7 @@ const HomeClient = () => {
           <div className='card-glass rounded-2xl p-5'>
             <h3 className='text-lg md:text-xl font-semibold text-white my font-display'>Worldwide shipping</h3>
             <p className='mt-2 text-black/70 text-sm'>
-              Gallery-grade packaging, customs guidance, and tracking for UAE, India, USA, and Hong Kong deliveries.
+              Gallery-grade packaging, customs guidance, and tracking for deliveries.
             </p>
           </div>
           <div className='card-glass rounded-2xl p-5'>
@@ -161,13 +162,16 @@ const HomeClient = () => {
       <section className='mt-16 space-y-6'>
         <div className='flex items-center justify-between'>
           <h1 className='text-3xl md:text-4xl font-semibold text-white my font-display'>Featured works</h1>
-          <Link href='/paintings' className='button-outline text-xs'>
+          <Link
+            href='/paintings'
+            className='button-outline text-xs'
+            style={{ color: '#FFA501', borderColor: '#FFA501' }}
+          >
             Browse all
           </Link>
         </div>
         <div className='container-grid gap-6'>
           {featured.map((painting, index) => {
-            console.log('Painting:', index, painting);
             return (
               <PaintingCard
                 key={painting.id || `painting-${index}`}

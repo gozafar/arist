@@ -19,6 +19,9 @@ export default function ImageModal({
   imageHeight = 2500,
   title = 'Artwork',
 }: ImageModalProps) {
+  const [loadedImageSrc, setLoadedImageSrc] = useState('');
+  const isImageLoading = loadedImageSrc !== imageSrc;
+
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -51,8 +54,22 @@ export default function ImageModal({
           </svg>
         </button>
 
-        {/* Image */}
-        <img src={imageSrc} alt={title} className='max-w-full max-h-[80vh] object-contain rounded-lg' />
+        {/* Image + Loader */}
+        <div className='relative'>
+          {isImageLoading && (
+            <div className='absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white/40 backdrop-blur-[1px]'>
+              <div className='h-10 w-10 animate-spin rounded-full border-4 border-black/20 border-t-black/70' />
+            </div>
+          )}
+          <img
+            key={imageSrc}
+            src={imageSrc}
+            alt={title}
+            className='max-w-full max-h-[80vh] object-contain rounded-lg'
+            onLoad={() => setLoadedImageSrc(imageSrc)}
+            onError={() => setLoadedImageSrc(imageSrc)}
+          />
+        </div>
 
         {/* Image info */}
         <div className='absolute bottom-10 left-4 text-black/80 text-sm'>

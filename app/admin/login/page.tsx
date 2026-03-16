@@ -77,7 +77,12 @@ const AdminLoginPage = () => {
             />
           </label>
           {error && <p className='text-sm text-red-300'>{error}</p>}
-          <button type='submit' className='button-primary w-full' disabled={loading}>
+          <button
+            type='submit'
+            className='button-primary w-full'
+            style={{ backgroundColor: '#FFA501', color: '#fff', borderColor: '#FFA501' }}
+            disabled={loading}
+          >
             {loading ? (
               <span className='flex items-center justify-center gap-2'>
                 <svg className='animate-spin h-4 w-4' viewBox='0 0 24 24'>

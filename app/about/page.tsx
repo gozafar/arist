@@ -26,10 +26,10 @@ const AboutPage = () => {
       <div className='grid gap-8 lg:grid-cols-[1fr_1.1fr] lg:items-start'>
         <div className='relative mx-auto w-full max-w-[450px] aspect-square overflow-hidden rounded-3xl border border-white/15 bg-white shadow-card'>
           <Image
-            src='https://res.cloudinary.com/dsqu6pi0d/image/upload/v1767425430/rakhi-studio/rakhi/IMG_E1632_qutygw.jpg'
-            alt='Rakhi Vashisht in her studio'
-            fill
-            priority
+            src='/affhuijb5qpwqwcpozaw.webp'
+            alt='Rakhi Vashisht presenting her paintings'
+            height={500}
+            width={800}
             className='object-cover'
           />
           <div className='absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent' />
@@ -79,10 +79,11 @@ const AboutPage = () => {
         </div>
         <div className='relative mx-auto w-full max-w-[450px] aspect-square overflow-hidden rounded-3xl border border-white/15 bg-white shadow-card'>
           <Image
-            src='https://res.cloudinary.com/dsqu6pi0d/image/upload/v1767425737/rakhi-studio/rakhi/IMG-20170904-WA0029_vr9v0y.jpg'
+            src='/20220611_122703.jpg'
             alt='Rakhi Vashisht presenting her paintings'
-            fill
             priority
+            height={500}
+            width={500}
             className='object-cover'
           />
           <div className='absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent' />

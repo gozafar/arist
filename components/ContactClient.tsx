@@ -115,7 +115,11 @@ const ContactClient = () => {
                   name='message'
                 />
               </label>
-              <Button type='submit' className='w-full md:w-auto'>
+              <Button
+                type='submit'
+                className='w-full md:w-auto'
+                style={{ backgroundColor: '#FFA501', color: '#fff', borderColor: '#FFA501' }}
+              >
                 Send message
               </Button>
             </form>
@@ -133,6 +137,7 @@ const ContactClient = () => {
                 <Link
                   href='https://www.instagram.com/rakhi_studio/'
                   className='button-outline text-xs'
+                  style={{ backgroundColor: '#FFA501', color: '#fff', borderColor: '#FFA501' }}
                   target='_blank'
                   rel='noreferrer'
                 >
@@ -144,12 +149,17 @@ const ContactClient = () => {
                 <Link
                   href='https://www.linkedin.com/in/rakhi-vashisht-b373858/'
                   className='button-outline text-xs'
+                  style={{ backgroundColor: '#FFA501', color: '#fff', borderColor: '#FFA501' }}
                   target='_blank'
                   rel='noreferrer'
                 >
                   Linkdin
                 </Link>
-                <Link href='mailto:rakhistudio1010@gmail.com' className='button-outline text-xs'>
+                <Link
+                  href='mailto:rakhistudio1010@gmail.com'
+                  className='button-outline text-xs'
+                  style={{ backgroundColor: '#FFA501', color: '#fff', borderColor: '#FFA501' }}
+                >
                   Email
                 </Link>
               </div>

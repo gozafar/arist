@@ -30,7 +30,7 @@ const PaintingCard = ({ painting, onImageClick }: { painting: PaintingDTO; onIma
         {/* Availability badge */}
         <span
           className={`absolute left-4 top-4 rounded-full px-3 py-1 text-xs font-medium backdrop-blur-sm border ${
-            isSold ? 'bg-red-500/30 text-white border-red-400/40' : 'bg-emerald-500/30 text-white border-emerald-400/40'
+            isSold ? 'bg-red-500/30 text-[#fff] border-red-400/40' : 'bg-[#FFA501] text-[#fff] border-[#FFA501]'
           }`}
         >
           {isSold ? 'Sold' : 'Available'}
@@ -82,7 +82,8 @@ const PaintingCard = ({ painting, onImageClick }: { painting: PaintingDTO; onIma
             <Link
               onClick={() => console.log('Painting ID:', painting.id)}
               href={`/paintings/${painting.id}`}
-              className='flex-1 rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-center text-xs font-medium text-white transition hover:bg-white/20'
+              className='flex-1 rounded-xl border bg-white/10 px-4 py-3 text-center text-xs font-medium transition hover:bg-[#FFA501]/15'
+              style={{ color: '#FFA501', borderColor: '#FFA501' }}
             >
               View
             </Link>
@@ -91,6 +92,7 @@ const PaintingCard = ({ painting, onImageClick }: { painting: PaintingDTO; onIma
               onClick={() => router.push(`/paintings/${painting.id}/PaintingOrder`)}
               disabled={isSold}
               className={`flex-1 text-xs ${isSold ? 'cursor-not-allowed opacity-60' : ''}`}
+              style={{ backgroundColor: '#FFA501', borderColor: '#FFA501' }}
             >
               {isSold ? 'Sold' : 'Contact'}
             </Button>

@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { GetGallery } from '@/lib/api/admin';
 import Image from 'next/image';
-import Pagination from '@/components/Pagination';
 import ImageModal from '@/components/ImageModal';
 
 type GalleryName = 'Contemporary / Modern Art' | 'Portrait Paintings' | 'Landscape Paintings' | 'Abstract Art';
@@ -40,22 +39,29 @@ export default function GalleryPage() {
   const [error, setError] = useState<string | null>(null);
   const [imageList, setImageList] = useState<GalleryImage[]>([]);
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
+  const sliderRef = useRef<HTMLDivElement>(null);
 
-  const PAGE_SIZE = 12;
+  const fetchGalleries = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await GetGallery({ page: 1, limit: 100 }); // Fetch all galleries for client-side pagination
 
-  // Pagination state similar to paintings
-  const [currentPage, setCurrentPage] = useState(1);
+      if (res?.galleries) {
+        setGalleries(res.galleries);
+      }
 
-  // Calculate pagination values
-  const totalPages = useMemo(() => Math.max(1, Math.ceil(imageList.length / PAGE_SIZE)), [imageList.length]);
-  const clampedPage = useMemo(() => Math.min(currentPage, totalPages), [currentPage, totalPages]);
-  const start = useMemo(() => (clampedPage - 1) * PAGE_SIZE, [clampedPage]);
-  const end = useMemo(() => start + PAGE_SIZE, [start]);
-  const visibleImages = useMemo(() => imageList.slice(start, end), [imageList, start, end]);
+      setError(null);
+    } catch (err) {
+      console.error('Failed to load galleries:', err);
+      setError('Failed to load galleries. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     fetchGalleries();
-  }, []);
+  }, [fetchGalleries]);
 
   useEffect(() => {
     if (selectedGallery) {
@@ -63,7 +69,6 @@ export default function GalleryPage() {
       setFilteredGalleries(filtered);
       const images = filtered[0]?.imageIds || [];
       setImageList(images);
-      setCurrentPage(1); // Reset to page 1 when gallery changes
     } else {
       const hardcodedFiltered = galleries.filter(gallery => GALLERY_NAMES.includes(gallery.name as GalleryName));
       setFilteredGalleries(hardcodedFiltered);
@@ -76,51 +81,39 @@ export default function GalleryPage() {
         }))
       );
       setImageList(allImages);
-      setCurrentPage(1); // Reset to page 1 when gallery changes
     }
   }, [selectedGallery, galleries]);
+  const hasHorizontalOverflow = imageList.length > 3;
+  const scrollByCardSet = (direction: 'left' | 'right') => {
+    if (!sliderRef.current) return;
+    const viewportWidth = sliderRef.current.clientWidth;
+    const distance = Math.max(viewportWidth * 0.9, 240);
+    sliderRef.current.scrollBy({
+      left: direction === 'right' ? distance : -distance,
+      behavior: 'smooth',
+    });
+  };
 
-  const fetchGalleries = async () => {
-    try {
-      setLoading(true);
-      const res = await GetGallery({ page: 1, limit: 100 }); // Fetch all galleries for client-side pagination
+  useEffect(() => {
+    if (!hasHorizontalOverflow || selectedImage) return;
 
-      if (res?.galleries) {
-        setGalleries(res.galleries);
+    const intervalId = window.setInterval(() => {
+      const slider = sliderRef.current;
+      if (!slider) return;
 
-        // Extract images from galleries based on selection
-        let images: GalleryImage[] = [];
-        if (selectedGallery) {
-          const filtered = res.galleries.filter(gallery => gallery.name === selectedGallery);
-          images = filtered[0]?.imageIds || [];
-        } else {
-          const hardcodedFiltered = res.galleries.filter(gallery =>
-            GALLERY_NAMES.includes(gallery.name as GalleryName)
-          );
-          images = hardcodedFiltered.flatMap(gallery =>
-            gallery.imageIds.map(img => ({
-              ...img,
-              galleryName: gallery.name,
-              createdAt: (img as GalleryImage).createdAt || gallery.createdAt,
-            }))
-          );
-        }
+      const distance = Math.max(slider.clientWidth * 0.9, 240);
+      const maxScrollLeft = slider.scrollWidth - slider.clientWidth;
+      const nextLeft = slider.scrollLeft + distance;
 
-        setImageList(images);
+      if (nextLeft >= maxScrollLeft - 4) {
+        slider.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        slider.scrollTo({ left: nextLeft, behavior: 'smooth' });
       }
+    }, 3000);
 
-      setError(null);
-    } catch (err) {
-      console.error('Failed to load galleries:', err);
-      setError('Failed to load galleries. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
+    return () => window.clearInterval(intervalId);
+  }, [hasHorizontalOverflow, imageList.length, selectedImage]);
 
   if (loading) {
     return (
@@ -180,61 +173,87 @@ export default function GalleryPage() {
         </div>
       </div>
 
-      {/* GALLERY GRID */}
-      {visibleImages.length > 0 ? (
-        <section className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'>
-          {visibleImages.map((item: GalleryImage) => (
-            <article
-              key={item._id || item.imageId}
-              className='group relative flex flex-col overflow-hidden rounded-3xl bg-white/5 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl'
+      {/* HORIZONTAL GALLERY */}
+      {imageList.length > 0 ? (
+        <section className='space-y-6'>
+          <div className='relative'>
+            {hasHorizontalOverflow && (
+              <>
+                <button
+                  type='button'
+                  onClick={() => scrollByCardSet('left')}
+                  className='absolute left-2 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/80 text-black shadow-md backdrop-blur transition hover:bg-white'
+                  aria-label='Scroll gallery left'
+                >
+                  <svg width='18' height='18' viewBox='0 0 24 24' fill='none' aria-hidden='true'>
+                    <path
+                      d='M15 18L9 12L15 6'
+                      stroke='currentColor'
+                      strokeWidth='2'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                    />
+                  </svg>
+                </button>
+                <button
+                  type='button'
+                  onClick={() => scrollByCardSet('right')}
+                  className='absolute right-2 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/80 text-black shadow-md backdrop-blur transition hover:bg-white'
+                  aria-label='Scroll gallery right'
+                >
+                  <svg width='18' height='18' viewBox='0 0 24 24' fill='none' aria-hidden='true'>
+                    <path
+                      d='M9 18L15 12L9 6'
+                      stroke='currentColor'
+                      strokeWidth='2'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                    />
+                  </svg>
+                </button>
+              </>
+            )}
+            <div
+              ref={sliderRef}
+              className='hide-scrollbar flex gap-4 overflow-x-auto pb-3 snap-x snap-mandatory scroll-smooth'
+              aria-label='Scrollable gallery'
             >
-              {/* IMAGE */}
-              <div className='relative aspect-square overflow-hidden'>
-                <div className='block h-full w-full cursor-zoom-in' onClick={() => setSelectedImage(item)}>
-                  <Image
-                    src={item.url}
-                    alt={item.name || 'Artwork'}
-                    fill
-                    className='object-cover transition-transform duration-700 group-hover:scale-105'
-                    sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
-                    quality={75}
-                    priority={true}
-                  />
-                </div>
+              {imageList.map((item: GalleryImage) => (
+                <article
+                  key={item._id || item.imageId}
+                  className='group relative flex w-[88%] shrink-0 snap-start flex-col overflow-hidden rounded-3xl bg-white/5 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl sm:w-[48%] lg:w-[31%]'
+                >
+                  {/* IMAGE */}
+                  <div className='relative aspect-square overflow-hidden'>
+                    <div className='block h-full w-full cursor-zoom-in' onClick={() => setSelectedImage(item)}>
+                      <Image
+                        src={item.url}
+                        alt={item.name || 'Artwork'}
+                        fill
+                        className='object-cover transition-transform duration-700 group-hover:scale-105'
+                        sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
+                        quality={75}
+                        priority={true}
+                      />
+                    </div>
 
-                {/* Hover overlay */}
-                <div className='pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100' />
+                    {/* Hover overlay */}
+                    <div className='pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100' />
+                  </div>
 
-                {/* Quick view badge */}
-                <span className='pointer-events-none absolute bottom-4 right-4 rounded-full bg-black/70 px-3 py-1 text-xs text-white backdrop-blur'>
-                  View artwork
-                </span>
-              </div>
-
-              {/* CONTENT */}
-              <div className='flex flex-1 flex-col gap-1 p-4'>
-                <h3 className='line-clamp-1 text-base font-semibold text-white'>{item.name || 'Untitled'}</h3>
-
-                {item.galleryName && <p className='text-xs text-black/80'>{item.galleryName}</p>}
-
-                <p className='text-xs text-black/70'>
-                  {item.createdAt
-                    ? new Date(item.createdAt).toLocaleDateString('en-US', {
-                        month: 'short',
-                        year: 'numeric',
-                      })
-                    : 'Date not available'}
-                </p>
-
-                {/* FOOTER */}
-                <div className='mt-auto pt-4'>
-                  {/* <button className='w-full rounded-xl border border-white/10 bg-white/10 px-4 py-2 text-xs font-medium text-white transition hover:bg-white/20'>
-                      View details
-                    </button> */}
-                </div>
-              </div>
-            </article>
-          ))}
+                  {/* CONTENT: name only */}
+                  <div className='p-4'>
+                    <h3 className='line-clamp-1 text-base font-semibold text-white'>{item.name || 'Untitled'}</h3>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+          {hasHorizontalOverflow && (
+            <p className='text-center text-xs text-black/60'>
+              Auto-scroll is active every 3 seconds. Use arrow buttons to move left or right anytime.
+            </p>
+          )}
         </section>
       ) : (
         <div className='py-12 text-center'>
@@ -246,16 +265,6 @@ export default function GalleryPage() {
             </button>
           )}
         </div>
-      )}
-
-      {/* PAGINATION */}
-      {imageList.length > 0 && (
-        <Pagination
-          total={imageList.length}
-          perPage={PAGE_SIZE}
-          currentPage={clampedPage}
-          onPageChange={handlePageChange}
-        />
       )}
 
       {/* IMAGE MODAL */}
