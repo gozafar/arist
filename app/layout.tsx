@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from 'next';
 import { headers } from 'next/headers';
-import { Playfair_Display, Inter } from 'next/font/google';
 import '@/styles/globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -17,9 +16,6 @@ import {
 import PWAInstallBanner from '@/components/PWAInstallBanner';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' });
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
   applicationName: 'Rakhi Studio Gallery',
@@ -72,7 +68,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang={lang}>
-      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
+      <body className='font-sans antialiased'>
         <PaintingProvider>
           <CartProvider>
             <div className='min-h-screen flex flex-col'>

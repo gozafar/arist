@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "next dev --webpack",
+    "build": "next build --webpack",
     "start": "next start",
     "prepare": "husky install",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx --max-warnings=999",
@@ -38,6 +38,7 @@
     "@types/react": "18.3.12",
     "@types/react-dom": "18.3.1",
     "autoprefixer": "10.4.20",
+    "babel-loader": "8.4.1",
     "eslint": "9.39.2",
     "eslint-config-next": "16.0.10",
     "eslint-config-prettier": "^9.1.0",
@@ -51,7 +52,7 @@
   "packageManager": "pnpm@10.16.1+sha512.0e155aa2629db8672b49e8475da6226aa4bdea85fdcdfdc15350874946d4f3c91faaf64cbdc4a5d1ab8002f473d5c3fcedcd197989cf0390f9badd3c04678706",
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx}": [
-      "eslint --max-warnings=999"
+      "eslint --no-warn-ignored --max-warnings=999"
     ],
     "**/*.{js,jsx,ts,tsx,json,css,scss,md,html,sh}": [
       "prettier --write"

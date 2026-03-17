@@ -152,7 +152,7 @@ export default function GalleryPage() {
         </div>
 
         <div className='flex flex-col sm:flex-row gap-3 text-xs text-white/70 '>
-          <select
+          {/* <select
             value={selectedGallery}
             onChange={e => setSelectedGallery(e.target.value)}
             className='rounded-full bg-white/5 px-3 py-2 border border-white/10 focus:border-white/20 outline-none min-w-[150px] w-full sm:w-auto text-black/70'
@@ -165,7 +165,7 @@ export default function GalleryPage() {
                 {name}
               </option>
             ))}
-          </select>
+          </select> */}
           <span className='rounded-full bg-white/5 px-4 py-2 text-black/70'>
             {filteredGalleries.length} collections
           </span>

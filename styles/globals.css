@@ -12,6 +12,8 @@
   --accent: rgb(10, 201, 188);
   --accent-hover: rgb(8, 176, 165);
   --border: rgba(10, 201, 188, 0.35);
+  --font-playfair: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
+  --font-inter: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 body {

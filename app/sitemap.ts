@@ -27,33 +27,42 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ];
   });
 
-  await dbConnect();
-  const paintings = await Painting.find({}, { _id: 1, updatedAt: 1 }).lean();
+  let paintingEntries: MetadataRoute.Sitemap = [];
 
-  const paintingEntries =
-    Array.isArray(paintings) && paintings.length
-      ? paintings
-          .map(p => {
-            const id = typeof p._id === 'string' ? p._id : p._id?.toString?.();
-            // const baseUrl = `${siteUrl}/paintings/${id}`;
-            const regionEntries = regions.map(region => ({
-              url: buildCountryUrl(`/paintings/${id}`, region),
-              lastModified: p.updatedAt instanceof Date ? p.updatedAt.toISOString() : new Date().toISOString(),
-              changeFrequency: 'weekly' as const,
-              priority: 0.7,
-            }));
-            return [
-              {
-                url: `${siteUrl}/paintings/${id}`,
-                lastModified: p.updatedAt instanceof Date ? p.updatedAt.toISOString() : new Date().toISOString(),
+  try {
+    await dbConnect();
+    const paintings = await Painting.find({}, { _id: 1, updatedAt: 1 }).lean();
+
+    paintingEntries =
+      Array.isArray(paintings) && paintings.length
+        ? paintings
+            .map(p => {
+              const id = typeof p._id === 'string' ? p._id : p._id?.toString?.();
+              if (!id) return [];
+
+              const lastModified = p.updatedAt instanceof Date ? p.updatedAt.toISOString() : new Date().toISOString();
+              const regionEntries = regions.map(region => ({
+                url: buildCountryUrl(`/paintings/${id}`, region),
+                lastModified,
                 changeFrequency: 'weekly' as const,
                 priority: 0.7,
-              },
-              ...regionEntries,
-            ];
-          })
-          .flat()
-      : [];
+              }));
+
+              return [
+                {
+                  url: `${siteUrl}/paintings/${id}`,
+                  lastModified,
+                  changeFrequency: 'weekly' as const,
+                  priority: 0.7,
+                },
+                ...regionEntries,
+              ];
+            })
+            .flat()
+        : [];
+  } catch (error) {
+    console.warn('[sitemap] Skipping painting URLs because MongoDB is unavailable.', error);
+  }
 
   return [...staticPages, ...paintingEntries];
 }

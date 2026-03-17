@@ -1,5 +1,3 @@
-import nextPWA from 'next-pwa';
-
 const isDev = process.env.NODE_ENV === 'development';
 
 const runtimeCaching = [
@@ -50,17 +48,24 @@ const runtimeCaching = [
   },
 ];
 
-const withPWA = nextPWA({
-  dest: 'public',
-  register: true,
-  skipWaiting: true,
-  disable: isDev,
-  runtimeCaching,
-  buildExcludes: [/middleware-manifest\\.json$/],
-  fallbacks: {
-    document: '/offline',
-  },
-});
+let withPWA = config => config;
+try {
+  const { default: nextPWA } = await import('next-pwa');
+  withPWA = nextPWA({
+    dest: 'public',
+    register: true,
+    skipWaiting: true,
+    disable: isDev,
+    runtimeCaching,
+    buildExcludes: [/middleware-manifest\\.json$/],
+    fallbacks: {
+      document: '/offline',
+    },
+  });
+} catch {
+  // Keep build working when optional PWA dependency is missing locally.
+  console.warn('[next.config] next-pwa not found, building without PWA support.');
+}
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
