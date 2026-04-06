@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { me } from '@/lib/api/auth';
+import Image from 'next/image';
 
 const baseNavItems = [
   { href: '/', label: 'Home' },
@@ -63,12 +64,12 @@ const Navbar = () => {
     <header className='sticky top-0 z-40 backdrop-blur-xl bg-[#FFA501] border-b border-white/15'>
       <div className='mx-auto flex max-w-6xl items-center justify-between px-4 py-3 lg:px-6'>
         <Link href='/' className='flex items-center gap-3'>
-          <img
+          <Image
             src='/Icon.png'
             alt='Rakhis Studio Logo'
-            className='h-10 w-10 rounded-full shadow-card'
-            width={40}
-            height={40}
+            className='h-[72px] w-[72px] rounded-full shadow-card'
+            width={1920}
+            height={1080}
           />
           <div>
             <p className='text-xs uppercase tracking-[0.35em] text-black/60'>Rakhi&apos;s Studio</p>

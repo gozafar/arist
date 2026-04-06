@@ -43,8 +43,8 @@ const Footer = () => {
           {/* Brand */}
           <div>
             <div className='flex flex-col items-center sm:items-start'>
-              <div className='mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-sand-400 via-sand-500 to-sand-700 shadow-card'>
-                <Image src='/Icon.png' alt="Rakhi's Studio" width={56} height={56} className='rounded-full' />
+              <div className='mb-3 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-sand-400 via-sand-500 to-sand-700 shadow-card'>
+                <Image src='/Icon.png' alt="Rakhi's Studio" width={1080} height={1920} className='h-full w-full' />
               </div>
               <h3 className='text-lg font-display !text-white font-semibold'>Rakhi&apos;s Studio Gallery</h3>
             </div>
