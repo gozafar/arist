@@ -159,7 +159,7 @@ export const internalCSSTemplate = `
 export const logoTemplate = `
 <div class="email-logo" style="text-align: center; margin-bottom: 20px;">
   <img 
-    src="/Icon.png" 
+    src="/icon.svg" 
     alt="Rakhi Studio Logo" 
     width="80" 
     height="80" 
@@ -194,7 +194,7 @@ export const footerTemplate = `
     <a href="https://facebook.com/rakhistudio" target="_blank" rel="noopener noreferrer">Facebook</a>
   </div>
   <p class="copyright">This is an automated message. Please do not reply to this email.</p>
-  <p class="copyright">© 2024 Rakhi Studio. All rights reserved.</p>
+  <p class="copyright">© 2026 Rakhi Studio. All rights reserved.</p>
 </div>
 `;
 

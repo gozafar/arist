@@ -52,10 +52,8 @@ class EmailService {
       };
 
       const info = await this.transporter.sendMail(mailOptions);
-      console.log('================', info);
       if (!isProduction) console.log('Email sent successfully via nodemailer', info.response);
-    } catch (error) {
-      console.log('Error sending email via nodemailer', error);
+    } catch {
       throw new Error('Error sending email via nodemailer');
     }
   };
