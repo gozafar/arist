@@ -89,7 +89,7 @@ export const paintingOrderConfirmationTemplate = (order: {
           <img 
             src="${order.url}" 
             alt="Your Ordered Painting" 
-            style="max-width: 300px; max-height: 200px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
+            style="max-width: 300px; max-height: 200px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: center; align-items: center; display: block; margin: 0 auto;"
           />
         </div>
         `
