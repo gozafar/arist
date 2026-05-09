@@ -38,14 +38,15 @@ const ContactSchema = new Schema<ContactDoc>(
       required: true,
       trim: true,
       lowercase: true,
-      unique: true,
       maxlength: 255,
+      index: true,
     },
     phone: {
       type: String,
       trim: true,
       maxlength: 20,
       match: /^[+]?[\d\s\-()]+$/,
+      index: true,
     },
     message: {
       type: String,

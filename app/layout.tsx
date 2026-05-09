@@ -16,6 +16,8 @@ import {
 import PWAInstallBanner from '@/components/PWAInstallBanner';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import FloatingWhatsApp from '@/components/whatsapp';
+import { envs } from '../configs/env';
 
 export const metadata: Metadata = {
   applicationName: 'Rakhi Studio Gallery',
@@ -67,7 +69,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const lang = getLangForCountry(country);
 
   return (
-    <html lang={lang}>
+    <html lang={lang} suppressHydrationWarning>
       <body className='font-sans antialiased'>
         <PaintingProvider>
           <CartProvider>
@@ -115,6 +117,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </div>
           </CartProvider>
         </PaintingProvider>
+
+        <FloatingWhatsApp phoneNumber={envs.whatsapp.phoneNumber} message={envs.whatsapp.message} />
       </body>
     </html>
   );
