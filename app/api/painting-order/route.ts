@@ -5,6 +5,7 @@ import { validatePaintingOrderWithBusinessLogic } from '../../../lib/validations
 import { emailService } from '../contact/nodemailer';
 import { getPaintingOrderHTML } from '../../../src/templates/emails/email-templates';
 import { envs } from '../../../configs/env';
+import Painting from '@/models/Painting';
 
 // POST - Create new order
 export async function POST(request: Request) {
@@ -27,6 +28,11 @@ export async function POST(request: Request) {
     // Connect to database after validation
     await dbConnect();
 
+    const getPainting = await Painting.findById(validation.sanitizedData!.paintingId.trim());
+    if (!getPainting) {
+      return NextResponse.json({ success: false, error: 'Painting not found' }, { status: 404 });
+    }
+
     const order = await PaintingOrder.create({
       user: {
         name: validation.sanitizedData!.name.trim(),
@@ -38,7 +44,7 @@ export async function POST(request: Request) {
         postal: validation.sanitizedData!.postal.trim(),
         country: validation.sanitizedData!.country.trim(),
       },
-      paintingId: validation.sanitizedData!.paintingId.trim(),
+      paintingId: getPainting._id,
     });
 
     //! send email with TSX template
@@ -46,9 +52,10 @@ export async function POST(request: Request) {
       await Promise.allSettled([
         emailService.send({
           to: envs.email.user,
-          subject: 'Order Confirmation',
-          text: 'Your order has been received. We will get back to you soon.',
+          subject: 'Enquiry Confirmation',
+          text: 'Your enquiry has been received. We will get back to you soon.',
           html: getPaintingOrderHTML({
+            url: getPainting.image,
             _id: order._id,
             user: {
               name: order.user.name,
@@ -63,9 +70,10 @@ export async function POST(request: Request) {
 
         emailService.send({
           to: order.user.email,
-          subject: 'Order Confirmation',
-          text: 'Your order has been received. We will get back to you soon.',
+          subject: 'Enquiry Confirmation',
+          text: 'Your enquiry has been received. We will get back to you soon.',
           html: getPaintingOrderHTML({
+            url: getPainting.image,
             _id: order._id,
             user: {
               name: order.user.name,

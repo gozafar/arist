@@ -3,6 +3,7 @@ import { contactUsTemplate } from './ContactUsTemplate';
 import { orderReceiverTemplate } from './OrderReceiverTemplate';
 
 export function getPaintingOrderHTML(order: {
+  url: string;
   _id: string;
   user: { name: string; email: string; phone: string };
   createdAt: string;
@@ -17,6 +18,7 @@ export function getContactUsHTML(contact: { name: string; email: string; phone: 
 }
 
 export function getOrderReceiverHTML(order: {
+  url: string;
   _id: string;
   user: { name: string; email: string; phone: string };
   createdAt: string;

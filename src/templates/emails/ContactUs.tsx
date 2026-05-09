@@ -35,7 +35,7 @@ const ContactUs: React.FC<ContactUsProps> = ({ contact }) => {
       >
         <div style={{ textAlign: 'center', marginBottom: '20px' }}>
           <img
-            src='/icon.svg'
+            src='https://res.cloudinary.com/dvtmoopfw/image/upload/v1778332918/image_7_Vectorized_tcypnm.svg'
             alt='Rakhi Studio Logo'
             width={80}
             height={80}

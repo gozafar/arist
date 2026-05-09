@@ -3,18 +3,15 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
 import AddToCartButton from '@/components/AddToCartButton';
 import type { PaintingDTO } from '@/lib/dto';
 import { endpoints } from '@/lib/api/endpoints';
-import PhotoPreview from '@/components/PhototPreview';
 import PaintingDescription from '@/components/PaintingDescription';
 import ImageModal from '@/components/ImageModal';
 
-type PaintingResponse = PaintingDTO;
-
 const PaintingDetailPage = ({ params }: { params: Promise<{ id: string }> }) => {
-  const resolvedParams = React.use(params);
+  const { id } = React.use(params);
+
   const [painting, setPainting] = useState<PaintingDTO | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,11 +20,11 @@ const PaintingDetailPage = ({ params }: { params: Promise<{ id: string }> }) => 
   useEffect(() => {
     const fetchPainting = async () => {
       try {
-        const base = process.env.NEXT_PUBLIC_CLIENT_BASE_URL || '';
+        const base = process.env.NEXT_PUBLIC_CLIENT_BASE_URL!;
         const endpoint =
           typeof endpoints.paintings.detail === 'function'
-            ? endpoints.paintings.detail(resolvedParams.id)
-            : `${endpoints.paintings.detail}/${resolvedParams.id}`;
+            ? endpoints.paintings.detail(id)
+            : `${endpoints.paintings.detail}/${id}`;
 
         const res = await fetch(`${base}${endpoint}`, {
           next: { tags: ['paintings'] },
@@ -47,7 +44,7 @@ const PaintingDetailPage = ({ params }: { params: Promise<{ id: string }> }) => 
     };
 
     fetchPainting();
-  }, [resolvedParams.id]);
+  }, [id]);
 
   if (loading) {
     return (

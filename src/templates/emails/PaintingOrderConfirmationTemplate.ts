@@ -81,9 +81,6 @@ export const paintingOrderConfirmationTemplate = (order: {
         </div>
 
         <!-- Painting Image -->
-        ${
-          order.url
-            ? `
         <div style="text-align: center; margin: 30px 0;">
           <h3 style="color: #333; margin-bottom: 15px;">🎨 Your Ordered Painting</h3>
           <img 
@@ -92,9 +89,6 @@ export const paintingOrderConfirmationTemplate = (order: {
             style="max-width: 300px; max-height: 200px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: center; align-items: center; display: block; margin: 0 auto;"
           />
         </div>
-        `
-            : ''
-        }
 
         <!-- Painting Information -->
         <div class="info-box">
