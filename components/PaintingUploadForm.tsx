@@ -118,7 +118,7 @@ const PaintingUploadForm = () => {
               type='number'
               value={form.year?.toString() || ''}
               onChange={e => handleChange('year', Number(e))}
-              min={2015}
+              min={2000}
               max={new Date().getFullYear() + 1}
             />
           </div>

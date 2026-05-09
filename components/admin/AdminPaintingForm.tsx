@@ -131,7 +131,7 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
     }
 
     // Only allow numbers, spaces, and * or ×
-    const cleanValue = value.replace(/[^0-9\s×*]/gi, '');
+    const cleanValue = value.replace(/[^0-9.\s×*]/gi, '');
 
     // Normalize the input
     const normalized = cleanValue
@@ -253,7 +253,7 @@ const AdminPaintingForm = ({ initial, onSubmit, mode = 'create' }: AdminPainting
               type='number'
               value={form.year?.toString() || ''}
               onChange={value => handleChange('year', Number(value))}
-              min={2015}
+              min={2000}
               max={new Date().getFullYear() + 1}
             />
           </div>
