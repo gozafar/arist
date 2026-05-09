@@ -152,7 +152,17 @@ const Footer = () => {
             </Link>
           </div>
 
-          <p className='!text-white'>Developed by Goitel Consultancy Private Limited</p>
+          <p className='!text-white'>
+            Developed by{' '}
+            <Link
+              href='https://www.gloitel.com'
+              target='_blank'
+              rel='noopener noreferrer'
+              className='underline hover:text-gray-300'
+            >
+              Gloitel Consulting Private Limited
+            </Link>
+          </p>
         </div>
       </div>
     </footer>

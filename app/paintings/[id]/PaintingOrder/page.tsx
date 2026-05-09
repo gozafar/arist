@@ -62,7 +62,11 @@ export default function ContactPainting() {
     <div className='mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-16'>
       <div className='mb-8 flex items-center justify-between'>
         <h1 className='section-heading'>Checkout</h1>
-        <Link href='/paintings' className='button-outline text-xs'>
+        <Link
+          href='/paintings'
+          className='button-outline text-xs '
+          style={{ backgroundColor: '#FFA501', borderColor: '#FFA501', color: 'white' }}
+        >
           Back
         </Link>
       </div>
