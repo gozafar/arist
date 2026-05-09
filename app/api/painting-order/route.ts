@@ -3,6 +3,7 @@ import PaintingOrder from '@/models/PaintingOrder';
 import { dbConnect } from '@/lib/db';
 import { validatePaintingOrderWithBusinessLogic } from '../../../lib/validations/paintingOrderValidation';
 import { emailService } from '../contact/nodemailer';
+import { getPaintingOrderHTML } from '../../../src/templates/emails/email-templates';
 
 // POST - Create new order
 export async function POST(request: Request) {
@@ -71,12 +72,23 @@ export async function POST(request: Request) {
       paintingId: validation.sanitizedData!.paintingId.trim(),
     });
 
-    //! send email
+    //! send email with TSX template
     if (order.user.email) {
       await emailService.send({
         to: order.user.email,
         subject: 'Order Confirmation',
         text: 'Your order has been received. We will get back to you soon.',
+        html: getPaintingOrderHTML({
+          _id: order._id,
+          user: {
+            name: order.user.name,
+            email: order.user.email,
+            phone: order.user.phone,
+          },
+          createdAt: order.createdAt,
+          customSize: order.customSize,
+          customMessage: order.customMessage,
+        }),
       });
     }
 

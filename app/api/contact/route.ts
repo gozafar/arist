@@ -5,6 +5,7 @@ import { dbConnect } from '@/lib/db';
 import { sanitizeContactData, validateContactForm } from '../../../lib/validations/contactValidation';
 import { ValidationError } from 'next/dist/compiled/amphtml-validator';
 import { emailService } from './nodemailer';
+import { getContactUsHTML } from '../../../src/templates/emails/email-templates';
 // import { error } from 'console';
 
 // POST /api/contact - Create new contact submission
@@ -42,12 +43,18 @@ export async function POST(request: NextRequest) {
     // Create new contact
     const contact = await Contact.create(sanitizedData);
 
-    //! send email
+    //! send email with TSX template
     if (contact) {
       await emailService.send({
         to: contact.email,
         subject: 'Thank you for contacting us',
         text: 'Thank you for contacting us. We will get back to you soon.',
+        html: getContactUsHTML({
+          name: contact.name,
+          email: contact.email,
+          phone: contact.phone,
+          message: contact.message,
+        }),
       });
     }
 
