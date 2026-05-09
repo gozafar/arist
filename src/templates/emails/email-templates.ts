@@ -1,5 +1,6 @@
 import { paintingOrderConfirmationTemplate } from './PaintingOrderConfirmationTemplate';
 import { contactUsTemplate } from './ContactUsTemplate';
+import { orderReceiverTemplate } from './OrderReceiverTemplate';
 
 export function getPaintingOrderHTML(order: {
   _id: string;
@@ -13,4 +14,14 @@ export function getPaintingOrderHTML(order: {
 
 export function getContactUsHTML(contact: { name: string; email: string; phone: string; message: string }) {
   return contactUsTemplate(contact);
+}
+
+export function getOrderReceiverHTML(order: {
+  _id: string;
+  user: { name: string; email: string; phone: string };
+  createdAt: string;
+  customSize?: string;
+  customMessage?: string;
+}) {
+  return orderReceiverTemplate(order);
 }

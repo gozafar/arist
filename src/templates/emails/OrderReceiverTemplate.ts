@@ -1,12 +1,13 @@
-import { internalCSSTemplate, logoTemplate, bannerTemplate, footerTemplate } from './helpers';
+import { internalCSSTemplate, logoTemplate, footerTemplate } from './helpers';
 
-export const paintingOrderConfirmationTemplate = (order: {
+export const orderReceiverTemplate = (order: {
   _id: string;
   user: { name: string; email: string; phone: string };
   createdAt: string;
-  url?: string;
+  paintingId?: string;
   customSize?: string;
   customMessage?: string;
+  url?: string;
 }) => {
   const orderDate = new Date(order.createdAt).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -39,7 +40,7 @@ export const paintingOrderConfirmationTemplate = (order: {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Order Confirmation - Rakhi Studio</title>
+  <title>New Order Received - Rakhi Studio</title>
   ${internalCSSTemplate}
 </head>
 <body>
@@ -49,14 +50,16 @@ export const paintingOrderConfirmationTemplate = (order: {
       <!-- Logo -->
       ${logoTemplate}
 
-      <!-- Banner -->
-      ${bannerTemplate}
-
       <!-- Content -->
       <div class="email-body">
-        <h2>Hi ${order.user.name},</h2>
+        <div class="email-header">
+          <h1>🔔 New Order Received</h1>
+          <p>A new painting order has been placed!</p>
+        </div>
+
+        <h2>Hello Team,</h2>
         <p>
-          We are delighted to confirm that we have received your painting order. Your request for the artwork has been successfully submitted and is now being reviewed by our team.
+          A new painting order has been received on Rakhi Studio. Please review the details below and take necessary action.
         </p>
 
         <!-- Order Details -->
@@ -64,15 +67,23 @@ export const paintingOrderConfirmationTemplate = (order: {
           <h3>📋 Order Details</h3>
           <table>
             <tr>
+              <td>Order ID:</td>
+              <td>${order._id}</td>
+            </tr>
+            <tr>
               <td>Order Date:</td>
               <td>${orderDate}</td>
             </tr>
             <tr>
-              <td>Email:</td>
+              <td>Customer Name:</td>
+              <td>${order.user.name}</td>
+            </tr>
+            <tr>
+              <td>Customer Email:</td>
               <td>${order.user.email}</td>
             </tr>
             <tr>
-              <td>Phone:</td>
+              <td>Customer Phone:</td>
               <td>${order.user.phone}</td>
             </tr>
             ${customSizeRow}
@@ -82,47 +93,37 @@ export const paintingOrderConfirmationTemplate = (order: {
 
         <!-- Painting Image -->
         ${
-          order.url
+          order.paintingId
             ? `
         <div style="text-align: center; margin: 30px 0;">
-          <h3 style="color: #333; margin-bottom: 15px;">🎨 Your Ordered Painting</h3>
+          <h3 style="color: #333; margin-bottom: 15px;">🎨 Ordered Painting</h3>
           <img 
             src="${order.url}" 
-            alt="Your Ordered Painting" 
+            alt="Ordered Painting" 
             style="max-width: 300px; max-height: 200px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
           />
+          <p style="color: #666; font-size: 14px; margin-top: 10px;">
+            Painting ID: ${order.paintingId}
+          </p>
         </div>
         `
             : ''
         }
 
-        <!-- Painting Information -->
+        <!-- Action Required -->
         <div class="info-box">
-          <h4>🎨 Painting Information</h4>
+          <h4>⚠️ Action Required</h4>
           <p>
-            We have received your request for the painting and will provide you with detailed information including pricing, dimensions, and estimated completion time within 24-48 hours.
+            Please review this order and contact the customer within 24-48 hours with pricing and timeline details.
           </p>
         </div>
 
-        <!-- Next Steps -->
-        <div class="next-steps">
-          <h3>📝 What Happens Next?</h3>
-          <ul>
-            <li>Our team will review your order and painting details</li>
-            <li>You will receive a detailed quote within 24-48 hours</li>
-            <li>Upon confirmation, we will begin the painting process</li>
-            <li>You will receive updates on the progress of your artwork</li>
-            <li>Final delivery arrangements will be made upon completion</li>
-          </ul>
-        </div>
-
         <p>
-          If you have any questions about your order, please feel free to contact us at 
-          <a href="mailto:rakhistudio1010@gmail.com">rakhistudio1010@gmail.com</a>.
+          You can manage this order from your admin dashboard. If you have any questions, please check the order details in the system.
         </p>
         <br>
         <p>Best regards,<br />
-        <strong>The Rakhi Studio Team</strong></p>
+        <strong>Rakhi Studio System</strong></p>
       </div>
 
       <!-- Footer -->
