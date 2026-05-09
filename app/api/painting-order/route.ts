@@ -1,10 +1,8 @@
 import { NextResponse } from 'next/server';
 import PaintingOrder from '@/models/PaintingOrder';
 import { dbConnect } from '@/lib/db';
-import {
-  validatePaintingOrderWithBusinessLogic,
-  PaintingOrderFormData,
-} from '../../../lib/validations/paintingOrderValidation';
+import { validatePaintingOrderWithBusinessLogic } from '../../../lib/validations/paintingOrderValidation';
+import { emailService } from '../contact/nodemailer';
 
 // POST - Create new order
 export async function POST(request: Request) {
@@ -72,6 +70,15 @@ export async function POST(request: Request) {
       },
       paintingId: validation.sanitizedData!.paintingId.trim(),
     });
+
+    //! send email
+    if (order.user.email) {
+      await emailService.send({
+        to: order.user.email,
+        subject: 'Order Confirmation',
+        text: 'Your order has been received. We will get back to you soon.',
+      });
+    }
 
     return NextResponse.json(
       {

@@ -4,6 +4,7 @@ import Contact from '@/models/Contact';
 import { dbConnect } from '@/lib/db';
 import { sanitizeContactData, validateContactForm } from '../../../lib/validations/contactValidation';
 import { ValidationError } from 'next/dist/compiled/amphtml-validator';
+import { emailService } from './nodemailer';
 // import { error } from 'console';
 
 // POST /api/contact - Create new contact submission
@@ -39,8 +40,16 @@ export async function POST(request: NextRequest) {
     const sanitizedData = sanitizeContactData({ name, email, phone, message, status, adminNotes });
 
     // Create new contact
-    const contact = new Contact(sanitizedData);
-    await contact.save();
+    const contact = await Contact.create(sanitizedData);
+
+    //! send email
+    if (contact) {
+      await emailService.send({
+        to: contact.email,
+        subject: 'Thank you for contacting us',
+        text: 'Thank you for contacting us. We will get back to you soon.',
+      });
+    }
 
     return NextResponse.json(
       {
@@ -63,10 +72,6 @@ export async function POST(request: NextRequest) {
     if (error instanceof mongoose.Error.ValidationError) {
       const validationErrors = Object.values(error.errors).map(err => err.message);
       return NextResponse.json({ error: 'Validation failed', details: validationErrors }, { status: 400 });
-    }
-
-    if (error) {
-      return NextResponse.json({ error: 'A contact with this email already exists' }, { status: 409 });
     }
 
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
