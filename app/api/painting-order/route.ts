@@ -4,6 +4,7 @@ import { dbConnect } from '@/lib/db';
 import { validatePaintingOrderWithBusinessLogic } from '../../../lib/validations/paintingOrderValidation';
 import { emailService } from '../contact/nodemailer';
 import { getPaintingOrderHTML } from '../../../src/templates/emails/email-templates';
+import { envs } from '../../../configs/env';
 
 // POST - Create new order
 export async function POST(request: Request) {
@@ -26,38 +27,6 @@ export async function POST(request: Request) {
     // Connect to database after validation
     await dbConnect();
 
-    // Check for existing email
-    const existingEmail = await PaintingOrder.findOne({
-      'user.email': validation.sanitizedData!.email.toLowerCase().trim(),
-    });
-
-    if (existingEmail) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Email already exists',
-          field: 'email',
-        },
-        { status: 409 }
-      );
-    }
-
-    // Check for existing phone
-    const existingPhone = await PaintingOrder.findOne({
-      'user.phone': validation.sanitizedData!.phone.trim(),
-    });
-
-    if (existingPhone) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Phone number already exists',
-          field: 'phone',
-        },
-        { status: 409 }
-      );
-    }
-
     const order = await PaintingOrder.create({
       user: {
         name: validation.sanitizedData!.name.trim(),
@@ -74,22 +43,41 @@ export async function POST(request: Request) {
 
     //! send email with TSX template
     if (order.user.email) {
-      await emailService.send({
-        to: order.user.email,
-        subject: 'Order Confirmation',
-        text: 'Your order has been received. We will get back to you soon.',
-        html: getPaintingOrderHTML({
-          _id: order._id,
-          user: {
-            name: order.user.name,
-            email: order.user.email,
-            phone: order.user.phone,
-          },
-          createdAt: order.createdAt,
-          customSize: order.customSize,
-          customMessage: order.customMessage,
+      await Promise.allSettled([
+        emailService.send({
+          to: envs.email.user,
+          subject: 'Order Confirmation',
+          text: 'Your order has been received. We will get back to you soon.',
+          html: getPaintingOrderHTML({
+            _id: order._id,
+            user: {
+              name: order.user.name,
+              email: order.user.email,
+              phone: order.user.phone,
+            },
+            createdAt: order.createdAt,
+            customSize: order.customSize,
+            customMessage: order.customMessage,
+          }),
         }),
-      });
+
+        emailService.send({
+          to: order.user.email,
+          subject: 'Order Confirmation',
+          text: 'Your order has been received. We will get back to you soon.',
+          html: getPaintingOrderHTML({
+            _id: order._id,
+            user: {
+              name: order.user.name,
+              email: order.user.email,
+              phone: order.user.phone,
+            },
+            createdAt: order.createdAt,
+            customSize: order.customSize,
+            customMessage: order.customMessage,
+          }),
+        }),
+      ]);
     }
 
     return NextResponse.json(

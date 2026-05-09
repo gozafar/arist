@@ -94,7 +94,7 @@ const PaintingCard = ({ painting, onImageClick }: { painting: PaintingDTO; onIma
               className={`flex-1 text-xs ${isSold ? 'cursor-not-allowed opacity-60' : ''}`}
               style={{ backgroundColor: '#FFA501', borderColor: '#FFA501' }}
             >
-              {isSold ? 'Sold' : 'Contact'}
+              {isSold ? 'Sold' : 'Enquiry'}
             </Button>
           </div>
         </div>

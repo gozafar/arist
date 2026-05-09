@@ -35,7 +35,7 @@ const ContactUs: React.FC<ContactUsProps> = ({ contact }) => {
       >
         <div style={{ textAlign: 'center', marginBottom: '20px' }}>
           <img
-            src='/Icon.png'
+            src='/icon.svg'
             alt='Rakhi Studio Logo'
             width={80}
             height={80}

@@ -6,6 +6,7 @@ import { sanitizeContactData, validateContactForm } from '../../../lib/validatio
 import { ValidationError } from 'next/dist/compiled/amphtml-validator';
 import { emailService } from './nodemailer';
 import { getContactUsHTML } from '../../../src/templates/emails/email-templates';
+import { envs } from '../../../configs/env';
 // import { error } from 'console';
 
 // POST /api/contact - Create new contact submission
@@ -29,14 +30,6 @@ export async function POST(request: NextRequest) {
 
     await dbConnect();
 
-    // Check if contact with this email already exists
-    const existingContact = await Contact.findOne({
-      email: email.trim().toLowerCase(),
-    });
-    if (existingContact) {
-      return NextResponse.json({ error: 'A contact with this email already exists' }, { status: 409 });
-    }
-
     // Sanitize and prepare contact data
     const sanitizedData = sanitizeContactData({ name, email, phone, message, status, adminNotes });
 
@@ -45,17 +38,31 @@ export async function POST(request: NextRequest) {
 
     //! send email with TSX template
     if (contact) {
-      await emailService.send({
-        to: contact.email,
-        subject: 'Thank you for contacting us',
-        text: 'Thank you for contacting us. We will get back to you soon.',
-        html: getContactUsHTML({
-          name: contact.name,
-          email: contact.email,
-          phone: contact.phone,
-          message: contact.message,
+      await Promise.allSettled([
+        emailService.send({
+          to: envs.email.user,
+          subject: 'Thank you for contacting us',
+          text: 'Thank you for contacting us. We will get back to you soon.',
+          html: getContactUsHTML({
+            name: contact.name,
+            email: contact.email,
+            phone: contact.phone,
+            message: contact.message,
+          }),
         }),
-      });
+
+        emailService.send({
+          to: contact.email,
+          subject: 'Thank you for contacting us',
+          text: 'Thank you for contacting us. We will get back to you soon.',
+          html: getContactUsHTML({
+            name: contact.name,
+            email: contact.email,
+            phone: contact.phone,
+            message: contact.message,
+          }),
+        }),
+      ]);
     }
 
     return NextResponse.json(
