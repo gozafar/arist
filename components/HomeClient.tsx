@@ -119,7 +119,7 @@ const HomeClient = () => {
           {/* RIGHT IMAGE */}
           <div className='relative mx-auto w-full max-w-[450px] aspect-square overflow-hidden rounded-3xl border border-white/15 bg-white shadow-card'>
             <Image
-              src='/MainPaing.png'
+              src='/MainPaing.jpeg'
               alt='Colorful abstract painting in a studio'
               fill
               priority

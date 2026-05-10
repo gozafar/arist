@@ -24,13 +24,13 @@ const AboutPage = () => {
   return (
     <div className='mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-16 space-y-12'>
       <div className='grid gap-8 lg:grid-cols-[1fr_1.1fr] lg:items-start'>
-        <div className='relative mx-auto w-full max-w-[450px] aspect-square overflow-hidden rounded-3xl border border-white/15 bg-white shadow-card'>
+        <div className='relative mx-auto w-full max-w-[450px]  overflow-hidden rounded-3xl border border-white/15 bg-white shadow-card'>
           <Image
             src='/affhuijb5qpwqwcpozaw.webp'
             alt='Rakhi Vashisht presenting her paintings'
-            height={500}
-            width={800}
-            className='object-cover'
+            height={1080}
+            width={1920}
+            className='h-auto w-full object-cover'
           />
           <div className='absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent' />
         </div>
@@ -74,17 +74,17 @@ const AboutPage = () => {
           <h3 className='text-lg font-semibold'>International collector focus</h3>
           <p className='max-w-2xl text-base leading-relaxed text-black/70 md:text-[16px]'>
             From luxury homes in Dubai to modern apartments in Hong Kong and design-led spaces in New York and Mumbai,
-            Rakhi&apos;s originals are collected for their emotional depth and investment value.
+            Rakhi&apos;s studio are collected for their emotional depth and investment value.
           </p>
         </div>
-        <div className='relative mx-auto w-full max-w-[450px] aspect-square overflow-hidden rounded-3xl border border-white/15 bg-white shadow-card'>
+        <div className='relative mx-auto w-full max-w-[450px] overflow-hidden rounded-3xl border border-white/15 bg-white shadow-card'>
           <Image
-            src='/20220611_122703.jpg'
+            src='/20220611_122703.jpeg'
             alt='Rakhi Vashisht presenting her paintings'
             priority
-            height={500}
-            width={500}
-            className='object-cover'
+            height={1080}
+            width={1920}
+            className='h-auto w-full object-contain'
           />
           <div className='absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent' />
         </div>
@@ -94,65 +94,36 @@ const AboutPage = () => {
         <h1 className='text-3xl md:text-4xl font-semibold text-white my font-display mb-4'>Exhibitions Timeline</h1>
 
         <div className='space-y-8 text-white/85'>
-          {/* EARLY */}
+          {/* 2026 */}
           <div className='relative pl-6 text-black/80'>
             <span className='absolute left-0 top-1 h-full w-px bg-white/10' />
-            <p className='mb-3 text-xs font-medium uppercase tracking-[0.25em] text-sand-800 font-semibold'>
-              Early Years
-            </p>
+            <p className='mb-3 text-xs font-medium uppercase tracking-[0.25em] text-sand-800 font-semibold'>2026</p>
 
             <ul className='space-y-2 leading-relaxed'>
               <li className='flex gap-3'>
                 <span className='mt-2 h-2 w-2 rounded-full bg-sand-300 shrink-0' />
-                <span className='text-black/70'>
-                  Lalit Kala Academy, Delhi – Kalidas Mahotsav
-                  <span className='text-sand-800 font-semibold'> (1989–1992)</span>
-                </span>
-              </li>
-            </ul>
-          </div>
-
-          {/* 2010–2016 */}
-          <div className='relative pl-6 text-black/80'>
-            <span className='absolute left-0 top-1 h-full w-px bg-white/10' />
-            <p className='mb-3 text-xs  uppercase tracking-[0.25em] text-sand-800 font-semibold'>2010–2016</p>
-
-            <ul className='space-y-2 leading-relaxed'>
-              <li className='flex gap-3'>
-                <span className='mt-2 h-2 w-2 rounded-full bg-sand-300 shrink-0' />
-                Dubai, UAE galleries
-                <span className='text-sand-800 font-semibold'> (2010–2013)</span>
+                Narratives on Canvas, HK Visual Arts Centre
+                <span className='text-sand-800 font-semibold'> (Apr 2026)</span>
               </li>
               <li className='flex gap-3'>
                 <span className='mt-2 h-2 w-2 rounded-full bg-sand-300 shrink-0' />
-                Art fairs, Moscow, Russia
-                <span className='text-sand-800 font-semibold'> (2013–2016)</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* 2017–2019 */}
-          <div className='relative pl-6 text-black/80'>
-            <span className='absolute left-0 top-1 h-full w-px bg-white/10' />
-            <p className='mb-3 text-xs font-medium uppercase tracking-[0.25em] text-sand-800 font-semibold'>
-              2017–2019
-            </p>
-
-            <ul className='space-y-2 leading-relaxed'>
-              <li className='flex gap-3'>
-                <span className='mt-2 h-2 w-2 rounded-full bg-sand-300 shrink-0' />
-                Group shows, Chitra Kala Parishad, Bangalore
-                <span className='text-sand-800 font-semibold'> (2017)</span>
+                Echoes of India, Macau
+                <span className='text-sand-800 font-semibold'> (Apr 2026)</span>
               </li>
               <li className='flex gap-3'>
                 <span className='mt-2 h-2 w-2 rounded-full bg-sand-300 shrink-0' />
-                Chitra Santhe, Bangalore
-                <span className='text-sand-800 font-semibold'> (2018 &amp; 2019)</span>
+                Women&apos;s Day Art Exhibition, Indian Consulate, Hong Kong
+                <span className='text-sand-800 font-semibold'> (Mar 2026)</span>
               </li>
               <li className='flex gap-3'>
                 <span className='mt-2 h-2 w-2 rounded-full bg-sand-300 shrink-0' />
-                Venkatappa Art Gallery, Bangalore
-                <span className='text-sand-800 font-semibold'> (2018)</span>
+                Art Exhibition, The Hive, Hong Kong
+                <span className='text-sand-800 font-semibold'> (Mar 2026)</span>
+              </li>
+              <li className='flex gap-3'>
+                <span className='mt-2 h-2 w-2 rounded-full bg-sand-300 shrink-0' />
+                AIA Carnival by Art Future Club
+                <span className='text-sand-800 font-semibold'> (Jan 2026)</span>
               </li>
             </ul>
           </div>
@@ -167,23 +138,8 @@ const AboutPage = () => {
             <ul className='space-y-2 leading-relaxed'>
               <li className='flex gap-3'>
                 <span className='mt-2 h-2 w-2 rounded-full bg-sand-300 shrink-0' />
-                Online show “Canvas of Unity”
-                <span className='text-sand-800 font-semibold'> (2020)</span>
-              </li>
-              <li className='flex gap-3'>
-                <span className='mt-2 h-2 w-2 rounded-full bg-sand-300 shrink-0' />
-                B&amp;S Arts Gallery, Sheraton, Hong Kong
-                <span className='text-sand-800 font-semibold'> (2021)</span>
-              </li>
-              <li className='flex gap-3'>
-                <span className='mt-2 h-2 w-2 rounded-full bg-sand-300 shrink-0' />
-                “Streets of HK” by Watermark Church, Hong Kong
-                <span className='text-sand-800 font-semibold'> (2021)</span>
-              </li>
-              <li className='flex gap-3'>
-                <span className='mt-2 h-2 w-2 rounded-full bg-sand-300 shrink-0' />
-                Visual Art Center, Hong Kong
-                <span className='text-sand-800 font-semibold'> (2023)</span>
+                Indian Consulate, Hong Kong – Republic Day &amp; Women’s Day Celebrations
+                <span className='text-sand-800 font-semibold'> (2024 &amp; 2025)</span>
               </li>
               <li className='flex gap-3'>
                 <span className='mt-2 h-2 w-2 rounded-full bg-sand-300 shrink-0' />
@@ -192,8 +148,86 @@ const AboutPage = () => {
               </li>
               <li className='flex gap-3'>
                 <span className='mt-2 h-2 w-2 rounded-full bg-sand-300 shrink-0' />
-                Indian Consulate, Hong Kong – Republic Day &amp; Women’s Day Celebrations
-                <span className='text-sand-800 font-semibold'> (2024 &amp; 2025)</span>
+                Visual Art Center, Hong Kong
+                <span className='text-sand-800 font-semibold'> (2023)</span>
+              </li>
+              <li className='flex gap-3'>
+                <span className='mt-2 h-2 w-2 rounded-full bg-sand-300 shrink-0' />
+                “Streets of HK” by Watermark Church, Hong Kong
+                <span className='text-sand-800 font-semibold'> (2021)</span>
+              </li>
+              <li className='flex gap-3'>
+                <span className='mt-2 h-2 w-2 rounded-full bg-sand-300 shrink-0' />
+                B&amp;S Arts Gallery, Sheraton, Hong Kong
+                <span className='text-sand-800 font-semibold'> (2021)</span>
+              </li>
+              <li className='flex gap-3'>
+                <span className='mt-2 h-2 w-2 rounded-full bg-sand-300 shrink-0' />
+                Online show “Canvas of Unity”
+                <span className='text-sand-800 font-semibold'> (2020)</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* 2017–2019 */}
+          <div className='relative pl-6 text-black/80'>
+            <span className='absolute left-0 top-1 h-full w-px bg-white/10' />
+            <p className='mb-3 text-xs font-medium uppercase tracking-[0.25em] text-sand-800 font-semibold'>
+              2017–2019
+            </p>
+
+            <ul className='space-y-2 leading-relaxed'>
+              <li className='flex gap-3'>
+                <span className='mt-2 h-2 w-2 rounded-full bg-sand-300 shrink-0' />
+                Chitra Santhe, Bangalore
+                <span className='text-sand-800 font-semibold'> (2018 &amp; 2019)</span>
+              </li>
+              <li className='flex gap-3'>
+                <span className='mt-2 h-2 w-2 rounded-full bg-sand-300 shrink-0' />
+                Venkatappa Art Gallery, Bangalore
+                <span className='text-sand-800 font-semibold'> (2018)</span>
+              </li>
+              <li className='flex gap-3'>
+                <span className='mt-2 h-2 w-2 rounded-full bg-sand-300 shrink-0' />
+                Group shows, Chitra Kala Parishad, Bangalore
+                <span className='text-sand-800 font-semibold'> (2017)</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* 2010–2016 */}
+          <div className='relative pl-6 text-black/80'>
+            <span className='absolute left-0 top-1 h-full w-px bg-white/10' />
+            <p className='mb-3 text-xs uppercase tracking-[0.25em] text-sand-800 font-semibold'>2010–2016</p>
+
+            <ul className='space-y-2 leading-relaxed'>
+              <li className='flex gap-3'>
+                <span className='mt-2 h-2 w-2 rounded-full bg-sand-300 shrink-0' />
+                Art fairs, Moscow, Russia
+                <span className='text-sand-800 font-semibold'> (2013–2016)</span>
+              </li>
+              <li className='flex gap-3'>
+                <span className='mt-2 h-2 w-2 rounded-full bg-sand-300 shrink-0' />
+                Dubai, UAE galleries
+                <span className='text-sand-800 font-semibold'> (2010–2013)</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* EARLY */}
+          <div className='relative pl-6 text-black/80'>
+            <span className='absolute left-0 top-1 h-full w-px bg-white/10' />
+            <p className='mb-3 text-xs font-medium uppercase tracking-[0.25em] text-sand-800 font-semibold'>
+              Early Years
+            </p>
+
+            <ul className='space-y-2 leading-relaxed'>
+              <li className='flex gap-3'>
+                <span className='mt-2 h-2 w-2 rounded-full bg-sand-300 shrink-0' />
+                <span className='text-black/70'>
+                  Lalit Kala Academy, Delhi – Kalidas Mahotsav
+                  <span className='text-sand-800 font-semibold'> (1989–1992)</span>
+                </span>
               </li>
             </ul>
           </div>
