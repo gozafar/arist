@@ -104,7 +104,7 @@ const HomeClient = () => {
             {/* STATS */}
             <div className='grid w-full grid-cols-1 gap-4 pt-4 sm:grid-cols-2'>
               <div className='rounded-2xl bg-white/80 px-5 py-4 text-center shadow-card'>
-                <p className='text-2xl font-semibold text-sand-700'>30+ works</p>
+                <p className='text-2xl font-semibold text-sand-700'>works</p>
                 <p className='text-sm text-black/70'>One-of-a-kind originals</p>
               </div>
 
