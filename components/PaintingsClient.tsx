@@ -235,8 +235,8 @@ const PaintingsClient = () => {
           <p className='text-sm uppercase tracking-[0.3em] text-white/60'>Available works</p>
           <h1 className='text-3xl md:text-4xl font-semibold text-white my font-display'>Paintings</h1>
           <p className='max-w-2xl text-base leading-relaxed text-black/70 md:text-[16px]'>
-            Shop original wall art curated for collectors in the UAE, India, USA, and Hong Kong. Each piece is sealed,
-            certified, and ready to hang with worldwide shipping.
+            Shop original wall art curated for collectors worldwide. Each piece is sealed, certified, and ready to hang
+            with worldwide shipping.
           </p>
         </div>
         <div className='flex gap-3 text-sm text-black/6 lg:mt-7'>
