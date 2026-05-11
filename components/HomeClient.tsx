@@ -94,7 +94,7 @@ const HomeClient = () => {
                 className='button-primary shadow-soft transition hover:shadow-lg hover:text-white'
                 style={{ backgroundColor: '#FFA501', borderColor: '#FFA501' }}
               >
-                Shop global collection
+                Check global collection
               </Link>
               <Link href='/contact' className='button-outline' style={{ color: '#FFA501', borderColor: '#FFA501' }}>
                 Talk to the artist
@@ -104,7 +104,7 @@ const HomeClient = () => {
             {/* STATS */}
             <div className='grid w-full grid-cols-1 gap-4 pt-4 sm:grid-cols-2'>
               <div className='rounded-2xl bg-white/80 px-5 py-4 text-center shadow-card'>
-                <p className='text-2xl font-semibold text-sand-700'>works</p>
+                <p className='text-2xl font-semibold text-sand-700'>Works</p>
                 <p className='text-sm text-black/70'>One-of-a-kind originals</p>
               </div>
 

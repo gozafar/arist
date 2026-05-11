@@ -5,11 +5,13 @@ interface FloatingWhatsAppProps {
   message?: string;
 }
 
+const DIRECT_WHATSAPP_NUMBER = '919899757066';
+
 const FloatingWhatsApp: React.FC<FloatingWhatsAppProps> = ({
-  phoneNumber,
-  message = 'Hello! I need some assistance.',
+  phoneNumber: _phoneNumber,
+  message = 'I need some assistance.',
 }) => {
-  const sanitizedNumber = phoneNumber?.replace(/\D/g, '') || '';
+  const sanitizedNumber = DIRECT_WHATSAPP_NUMBER;
   const whatsappUrl = `https://wa.me/${sanitizedNumber}?text=${encodeURIComponent(message)}`;
 
   return (

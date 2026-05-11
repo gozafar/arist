@@ -61,7 +61,7 @@ export default function ContactPainting() {
   return (
     <div className='mx-auto max-w-6xl px-4 py-12 lg:px-6 lg:py-16'>
       <div className='mb-8 flex items-center justify-between'>
-        <h1 className='section-heading'>Checkout</h1>
+        <h1 className='section-heading'>Enquiry Form</h1>
         <Link
           href='/paintings'
           className='button-outline text-xs '
@@ -73,8 +73,8 @@ export default function ContactPainting() {
       <div className='flex justify-center'>
         <div className='w-full max-w-2xl'>
           <div className='card-glass rounded-3xl p-6'>
-            <h2 className='font-display text-2xl'>Shipping details</h2>
-            <p className='mt-1 text-sm text-white/70'>We will confirm shipping timelines after payment.</p>
+            <h2 className='font-display text-2xl'>Enquiry details</h2>
+            <p className='mt-1 text-sm text-white/70'>Our team will connect with you regarding your enquiry.</p>
             <div className='mt-6'>
               <AddressForm key={`address-form-${formKey}`} onSubmit={handleOrderSubmit} isLoading={isLoading} />
             </div>

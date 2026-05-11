@@ -86,7 +86,7 @@ const Footer = () => {
               Connect
             </h4>
 
-            <ul className='space-y-3'>
+            <ul className='mx-auto w-fit space-y-3 sm:mx-0'>
               {SOCIAL_LINKS.map(({ name, href, icon: Icon, hoverClass, external }) => (
                 <li key={name}>
                   <Link
@@ -94,9 +94,9 @@ const Footer = () => {
                     target={external ? '_blank' : '_self'}
                     rel={external ? 'noopener noreferrer' : undefined}
                     aria-label={name}
-                    className='group flex items-center justify-center gap-2 text-sm !text-white hover:!text-black sm:justify-start'
+                    className='group grid grid-cols-[20px_auto] items-center gap-3 text-sm !text-white hover:!text-black'
                   >
-                    <Icon className={`h-5 w-5 text-gray-600 transition-colors ${hoverClass}`} />
+                    <Icon className={`h-5 w-5 justify-self-center text-gray-600 transition-colors ${hoverClass}`} />
                     <span className='transition-transform group-hover:translate-x-1'>{name}</span>
                   </Link>
                 </li>
@@ -110,9 +110,9 @@ const Footer = () => {
               Contact Us
             </h4>
 
-            <address className='not-italic text-sm !text-white space-y-3'>
-              <div className='flex items-start justify-center gap-2 sm:justify-start'>
-                <FiMapPin className='mt-0.5 h-4 w-4 text-sand-600' />
+            <address className='mx-auto w-fit space-y-3 text-sm !text-white not-italic sm:mx-0'>
+              <div className='grid grid-cols-[20px_auto] items-start gap-3'>
+                <FiMapPin className='mt-0.5 h-4 w-4 justify-self-center text-sand-600' />
                 <div>
                   <p>Rakhi Vashisht</p>
                   <p>29E, Coastal Skyline, Block 1</p>
@@ -122,17 +122,17 @@ const Footer = () => {
 
               <Link
                 href='mailto:rakhistudio1010@gmail.com'
-                className='flex items-center justify-center gap-2 hover:!text-black sm:justify-start'
+                className='grid grid-cols-[20px_auto] items-center gap-3 hover:!text-black'
               >
-                <FiMail className='h-4 w-4 text-gray-800' />
+                <FiMail className='h-4 w-4 justify-self-center text-gray-800' />
                 <span>rakhstudio1010@gmail.com</span>
               </Link>
 
               <Link
                 href='tel:+911234567890'
-                className='flex items-center justify-center gap-2 hover:!text-black sm:justify-start'
+                className='grid grid-cols-[20px_auto] items-center gap-3 hover:!text-black'
               >
-                <FiPhone className='h-4 w-4 text-gray-800' />
+                <FiPhone className='h-4 w-4 justify-self-center text-gray-800' />
                 <span>+852 97236007 | +91 9899757066</span>
               </Link>
             </address>
