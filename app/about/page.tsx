@@ -40,7 +40,7 @@ const AboutPage = () => {
           <h1 className='text-3xl md:text-4xl font-semibold text-white my font-display'>Meet Rakhi Vashisht</h1>
           <p className='max-w-2xl text-base leading-relaxed text-black/70 md:text-[16px]'>
             Born amidst the vibrant landscapes of Madhya Pradesh, India, Rakhi discovered her calling in colors and
-            forms early on—earning Elementary and Intermediate certifications from JJ School of Arts by age ten. Though
+            forms early on earning Elementary and Intermediate certifications from JJ School of Arts by age ten. Though
             her academic path spanned Textile Engineering and an MBA in Finance, art remained her quiet rhythm,
             returning with renewed intensity as acrylics became her chosen language.
           </p>
@@ -67,13 +67,13 @@ const AboutPage = () => {
             has lived within.
           </p>
           <p className='max-w-2xl text-base leading-relaxed text-black/70 md:text-[16px]'>
-            She delights in experimentation—exploring materials, techniques, and mediums—and moves fluidly between
+            She delights in experimentation exploring materials, techniques, and mediums and moves fluidly between
             abstract explorations, human figures, landscapes, and seascapes. Each piece carries a quiet poetry that
             invites reflection.
           </p>
           <h3 className='text-lg font-semibold'>International collector focus</h3>
           <p className='max-w-2xl text-base leading-relaxed text-black/70 md:text-[16px]'>
-            From luxury homes in Dubai to modern apartments in Hong Kong and design-led spaces in New York and Mumbai,
+            From luxury homes in Dubai to modern apartments in Hong Kong and design led spaces in New York and Mumbai,
             Rakhi&apos;s studio are collected for their emotional depth and investment value.
           </p>
         </div>
@@ -122,7 +122,8 @@ const AboutPage = () => {
               </li>
               <li className='flex gap-3'>
                 <span className='mt-2 h-2 w-2 rounded-full bg-sand-300 shrink-0' />
-                AIA Carnival by Art Future Club
+                {/* AIA Carnival by Art Future Club */}
+                Art exhibition at AIA carnival by Art Future Club, Hong Kong
                 <span className='text-sand-800 font-semibold'> (Jan 2026)</span>
               </li>
             </ul>
@@ -148,7 +149,7 @@ const AboutPage = () => {
               </li>
               <li className='flex gap-3'>
                 <span className='mt-2 h-2 w-2 rounded-full bg-sand-300 shrink-0' />
-                Visual Art Center, Hong Kong
+                Art exhibition Visual Art Center, Hong Kong
                 <span className='text-sand-800 font-semibold'> (2023)</span>
               </li>
               <li className='flex gap-3'>

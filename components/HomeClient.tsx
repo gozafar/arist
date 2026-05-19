@@ -83,8 +83,12 @@ const HomeClient = () => {
               space for clients globally
             </h1>
             <p className='max-w-2xl text-base leading-relaxed text-black/70 md:text-[16px]'>
-              Rakhi&apos;s Studio is an international painting marketplace connecting collectors in Dubai, Mumbai, New
-              York, and Hong Kong with certified originals, museum-grade framing, and worldwide delivery.
+              {/* Rakhi&apos;s Studio is an international painting marketplace connecting collectors in Dubai, Mumbai, New
+              York, and Hong Kong with certified originals, museum-grade framing, and worldwide delivery. */}
+              {/* Rakhi&apos;s Studio is an international painting marketplace connecting collectors worldwide with
+              certified originals, museum-grade framing, and worldwide delivery. */}
+              Rakhi&apos;s Studio is an international painting marketplace connecting collectors worldwide with
+              certified originals, prints, and custom artworks, along with museum-grade framing and worldwide delivery.
             </p>
 
             {/* CTA BUTTONS */}
@@ -105,12 +109,12 @@ const HomeClient = () => {
             <div className='grid w-full grid-cols-1 gap-4 pt-4 sm:grid-cols-2'>
               <div className='rounded-2xl bg-white/80 px-5 py-4 text-center shadow-card'>
                 <p className='text-2xl font-semibold text-sand-700'>Works</p>
-                <p className='text-sm text-black/70'>One-of-a-kind originals</p>
+                <p className='text-sm text-black/70'>originals, prints & custom artworks</p>
               </div>
 
               <div className='rounded-2xl bg-white/80 px-5 py-4 text-center shadow-card'>
                 <p className='text-2xl font-semibold text-sand-700'>Worldwide</p>
-                <p className='text-sm text-black/70'>Insured global shipping</p>
+                <p className='text-sm text-black/70'>Worldwide Shipping</p>
                 {/* <p className='text-sm text-black/70'>India, USA, UAE, Hong Kong</p> */}
               </div>
             </div>

@@ -27,8 +27,8 @@ export default function PWAInstallBanner() {
     <div className='fixed bottom-4 left-0 right-0 z-50 flex justify-center px-4'>
       <div className='flex max-w-xl items-center gap-4 rounded-lg bg-white px-4 py-3 shadow-lg ring-1 ring-neutral-200'>
         <div className='flex-1 text-left'>
-          <p className='text-sm font-semibold text-neutral-900'>Install Artistry</p>
-          <p className='text-xs text-neutral-600'>Add Artistry Gallery to your home screen for faster access.</p>
+          <p className='text-sm font-semibold text-neutral-900'>Install Rakhi&apos;s App</p>
+          <p className='text-xs text-neutral-600'>Add Rakhi&apos;s Gallery to your home screen for faster access.</p>
         </div>
         <div className='flex items-center gap-2'>
           <button

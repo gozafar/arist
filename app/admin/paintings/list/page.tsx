@@ -64,11 +64,11 @@ export default function CategoriesListPage() {
     setIsModalOpen(true);
   };
 
-  const handleDeleteClick = (category: CategoryItem) => {
-    setSelectedCategory(category);
-    setModalMode('delete');
-    setIsModalOpen(true);
-  };
+  // const handleDeleteClick = (category: CategoryItem) => {
+  //   setSelectedCategory(category);
+  //   setModalMode('delete');
+  //   setIsModalOpen(true);
+  // };
 
   const handleView = (category: CategoryItem) => {
     setSelectedCategory(category);
@@ -163,11 +163,13 @@ export default function CategoriesListPage() {
               <tbody>
                 {paginated.map(category => (
                   <tr
-                    key={category.id}
+                    key={category?.id}
                     className='cursor-pointer border-t border-white/10 transition hover:bg-white/10'
                     onClick={() => handleView(category)}
                   >
-                    <td className='px-6 py-4 font-medium text-white'>{category.categoryName}</td>
+                    <td className='px-6 py-4 font-medium text-white'>
+                      {category.categoryName.charAt(0).toUpperCase() + category.categoryName.slice(1)}
+                    </td>
                     <td className='px-6 py-4'>{new Date(category.createdAt).toLocaleDateString()}</td>
                     <td className='px-6 py-4'>{new Date(category.updatedAt).toLocaleDateString()}</td>
                     <td className='px-6 py-4 text-right'>
