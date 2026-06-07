@@ -16,6 +16,7 @@ export type PaintingDTO = {
   tags: string[];
   availability: 'in-stock' | 'sold';
   categoryId: string;
+  categoryName?: string;
   createdAt: string;
   updatedAt: string;
 };

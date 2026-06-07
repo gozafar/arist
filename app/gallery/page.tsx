@@ -29,7 +29,43 @@ interface Gallery {
   name: string;
   imageIds: GalleryImage[];
   createdAt: string;
+  updatedAt?: string;
 }
+
+const GALLERY_SCROLL_STEP = 360;
+
+const getGalleryOrder = (galleryName?: string) => {
+  const index = GALLERY_NAMES.indexOf(galleryName as GalleryName);
+  return index === -1 ? Number.MAX_SAFE_INTEGER : index;
+};
+
+const getTimeValue = (value?: string) => {
+  if (!value) return 0;
+  const timestamp = new Date(value).getTime();
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+};
+
+const sortImages = (images: GalleryImage[]) =>
+  [...images].sort((a, b) => {
+    const dateDifference = getTimeValue(b.createdAt) - getTimeValue(a.createdAt);
+    if (dateDifference !== 0) return dateDifference;
+
+    const nameDifference = (a.name || '').localeCompare(b.name || '');
+    if (nameDifference !== 0) return nameDifference;
+
+    return (a._id || a.imageId || '').localeCompare(b._id || b.imageId || '');
+  });
+
+const sortGalleries = (galleryItems: Gallery[]) =>
+  [...galleryItems].sort((a, b) => {
+    const galleryDifference = getGalleryOrder(a.name) - getGalleryOrder(b.name);
+    if (galleryDifference !== 0) return galleryDifference;
+
+    const updatedDifference = getTimeValue(b.updatedAt) - getTimeValue(a.updatedAt);
+    if (updatedDifference !== 0) return updatedDifference;
+
+    return a.name.localeCompare(b.name);
+  });
 
 export default function GalleryPage() {
   const [galleries, setGalleries] = useState<Gallery[]>([]);
@@ -40,6 +76,7 @@ export default function GalleryPage() {
   const [imageList, setImageList] = useState<GalleryImage[]>([]);
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
   const sliderRef = useRef<HTMLDivElement>(null);
+  const autoScrollDirectionRef = useRef<'left' | 'right'>('right');
 
   const fetchGalleries = useCallback(async () => {
     try {
@@ -65,20 +102,30 @@ export default function GalleryPage() {
 
   useEffect(() => {
     if (selectedGallery) {
-      const filtered = galleries.filter(gallery => gallery.name === selectedGallery);
+      const filtered = sortGalleries(galleries.filter(gallery => gallery.name === selectedGallery));
       setFilteredGalleries(filtered);
-      const images = filtered[0]?.imageIds || [];
+      const images = sortImages(
+        (filtered[0]?.imageIds || []).map(img => ({
+          ...img,
+          galleryName: filtered[0]?.name,
+          createdAt: (img as { createdAt?: string }).createdAt || filtered[0]?.createdAt,
+        }))
+      );
       setImageList(images);
     } else {
-      const hardcodedFiltered = galleries.filter(gallery => GALLERY_NAMES.includes(gallery.name as GalleryName));
+      const hardcodedFiltered = sortGalleries(
+        galleries.filter(gallery => GALLERY_NAMES.includes(gallery.name as GalleryName))
+      );
       setFilteredGalleries(hardcodedFiltered);
 
       const allImages = hardcodedFiltered.flatMap(gallery =>
-        gallery.imageIds.map(img => ({
-          ...img,
-          galleryName: gallery.name,
-          createdAt: (img as { createdAt?: string }).createdAt || gallery.createdAt,
-        }))
+        sortImages(
+          gallery.imageIds.map(img => ({
+            ...img,
+            galleryName: gallery.name,
+            createdAt: (img as { createdAt?: string }).createdAt || gallery.createdAt,
+          }))
+        )
       );
       setImageList(allImages);
     }
@@ -86,13 +133,19 @@ export default function GalleryPage() {
   const hasHorizontalOverflow = imageList.length > 3;
   const scrollByCardSet = (direction: 'left' | 'right') => {
     if (!sliderRef.current) return;
-    const viewportWidth = sliderRef.current.clientWidth;
-    const distance = Math.max(viewportWidth * 0.9, 240);
     sliderRef.current.scrollBy({
-      left: direction === 'right' ? distance : -distance,
+      left: direction === 'right' ? GALLERY_SCROLL_STEP : -GALLERY_SCROLL_STEP,
       behavior: 'smooth',
     });
   };
+
+  useEffect(() => {
+    const slider = sliderRef.current;
+    if (!slider) return;
+
+    autoScrollDirectionRef.current = 'right';
+    slider.scrollTo({ left: 0, behavior: 'auto' });
+  }, [imageList.length, selectedGallery]);
 
   useEffect(() => {
     if (!hasHorizontalOverflow || selectedImage) return;
@@ -101,16 +154,28 @@ export default function GalleryPage() {
       const slider = sliderRef.current;
       if (!slider) return;
 
-      const distance = Math.max(slider.clientWidth * 0.9, 240);
       const maxScrollLeft = slider.scrollWidth - slider.clientWidth;
-      const nextLeft = slider.scrollLeft + distance;
+      const currentLeft = slider.scrollLeft;
+      const direction = autoScrollDirectionRef.current;
 
-      if (nextLeft >= maxScrollLeft - 4) {
-        slider.scrollTo({ left: 0, behavior: 'smooth' });
-      } else {
+      if (maxScrollLeft <= 0) return;
+
+      if (direction === 'right') {
+        const nextLeft = Math.min(currentLeft + GALLERY_SCROLL_STEP, maxScrollLeft);
         slider.scrollTo({ left: nextLeft, behavior: 'smooth' });
+
+        if (nextLeft >= maxScrollLeft - 4) {
+          autoScrollDirectionRef.current = 'left';
+        }
+      } else {
+        const nextLeft = Math.max(currentLeft - GALLERY_SCROLL_STEP, 0);
+        slider.scrollTo({ left: nextLeft, behavior: 'smooth' });
+
+        if (nextLeft <= 4) {
+          autoScrollDirectionRef.current = 'right';
+        }
       }
-    }, 3000);
+    }, 2200);
 
     return () => window.clearInterval(intervalId);
   }, [hasHorizontalOverflow, imageList.length, selectedImage]);
@@ -224,13 +289,13 @@ export default function GalleryPage() {
                   className='group relative flex w-[88%] shrink-0 snap-start flex-col overflow-hidden rounded-3xl bg-white/5 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl sm:w-[48%] lg:w-[31%]'
                 >
                   {/* IMAGE */}
-                  <div className='relative aspect-square overflow-hidden'>
+                  <div className='relative aspect-[4/5] overflow-hidden bg-white/5'>
                     <div className='block h-full w-full cursor-zoom-in' onClick={() => setSelectedImage(item)}>
                       <Image
                         src={item.url}
                         alt={item.name || 'Artwork'}
                         fill
-                        className='object-cover transition-transform duration-700 group-hover:scale-105'
+                        className='object-contain transition-transform duration-700 group-hover:scale-105'
                         sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
                         quality={75}
                         priority={true}
@@ -242,9 +307,9 @@ export default function GalleryPage() {
                   </div>
 
                   {/* CONTENT: name only */}
-                  <div className='p-4'>
+                  {/* <div className='p-4'>
                     <h3 className='line-clamp-1 text-base font-semibold text-white'>{item.name || 'Untitled'}</h3>
-                  </div>
+                  </div> */}
                 </article>
               ))}
             </div>

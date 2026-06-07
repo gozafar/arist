@@ -205,8 +205,13 @@ const AddressForm = ({ onSubmit, isLoading }: Props) => {
         />
       </div>
 
-      <Button type='submit' className='w-full md:w-auto' disabled={isLoading}>
-        {isLoading ? 'Processing...' : 'Order Create'}
+      <Button
+        type='submit'
+        className={`flex-1 text-xs ${isLoading ? 'cursor-not-allowed opacity-60' : ''}`}
+        style={{ backgroundColor: '#FFA501', borderColor: '#FFA501' }}
+        disabled={isLoading}
+      >
+        {isLoading ? 'Processing...' : 'Submit Enquiry'}
       </Button>
     </form>
   );

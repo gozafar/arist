@@ -48,14 +48,28 @@ export const GET = async (request: Request) => {
   }
   const skip = (page - 1) * limit;
   const [items, total] = await Promise.all([
-    Painting.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+    Painting.find(query)
+      .populate({ path: 'categoryId', select: 'categoryName' })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
     Painting.countDocuments(query),
   ]);
 
-  const serialized = items.map(({ _id, ...rest }) => ({
-    ...rest,
-    id: _id?.toString(),
-  }));
+  const serialized = items.map(({ _id, categoryId, ...rest }) => {
+    const populatedCategory =
+      categoryId && typeof categoryId === 'object' && 'categoryName' in categoryId
+        ? (categoryId as { _id?: { toString?: () => string }; categoryName?: string })
+        : null;
+
+    return {
+      ...rest,
+      id: _id?.toString(),
+      categoryId: populatedCategory?._id?.toString?.() ?? String(categoryId ?? ''),
+      categoryName: populatedCategory?.categoryName,
+    };
+  });
 
   return NextResponse.json(
     {
