@@ -73,8 +73,8 @@ const AboutPage = () => {
           </p>
           <h3 className='text-lg font-semibold'>International collector focus</h3>
           <p className='max-w-2xl text-base leading-relaxed text-black/70 md:text-[16px]'>
-            From luxury homes in Dubai to modern apartments in Hong Kong and design-led spaces in New York and Mumbai,
-            Rakhi&apos;s originals are collected for their emotional depth and investment value.
+            From luxury homes to modern apartments and design-led spaces, Rakhi&apos;s is recognized for creating
+            interiors with emotional depth and lasting investment value.
           </p>
         </div>
         <div className='relative mx-auto w-full max-w-[450px] aspect-square overflow-hidden rounded-3xl border border-white/15 bg-white shadow-card'>
@@ -203,10 +203,10 @@ const AboutPage = () => {
       <div className='card-glass rounded-[28px] border border-white/10 bg-white/5 p-6 md:p-8 space-y-4'>
         <h1 className='text-3xl md:text-4xl font-semibold text-white my font-display mb-4'>Artist Statement</h1>
         <p className=' text-base leading-relaxed text-black/70 md:text-[16px]'>
-          For Rakhi, art is like meditation—a sanctuary where mind and soul find harmony. Each painting becomes a way of
-          reliving a memory or expressing her innermost self, capturing emotions that transcend words. Her work is not
-          simply about creating visuals; it is about offering spaces where viewers can connect with something deeply
-          personal yet universally human.
+          For Rakhi&apos;s art is like meditation a sanctuary where mind and soul find harmony. Each painting becomes a
+          way of reliving a memory or expressing her innermost self, capturing emotions that transcend words. Her work
+          is not simply about creating visuals; it is about offering spaces where viewers can connect with something
+          deeply personal yet universally human.
         </p>
         <p>
           She views art as both personal and communal, a bridge that unites people with their own journeys while

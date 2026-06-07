@@ -63,7 +63,7 @@ const Navbar = () => {
   return (
     <header className='sticky top-0 z-40 backdrop-blur-xl bg-[#FFA501] border-b border-white/15'>
       <div className='mx-auto flex max-w-6xl items-center justify-between px-4 py-3 lg:px-6'>
-        <Link href='/' className='flex items-center gap-3'>
+        <Link href='/' className='flex items-center gap-24'>
           <Image
             src='/Icon.png'
             alt='Rakhis Studio Logo'
@@ -72,8 +72,8 @@ const Navbar = () => {
             height={1080}
           />
           <div>
-            <p className='text-xs uppercase tracking-[0.35em] text-black/60'>Rakhi&apos;s Studio</p>
-            <p className='font-display text-xl text-black font-semibold'>Online Gallery</p>
+            <p className='font-display text-xl text-black font-semibold'>Rakhi&apos;s Studio</p>
+            {/* <p className='font-display text-xl text-black font-semibold'>Online Gallery</p> */}
           </div>
         </Link>
 

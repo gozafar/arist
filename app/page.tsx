@@ -27,7 +27,7 @@ const HomePage = () => {
       {
         '@type': 'Review',
         'reviewBody':
-          'The curation feels museum-grade. Each piece has depth and soul, with colors that transform the room without overpowering it.',
+          'The curation feels museum grade. Each piece has depth and soul, with colors that transform the room without overpowering it.',
         'author': { '@type': 'Person', 'name': 'Rina Mehta' },
         'itemReviewed': { '@type': 'Organization', 'name': 'Rakhi Studio', 'url': siteUrl },
       },
